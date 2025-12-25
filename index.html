@@ -3,36 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Такси Екатеринбург</title>
+    <title>Такси MAX</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root {
-            --main-color: #fcc200; /* Желтый как у такси */
-            --bg-color: #f7f7f7;
-        }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg-color); margin: 0; padding: 15px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 400px; background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); box-sizing: border-box; }
-        h2 { text-align: center; margin-bottom: 20px; font-size: 20px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; color: #666; }
-        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; outline: none; }
-        input:focus { border-color: var(--main-color); }
-        
+        :root { --main-color: #fcc200; --bg-color: #f7f7f7; }
+        body { font-family: sans-serif; background: var(--bg-color); margin: 0; padding: 15px; }
+        .container { width: 100%; background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); box-sizing: border-box; }
+        h2 { text-align: center; margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #666; }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
         .price-section { background: #fffcf0; border: 2px solid var(--main-color); border-radius: 15px; padding: 15px; text-align: center; margin-bottom: 20px; }
-        .price-title { font-size: 14px; color: #886b00; margin-bottom: 5px; }
         .price-display { font-size: 36px; font-weight: 800; margin-bottom: 10px; }
-        
-        .controls { display: flex; justify-content: center; align-items: center; gap: 20px; }
-        .btn-round { width: 45px; height: 45px; border-radius: 50%; border: none; background: #eee; font-size: 24px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .btn-round:active { background: #ddd; }
-        
-        .payment-methods { display: flex; gap: 10px; margin-bottom: 20px; }
-        .pay-btn { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 10px; background: white; font-size: 14px; cursor: pointer; }
-        .pay-btn.active { background: var(--main-color); border-color: var(--main-color); font-weight: bold; }
-
-        .order-button { width: 100%; padding: 16px; background: #000; color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; }
-        .order-button:active { background: #333; }
-        
-        .hint { font-size: 12px; color: #999; text-align: center; margin-top: 10px; }
+        .controls { display: flex; justify-content: center; gap: 20px; }
+        .btn-round { width: 45px; height: 45px; border-radius: 50%; border: none; background: #eee; font-size: 24px; cursor: pointer; }
+        .order-button { width: 100%; padding: 16px; background: #000; color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -41,90 +25,54 @@
     <h2>Заказ такси 0%</h2>
     
     <label>Откуда</label>
-    <input type="text" id="from" placeholder="Улица, дом (например, Ленина 5)">
+    <input type="text" id="from" placeholder="Улица, дом">
     
     <label>Куда</label>
     <input type="text" id="to" placeholder="Куда едем?">
-    
-    <label>Примерное время в пути (минуты)</label>
-    <input type="number" id="minutes" placeholder="Например: 20" oninput="calculateRecommended()">
 
     <div class="price-section">
-        <div class="price-title">Рекомендовано системой</div>
+        <div style="font-size: 14px; color: #886b00;">Ваша цена за поездку</div>
         <div class="price-display" id="display_price">300 ₽</div>
         <div class="controls">
             <button class="btn-round" onclick="adjustPrice(-100)">−</button>
-            <span style="font-size: 18px; font-weight: bold;">Шаг 100₽</span>
             <button class="btn-round" onclick="adjustPrice(100)">+</button>
         </div>
     </div>
 
-    <label>Способ оплаты</label>
-    <div class="payment-methods">
-        <button id="cash" class="pay-btn active" onclick="selectPayment('Наличные')">💵 Наличные</button>
-        <button id="sbp" class="pay-btn" onclick="selectPayment('СБП перевод')">📲 СБП</button>
-    </div>
-
     <button class="order-button" onclick="confirmOrder()">ЗАКАЗАТЬ</button>
-    <div class="hint">Оплата водителю напрямую без комиссии</div>
 </div>
 
 <script>
     let tg = window.Telegram.WebApp;
-    tg.expand(); // Раскрыть на весь экран
+    tg.expand();
 
-    let currentPrice = 300;
-    let selectedMethod = "Наличные";
-
-    function calculateRecommended() {
-        let mins = document.getElementById('minutes').value;
-        if (mins > 0) {
-            // Логика: каждые 10 минут = 300р
-            currentPrice = Math.ceil(mins / 10) * 300;
-            if (currentPrice < 300) currentPrice = 300;
-            updatePriceUI();
-        }
-    }
+    let currentPrice = 300; // Начальная цена
 
     function adjustPrice(amount) {
-        if (currentPrice + amount >= 300) {
+        if (currentPrice + amount >= 100) {
             currentPrice += amount;
-            updatePriceUI();
+            document.getElementById('display_price').innerText = currentPrice + " ₽";
         }
-    }
-
-    function updatePriceUI() {
-        document.getElementById('display_price').innerText = currentPrice + " ₽";
-    }
-
-    function selectPayment(method) {
-        selectedMethod = method;
-        document.getElementById('cash').classList.toggle('active', method === 'Наличные');
-        document.getElementById('sbp').classList.toggle('active', method === 'СБП перевод');
     }
 
     function confirmOrder() {
         const from = document.getElementById('from').value;
         const to = document.getElementById('to').value;
-        const mins = document.getElementById('minutes').value;
 
-        if (!from || !to || !mins) {
-            alert("Пожалуйста, заполните все поля");
+        if (!from || !to) {
+            alert("Заполните адреса");
             return;
         }
 
         const orderData = {
             from: from,
             to: to,
-            estimated_time: mins,
-            price: currentPrice,
-            payment: selectedMethod
+            price: currentPrice
         };
 
-        tg.sendData(JSON.stringify(orderData)); // Отправка данных боту
-        tg.close(); // Закрыть Mini App
+        tg.sendData(JSON.stringify(orderData));
+        tg.close();
     }
 </script>
-
 </body>
 </html>
