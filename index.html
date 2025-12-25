@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Такси MAX Neon Full</title>
+    <title>Такси MAX Neon Luxury</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { 
@@ -15,14 +16,19 @@
             --input-bg: #252525;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+        }
 
         body { 
-            font-family: -apple-system, system-ui, sans-serif; 
+            /* Применение нового шрифта */
+            font-family: 'Montserrat', sans-serif; 
             background: var(--bg-dark); 
             color: var(--silver); 
             margin: 0; 
             padding: 10px 15px; 
+            letter-spacing: -0.2px;
         }
 
         .container { 
@@ -30,94 +36,106 @@
             background: var(--card-bg); 
             border-radius: 20px; 
             padding: 20px; 
-            box-shadow: 0 0 20px rgba(188, 19, 254, 0.15); 
-            border: 1px solid rgba(192, 192, 192, 0.1);
+            box-shadow: 0 0 25px rgba(188, 19, 254, 0.12); 
+            border: 1px solid rgba(192, 192, 192, 0.08);
         }
         
         .field-group { margin-bottom: 18px; position: relative; }
         .label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        
         label { 
-            font-size: 12px; 
-            font-weight: 700; 
+            font-size: 11px; 
+            font-weight: 800; /* Extra Bold для заголовков */
             color: var(--neon-yellow); 
             text-transform: uppercase; 
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
         }
 
         .remove-btn { color: #ff3b30; font-size: 18px; border: none; background: none; cursor: pointer; padding: 0 5px; }
         
         input, textarea { 
+            font-family: 'Montserrat', sans-serif;
             width: 100%; 
             padding: 14px; 
             border: 1px solid rgba(192, 192, 192, 0.2); 
             border-radius: 12px; 
-            font-size: 16px; 
+            font-size: 15px; 
+            font-weight: 400;
             outline: none; 
             background: var(--input-bg); 
             color: #fff; 
             transition: 0.3s; 
         }
-        input:focus { border-color: var(--neon-purple); box-shadow: 0 0 10px rgba(188, 19, 254, 0.4); }
+        input:focus { border-color: var(--neon-purple); box-shadow: 0 0 10px rgba(188, 19, 254, 0.3); }
 
-        .add-stop-btn { color: var(--neon-purple); font-size: 14px; font-weight: 600; border: none; background: none; padding: 10px 0; cursor: pointer; display: block; }
+        .add-stop-btn { 
+            font-family: 'Montserrat', sans-serif;
+            color: var(--neon-purple); 
+            font-size: 13px; 
+            font-weight: 600; 
+            border: none; 
+            background: none; 
+            padding: 10px 0; 
+            cursor: pointer; 
+            display: block; 
+        }
 
         .suggestions { 
             position: absolute; top: 100%; left: 0; right: 0; 
             background: #2a2a2a; border: 1px solid var(--neon-purple); 
             border-radius: 12px; z-index: 1000; display: none; 
             max-height: 200px; overflow-y: auto;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
         }
-        .suggestion-item { padding: 12px; border-bottom: 1px solid #333; color: #fff; font-size: 14px; cursor: pointer; }
-        .suggestion-item.geo-suggestion { color: var(--neon-yellow); font-weight: bold; background: rgba(252, 194, 0, 0.1); }
+        .suggestion-item { padding: 12px; border-bottom: 1px solid #333; color: #fff; font-size: 13px; cursor: pointer; }
+        .suggestion-item.geo-suggestion { color: var(--neon-yellow); font-weight: 800; background: rgba(252, 194, 0, 0.08); }
 
-        .photo-block { margin: 15px 0; }
         .file-input-label { 
             display: block; text-align: center; padding: 12px; 
             background: #252525; border: 1px dashed var(--silver); 
-            border-radius: 10px; font-size: 14px; cursor: pointer; color: var(--silver); 
+            border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--silver); 
         }
-        #photo-preview { font-size: 13px; color: #28a745; margin-top: 8px; display: none; text-align: center; font-weight: 600; }
+        #photo-preview { font-size: 12px; color: #28a745; margin-top: 8px; display: none; text-align: center; font-weight: 800; }
 
         .price-section { 
-            background: rgba(252, 194, 0, 0.03); 
+            background: rgba(252, 194, 0, 0.02); 
             border: 2px solid var(--neon-yellow); 
             border-radius: 18px; 
             padding: 15px; 
             margin: 20px 0; 
         }
         .price-container { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        
         .price-display { 
-            font-size: 36px; 
-            font-weight: 800; 
+            font-size: 38px; 
+            font-weight: 800; /* Самый жирный шрифт для цены */
             color: var(--neon-yellow); 
-            text-shadow: 0 0 10px rgba(252, 194, 0, 0.3);
+            text-shadow: 0 0 12px rgba(252, 194, 0, 0.4);
             flex-grow: 1;
             text-align: center;
         }
+        
         .btn-round { 
             width: 50px; height: 50px; border-radius: 50%; border: 1px solid var(--neon-purple); 
-            background: #252525; color: var(--neon-purple); font-size: 26px; cursor: pointer;
+            background: #252525; color: var(--neon-purple); font-size: 24px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
         }
 
-        .pay-row { 
-            display: flex; 
-            gap: 10px; 
-            margin-top: 10px;
-        }
+        .pay-row { display: flex; gap: 10px; margin-top: 10px; }
         .pay-btn { 
+            font-family: 'Montserrat', sans-serif;
             flex: 1;
             padding: 14px 5px; 
             border-radius: 12px; 
             border: 1px solid var(--silver); 
             background: var(--input-bg); 
-            font-size: 14px; 
-            font-weight: 600; 
+            font-size: 13px; 
+            font-weight: 700; 
             color: var(--silver);
             cursor: pointer; 
             text-align: center; 
             transition: 0.3s;
+            text-transform: uppercase;
         }
         .pay-btn.active { 
             border-color: var(--neon-purple); 
@@ -127,14 +145,16 @@
         }
 
         .order-button { 
+            font-family: 'Montserrat', sans-serif;
             width: 100%; padding: 20px; 
             background: var(--neon-yellow); 
             color: #000; border: none; 
-            border-radius: 15px; font-size: 20px; 
-            font-weight: 900; cursor: pointer; 
+            border-radius: 16px; font-size: 18px; 
+            font-weight: 800; cursor: pointer; 
             box-shadow: 0 0 20px rgba(252, 194, 0, 0.4);
             margin-top: 10px;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
     </style>
 </head>
@@ -158,13 +178,13 @@
 
     <div class="field-group">
         <label>Комментарий:</label>
-        <textarea id="comment" rows="1" placeholder="Подъезд, шлагбаум или пожелания..."></textarea>
+        <textarea id="comment" rows="1" placeholder="Ваши пожелания..."></textarea>
     </div>
 
     <div class="photo-block">
         <label class="file-input-label" for="photo-upload">📷 Фото места ожидания</label>
         <input type="file" id="photo-upload" accept="image/*" style="display:none" onchange="handlePhoto(this)">
-        <div id="photo-preview">✓ Фото прикреплено</div>
+        <div id="photo-preview">✓ ФОТО ПРИКРЕПЛЕНО</div>
     </div>
 
     <div class="price-section">
@@ -178,12 +198,12 @@
     <div class="payment-container">
         <label>Способ оплаты:</label>
         <div class="pay-row">
-            <div id="pay-cash" class="pay-btn active" onclick="setPayment('Наличные')">💵 Наличные</div>
-            <div id="pay-online" class="pay-btn" onclick="setPayment('Перевод')">📲 Перевод</div>
+            <div id="pay-cash" class="pay-btn active" onclick="setPayment('Наличные')">Наличные</div>
+            <div id="pay-online" class="pay-btn" onclick="setPayment('Перевод')">Перевод</div>
         </div>
     </div>
 
-    <button class="order-button" onclick="confirmOrder()">ЗАКАЗАТЬ</button>
+    <button class="order-button" onclick="confirmOrder()">ЗАКАЗАТЬ ТАКСИ</button>
 </div>
 
 <script>
@@ -192,12 +212,14 @@
     tg.setHeaderColor("#0d0d0d");
 
     const DADATA_API_KEY = "6f49e7177e36608d4139b823d71466c86bd7ca4f"; 
-
     let currentPrice = 300;
     let paymentMethod = 'Наличные';
     let photoAdded = false;
     let searchTimeout;
 
+    // Вся логика функций (showGeoPrompt, getCurrentLocation, getSuggestions, adjustPrice, setPayment, addExtraStop, confirmOrder) 
+    // остается без изменений из предыдущей сборки.
+    
     function showGeoPrompt(input) {
         if (input.value.length === 0) {
             const container = input.nextElementSibling;
@@ -303,7 +325,7 @@
     function confirmOrder() {
         const from = document.getElementById('from').value;
         const to = document.getElementById('to').value;
-        if (!from || !to) { tg.showAlert("Заполните основные адреса"); return; }
+        if (!from || !to) { tg.showAlert("Заполните адреса"); return; }
         const extra = document.querySelector('.extra-input')?.value || "";
         const orderData = {
             route: extra ? `${from} -> ${extra} -> ${to}` : `${from} -> ${to}`,
