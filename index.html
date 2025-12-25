@@ -16,13 +16,9 @@
             --input-bg: #252525;
         }
 
-        * { 
-            box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent; 
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body { 
-            /* Применение нового шрифта */
             font-family: 'Montserrat', sans-serif; 
             background: var(--bg-dark); 
             color: var(--silver); 
@@ -45,7 +41,7 @@
         
         label { 
             font-size: 11px; 
-            font-weight: 800; /* Extra Bold для заголовков */
+            font-weight: 800; 
             color: var(--neon-yellow); 
             text-transform: uppercase; 
             letter-spacing: 1.5px;
@@ -105,14 +101,10 @@
             margin: 20px 0; 
         }
         .price-container { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-        
         .price-display { 
-            font-size: 38px; 
-            font-weight: 800; /* Самый жирный шрифт для цены */
-            color: var(--neon-yellow); 
+            font-size: 38px; font-weight: 800; color: var(--neon-yellow); 
             text-shadow: 0 0 12px rgba(252, 194, 0, 0.4);
-            flex-grow: 1;
-            text-align: center;
+            flex-grow: 1; text-align: center;
         }
         
         .btn-round { 
@@ -123,38 +115,23 @@
 
         .pay-row { display: flex; gap: 10px; margin-top: 10px; }
         .pay-btn { 
-            font-family: 'Montserrat', sans-serif;
-            flex: 1;
-            padding: 14px 5px; 
-            border-radius: 12px; 
-            border: 1px solid var(--silver); 
-            background: var(--input-bg); 
-            font-size: 13px; 
-            font-weight: 700; 
-            color: var(--silver);
-            cursor: pointer; 
-            text-align: center; 
-            transition: 0.3s;
-            text-transform: uppercase;
+            font-family: 'Montserrat', sans-serif; flex: 1;
+            padding: 14px 5px; border-radius: 12px; 
+            border: 1px solid var(--silver); background: var(--input-bg); 
+            font-size: 13px; font-weight: 700; color: var(--silver);
+            cursor: pointer; text-align: center; transition: 0.3s; text-transform: uppercase;
         }
         .pay-btn.active { 
-            border-color: var(--neon-purple); 
-            background: var(--neon-purple); 
-            color: #fff; 
-            box-shadow: 0 0 15px rgba(188, 19, 254, 0.4);
+            border-color: var(--neon-purple); background: var(--neon-purple); 
+            color: #fff; box-shadow: 0 0 15px rgba(188, 19, 254, 0.4);
         }
 
         .order-button { 
             font-family: 'Montserrat', sans-serif;
-            width: 100%; padding: 20px; 
-            background: var(--neon-yellow); 
-            color: #000; border: none; 
-            border-radius: 16px; font-size: 18px; 
-            font-weight: 800; cursor: pointer; 
-            box-shadow: 0 0 20px rgba(252, 194, 0, 0.4);
-            margin-top: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            width: 100%; padding: 20px; background: var(--neon-yellow); 
+            color: #000; border: none; border-radius: 16px; font-size: 18px; 
+            font-weight: 800; cursor: pointer; box-shadow: 0 0 20px rgba(252, 194, 0, 0.4);
+            margin-top: 10px; text-transform: uppercase; letter-spacing: 1px;
         }
     </style>
 </head>
@@ -163,7 +140,7 @@
 <div class="container">
     <div class="field-group">
         <label>Откуда:</label>
-        <input type="text" id="from" placeholder="Улица и дом" autocomplete="off" onfocus="showGeoPrompt(this)" oninput="getSuggestions(this)">
+        <input type="text" id="from" placeholder="Улица и дом" autocomplete="off" onfocus="showGeoPrompt(this)" oninput="getSuggestions(this)" onkeydown="if(event.keyCode==13) this.blur()">
         <div class="suggestions"></div>
     </div>
 
@@ -172,13 +149,13 @@
     
     <div class="field-group">
         <label>Куда:</label>
-        <input type="text" id="to" placeholder="Конечный адрес" autocomplete="off" oninput="getSuggestions(this)">
+        <input type="text" id="to" placeholder="Конечный адрес" autocomplete="off" oninput="getSuggestions(this)" onkeydown="if(event.keyCode==13) this.blur()">
         <div class="suggestions"></div>
     </div>
 
     <div class="field-group">
         <label>Комментарий:</label>
-        <textarea id="comment" rows="1" placeholder="Ваши пожелания..."></textarea>
+        <textarea id="comment" rows="1" placeholder="Ваши пожелания..." onkeydown="if(event.keyCode==13) { this.blur(); return false; }"></textarea>
     </div>
 
     <div class="photo-block">
@@ -217,9 +194,21 @@
     let photoAdded = false;
     let searchTimeout;
 
-    // Вся логика функций (showGeoPrompt, getCurrentLocation, getSuggestions, adjustPrice, setPayment, addExtraStop, confirmOrder) 
-    // остается без изменений из предыдущей сборки.
-    
+    // ОБЪЕДИНЕННОЕ СКРЫТИЕ КЛАВИАТУРЫ (Клик по фону и Скролл)
+    document.addEventListener('click', function(e) {
+        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+                document.activeElement.blur();
+            }
+        }
+    });
+
+    window.addEventListener('scroll', function() {
+        if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+            document.activeElement.blur();
+        }
+    });
+
     function showGeoPrompt(input) {
         if (input.value.length === 0) {
             const container = input.nextElementSibling;
@@ -303,7 +292,7 @@
         div.id = 'stop-group';
         div.innerHTML = `
             <div class="label-row"><label>Промежуточный адрес:</label><button class="remove-btn" onclick="removeStop()">✕</button></div>
-            <input type="text" class="extra-input" placeholder="Введите адрес" autocomplete="off" oninput="getSuggestions(this)">
+            <input type="text" class="extra-input" placeholder="Введите адрес" autocomplete="off" oninput="getSuggestions(this)" onkeydown="if(event.keyCode==13) this.blur()">
             <div class="suggestions"></div>
         `;
         container.appendChild(div);
