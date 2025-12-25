@@ -15,12 +15,12 @@
         label { font-size: 14px; font-weight: 600; color: #444; }
         .remove-btn { color: #ff3b30; font-size: 12px; font-weight: 600; border: none; background: none; cursor: pointer; }
         
-        input, textarea { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 12px; font-size: 16px; box-sizing: border-box; outline: none; background: #fafafa; }
+        input, textarea { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 12px; font-size: 16px; box-sizing: border-box; outline: none; background: #fafafa; transition: 0.2s; }
         input:focus, textarea:focus { border-color: var(--main-color); background: #fff; }
 
         .add-stop-btn { color: #007bff; font-size: 15px; font-weight: 600; border: none; background: none; padding: 10px 0; cursor: pointer; margin-bottom: 15px; display: block; }
 
-        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 0 0 12px 12px; z-index: 1000; max-height: 200px; overflow-y: auto; box-shadow: 0 8px 15px rgba(0,0,0,0.1); display: none; }
+        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 0 0 12px 12px; z-index: 1000; max-height: 220px; overflow-y: auto; box-shadow: 0 8px 15px rgba(0,0,0,0.1); display: none; }
         .suggestion-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #f5f5f5; font-size: 14px; color: #333; line-height: 1.4; }
         .suggestion-item:active { background: #f0f0f0; }
 
@@ -35,9 +35,10 @@
         .price-section { background: #fffcf0; border: 2px solid var(--main-color); border-radius: 18px; padding: 20px; text-align: center; margin-top: 30px; margin-bottom: 25px; }
         .price-display { font-size: 38px; font-weight: 800; margin-bottom: 15px; }
         .controls { display: flex; justify-content: center; gap: 25px; }
-        .btn-round { width: 50px; height: 50px; border-radius: 50%; border: none; background: #fff; font-size: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer; }
+        .btn-round { width: 50px; height: 50px; border-radius: 50%; border: none; background: #fff; font-size: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer; display: flex; align-items: center; justify-content: center; }
         
-        .order-button { width: 100%; padding: 18px; background: #000; color: white; border: none; border-radius: 15px; font-size: 18px; font-weight: 700; cursor: pointer; }
+        .order-button { width: 100%; padding: 18px; background: #000; color: white; border: none; border-radius: 15px; font-size: 18px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .order-button:active { transform: scale(0.98); opacity: 0.9; }
     </style>
 </head>
 <body>
@@ -93,10 +94,10 @@
     let currentPrice = 300;
     let paymentMethod = 'Наличные';
     let photoAdded = false;
+    let searchTimeout;
 
-    // ГЕО-НАСТРОЙКИ (Екатеринбург как приоритет)
-    const CITY_QUERY = "Екатеринбург";
-    const VIEWBOX = "60.40,56.70,60.80,56.95"; // Ограничение поиска районом города
+    // Настройка приоритета города
+    const CITY_NAME = "Екатеринбург";
 
     function adjustPrice(amount) {
         if (currentPrice + amount >= 100) {
@@ -130,53 +131,75 @@
         document.getElementById('add-btn').style.display = 'block';
     }
 
-    function tryAutoLocation() {
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
-            const data = await res.json();
-            if (data.address) {
-                const street = data.address.road || data.address.pedestrian || "";
-                const house = data.address.house_number || "";
-                document.getElementById('from').value = house ? `${street}, ${house}` : street;
-            }
-        }, null, {enableHighAccuracy: true});
+    // Улучшенный поиск адресов
+    async function getSuggestions(input) {
+        const query = input.value.trim();
+        const container = input.nextElementSibling;
+
+        if (query.length < 3) {
+            container.style.display = 'none';
+            return;
+        }
+
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(async () => {
+            try {
+                // Добавляем город в запрос для Nominatim
+                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(CITY_NAME + ' ' + query)}&addressdetails=1&limit=8&accept-language=ru&countrycodes=ru`;
+                
+                const res = await fetch(url, { headers: { 'User-Agent': 'TaxiApp' } });
+                const data = await res.json();
+
+                container.innerHTML = '';
+
+                if (data && data.length > 0) {
+                    const seen = new Set();
+                    const filtered = data.map(item => {
+                        const a = item.address;
+                        // Выбираем наиболее подходящее поле для улицы
+                        const street = a.road || a.pedestrian || a.street || a.suburb || "";
+                        const house = a.house_number || "";
+                        if (!street) return null;
+                        
+                        return house ? `${street}, ${house}` : street;
+                    }).filter(item => {
+                        if (!item || seen.has(item)) return false;
+                        seen.add(item);
+                        return true;
+                    });
+
+                    if (filtered.length > 0) {
+                        container.style.display = 'block';
+                        filtered.forEach(text => {
+                            const div = document.createElement('div');
+                            div.className = 'suggestion-item';
+                            div.innerText = text;
+                            div.onclick = () => {
+                                input.value = text;
+                                container.style.display = 'none';
+                            };
+                            container.appendChild(div);
+                        });
+                    } else { container.style.display = 'none'; }
+                } else { container.style.display = 'none'; }
+            } catch (e) { console.error(e); }
+        }, 400); // Оптимальная задержка для Nominatim
     }
 
-    async function getSuggestions(input) {
-        const query = input.value;
-        const container = input.nextElementSibling;
-        if (query.length < 2) { container.style.display = 'none'; return; }
-
-        try {
-            // Ищем сначала в пределах города через viewbox и bounded=1
-            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(CITY_QUERY + ' ' + query)}&addressdetails=1&limit=6&viewbox=${VIEWBOX}&bounded=0&accept-language=ru`;
-            const res = await fetch(url);
-            const data = await res.json();
-            
-            container.innerHTML = '';
-            if (data && data.length > 0) {
-                container.style.display = 'block';
-                data.forEach(item => {
-                    const addr = item.address;
-                    const street = addr.road || addr.pedestrian || addr.suburb || addr.city_district || "";
-                    const house = addr.house_number || "";
-                    
+    function tryAutoLocation() {
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&accept-language=ru`);
+                const data = await res.json();
+                if (data.address) {
+                    const street = data.address.road || data.address.pedestrian || "";
+                    const house = data.address.house_number || "";
                     if (street) {
-                        const displayLabel = house ? `${street}, ${house}` : street;
-                        const div = document.createElement('div');
-                        div.className = 'suggestion-item';
-                        div.innerText = displayLabel;
-                        div.onclick = () => { 
-                            input.value = displayLabel; 
-                            container.style.display = 'none'; 
-                        };
-                        container.appendChild(div);
+                        document.getElementById('from').value = house ? `${street}, ${house}` : street;
                     }
-                });
-            } else {
-                container.style.display = 'none';
-            }
-        } catch (e) { console.error(e); }
+                }
+            } catch(e) {}
+        }, null, {enableHighAccuracy: true});
     }
 
     function handlePhoto(input) {
@@ -191,7 +214,7 @@
         const to = document.getElementById('to').value;
         const extra = document.querySelector('.extra-input')?.value || "";
         const comment = document.getElementById('comment').value;
-        if (!from || !to) { alert("Заполните адреса"); return; }
+        if (!from || !to) { alert("Пожалуйста, заполните адреса"); return; }
         
         const orderData = {
             route: extra ? `${from} ➔ ${extra} ➔ ${to}` : `${from} ➔ ${to}`,
@@ -200,6 +223,7 @@
             comment: comment,
             photo: photoAdded ? "Прикреплено" : "Нет"
         };
+        
         tg.sendData(JSON.stringify(orderData));
         tg.close();
     }
