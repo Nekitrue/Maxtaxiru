@@ -3,252 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Такси MAX Neon Light</title>
+    <title>Такси MAX</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/polyline/1.1.0/polyline.js"></script>
     <style>
-        :root { 
-            --neon-blue: #00f2ff; 
-            --neon-pink: #ff00ff; 
-            --bg-dark: #0d0d0d; 
-            --card-bg: #1a1a1a;
-            --input-bg: rgba(255, 255, 255, 0.07);
-        }
+        :root { --main-color: #fcc200; --bg-color: #f7f7f7; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg-color); margin: 0; padding: 10px 15px; }
+        .container { width: 100%; background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); box-sizing: border-box; margin-top: 5px; }
         
-        * { box-sizing: border-box; } /* Предотвращает наползание за счет учета внутренних отступов */
-
-        body { 
-            font-family: 'Segoe UI', Roboto, sans-serif; 
-            background: var(--bg-dark); 
-            color: #e0e0e0;
-            margin: 0; padding: 10px; 
-            display: flex; flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .container { 
-            width: 100%; background: var(--card-bg); 
-            border-radius: 25px; padding: 15px; 
-            border: 1px solid rgba(0, 242, 255, 0.2);
-            padding-bottom: 30px; /* Отступ снизу для комфортного скролла */
-        }
-
-        #map { 
-            height: 220px; width: 100%; 
-            border-radius: 18px; margin-bottom: 20px; 
-            border: 2px solid var(--neon-blue);
-            box-shadow: 0 0 10px var(--neon-blue);
-            z-index: 1;
-        }
-
-        .field-group { margin-bottom: 18px; position: relative; z-index: 5; }
-        label { font-size: 11px; color: var(--neon-blue); font-weight: bold; margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+        .field-group { margin-bottom: 18px; position: relative; }
+        .label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        label { font-size: 14px; font-weight: 600; color: #444; }
+        .remove-btn { color: #ff3b30; font-size: 12px; font-weight: 600; border: none; background: none; cursor: pointer; }
         
-        input { 
-            width: 100%; padding: 12px 15px; 
-            border: 1px solid rgba(255, 255, 255, 0.15); 
-            border-radius: 12px; font-size: 15px; 
-            outline: none; background: var(--input-bg); 
-            color: white; transition: 0.2s;
-        }
-        input:focus { border-color: var(--neon-pink); background: rgba(255, 255, 255, 0.1); }
+        input, textarea { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 12px; font-size: 16px; box-sizing: border-box; outline: none; background: #fafafa; transition: 0.2s; }
+        input:focus { border-color: var(--main-color); background: #fff; }
 
-        .suggestions { 
-            position: absolute; top: 100%; left: 0; right: 0; 
-            background: #222; border: 1px solid var(--neon-blue); 
-            border-radius: 10px; z-index: 1000; 
-            max-height: 180px; overflow-y: auto; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-        }
-        .suggestion-item { padding: 12px; border-bottom: 1px solid #333; font-size: 13px; cursor: pointer; }
-        .geo-item { color: var(--neon-blue); font-weight: bold; }
+        .add-stop-btn { color: #007bff; font-size: 15px; font-weight: 600; border: none; background: none; padding: 10px 0; cursor: pointer; margin-bottom: 15px; display: block; }
 
-        .price-section { 
-            background: #111; border-radius: 18px; padding: 15px; 
-            text-align: center; border: 1px solid var(--neon-pink);
-            margin-top: 10px; margin-bottom: 20px;
-        }
-        .price-display { font-size: 32px; font-weight: 900; color: var(--neon-pink); text-shadow: 0 0 8px var(--neon-pink); }
+        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 0 0 12px 12px; z-index: 1000; max-height: 220px; overflow-y: auto; box-shadow: 0 8px 15px rgba(0,0,0,0.1); display: none; }
+        .suggestion-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #f5f5f5; font-size: 14px; color: #333; line-height: 1.4; }
+        .suggestion-item.geo-suggestion { color: #007bff; font-weight: 600; background: #f0f7ff; }
+
+        .photo-block { margin: 15px 0; }
+        .file-input-label { display: block; text-align: center; padding: 12px; background: #f0f0f0; border: 1px dashed #ccc; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; color: #555; transition: 0.3s; }
+        #photo-preview { font-size: 13px; color: #28a745; margin-top: 8px; display: none; text-align: center; font-weight: 600; }
+
+        .price-section { background: #fffcf0; border: 2px solid var(--main-color); border-radius: 18px; padding: 20px; text-align: center; margin-top: 20px; margin-bottom: 25px; }
+        .price-display { font-size: 38px; font-weight: 800; margin-bottom: 15px; }
+        .controls { display: flex; justify-content: center; gap: 25px; }
+        .btn-round { width: 50px; height: 50px; border-radius: 50%; border: none; background: #fff; font-size: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer; display: flex; align-items: center; justify-content: center; }
         
-        .controls { display: flex; justify-content: center; gap: 25px; margin-top: 8px; }
-        .btn-round { 
-            width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--neon-blue); 
-            background: transparent; color: var(--neon-blue); font-size: 22px; cursor: pointer;
-        }
+        .pay-btn { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid #eee; background: #fafafa; font-size: 15px; font-weight: 600; cursor: pointer; text-align: center; margin-bottom: 10px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .pay-btn.active { border-color: var(--main-color); background: var(--main-color); color: #000; transform: scale(1.05); box-shadow: 0 5px 15px rgba(252, 194, 0, 0.3); }
 
-        .order-button { 
-            width: 100%; padding: 16px; background: transparent; 
-            color: var(--neon-blue); border: 2px solid var(--neon-blue); 
-            border-radius: 15px; font-size: 18px; font-weight: 800; 
-            text-transform: uppercase; box-shadow: 0 0 12px var(--neon-blue);
-        }
-
-        .custom-marker div {
-            background: var(--neon-pink); width: 14px; height: 14px; 
-            border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 8px var(--neon-pink);
-        }
+        .order-button { width: 100%; padding: 18px; background: #000; color: white; border: none; border-radius: 15px; font-size: 18px; font-weight: 700; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div id="map"></div>
-
     <div class="field-group">
         <label>Откуда:</label>
-        <input type="text" id="from" placeholder="Точка А" autocomplete="off" onclick="showGeoPrompt(this)" oninput="getSuggestions(this, 'from')">
-        <div class="suggestions" style="display:none"></div>
+        <input type="text" id="from" placeholder="Улица и дом" autocomplete="off" onfocus="showGeoPrompt(this)" oninput="getSuggestions(this)">
+        <div class="suggestions"></div>
+    </div>
+
+    <div id="extra-stops"></div>
+    <button class="add-stop-btn" id="add-btn" onclick="addExtraStop()">+ Добавить адрес</button>
+    
+    <div class="field-group">
+        <label>Куда:</label>
+        <input type="text" id="to" placeholder="Куда едем?" autocomplete="off" oninput="getSuggestions(this)">
+        <div class="suggestions"></div>
     </div>
 
     <div class="field-group">
-        <label>Куда:</label>
-        <input type="text" id="to" placeholder="Точка Б" autocomplete="off" oninput="getSuggestions(this, 'to')">
-        <div class="suggestions" style="display:none"></div>
+        <label>Комментарий водителю:</label>
+        <textarea id="comment" rows="2" placeholder="..."></textarea>
+    </div>
+
+    <div class="photo-block">
+        <label class="file-input-label" for="photo-upload">📷 Прикрепить фото места</label>
+        <input type="file" id="photo-upload" accept="image/*" style="display:none" onchange="handlePhoto(this)">
+        <div id="photo-preview">✓ Фото прикреплено</div>
     </div>
 
     <div class="price-section">
         <div class="price-display" id="display_price">300 ₽</div>
         <div class="controls">
-            <button class="btn-round" onclick="adjustPrice(-50)">−</button>
-            <button class="btn-round" onclick="adjustPrice(50)">+</button>
+            <button class="btn-round" onclick="adjustPrice(-100)">−</button>
+            <button class="btn-round" onclick="adjustPrice(100)">+</button>
         </div>
     </div>
 
-    <button class="order-button" onclick="confirmOrder()">Заказать</button>
+    <div class="payment-container">
+        <label style="display:block; margin-bottom:10px;">Способ оплаты:</label>
+        <div id="pay-cash" class="pay-btn active" onclick="setPayment('Наличные')">💵 Наличные</div>
+        <div id="pay-online" class="pay-btn" onclick="setPayment('Онлайн перевод водителю')">📲 Онлайн перевод водителю</div>
+    </div>
+
+    <button class="order-button" onclick="confirmOrder()">ЗАКАЗАТЬ</button>
 </div>
 
 <script>
     let tg = window.Telegram.WebApp;
     tg.expand();
-    tg.setHeaderColor("#0d0d0d");
 
     const DADATA_API_KEY = "6f49e7177e36608d4139b823d71466c86bd7ca4f"; 
+
     let currentPrice = 300;
-    let routePolyline = null;
-    let markerFrom, markerTo;
-    let coords = { from: null, to: null };
+    let paymentMethod = 'Наличные';
+    let photoAdded = false;
+    let searchTimeout;
 
-    // Светлая карта с видимыми домами (CartoDB Voyager)
-    const map = L.map('map', { zoomControl: false }).setView([56.8389, 60.6057], 13);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '©OpenStreetMap ©CartoDB'
-    }).addTo(map);
-
-    function createIcon(color) {
-        return L.divIcon({
-            className: 'custom-marker',
-            html: `<div style="background:${color}"></div>`
-        });
-    }
-
-    markerFrom = L.marker([56.8389, 60.6057], { icon: createIcon('var(--neon-pink)') }).addTo(map);
-    markerTo = L.marker([0,0], { icon: createIcon('var(--neon-blue)') });
-
-    map.on('click', e => {
-        markerFrom.setLatLng(e.latlng);
-        coords.from = [e.latlng.lat, e.latlng.lng];
-        reverseGeocode(e.latlng.lat, e.latlng.lng, 'from');
-    });
-
+    // Показать предложение определить геолокацию при фокусе
     function showGeoPrompt(input) {
-        const container = input.nextElementSibling;
         if (input.value.length === 0) {
-            container.innerHTML = `<div class="suggestion-item geo-item" onclick="detectMyLocation()">📍 Моё местоположение</div>`;
+            const container = input.nextElementSibling;
+            container.innerHTML = '<div class="suggestion-item geo-suggestion" onclick="getCurrentLocation()">📍 Определить моё местоположение</div>';
             container.style.display = 'block';
         }
     }
 
-    function detectMyLocation() {
-        if (!navigator.geolocation) return;
-        document.getElementById('from').nextElementSibling.style.display = 'none';
-        navigator.geolocation.getCurrentPosition(pos => {
-            const lat = pos.coords.latitude;
-            const lon = pos.coords.longitude;
-            coords.from = [lat, lon];
-            markerFrom.setLatLng([lat, lon]);
-            map.setView([lat, lon], 16);
-            reverseGeocode(lat, lon, 'from');
-        });
-    }
+    function getCurrentLocation() {
+        const fromInput = document.getElementById('from');
+        const container = fromInput.nextElementSibling;
+        container.style.display = 'none';
 
-    async function reverseGeocode(lat, lon, fieldId) {
-        const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": "Token " + DADATA_API_KEY },
-            body: JSON.stringify({ lat, lon })
-        });
-        const data = await res.json();
-        if (data.suggestions?.length) {
-            document.getElementById(fieldId).value = data.suggestions[0].value;
-            updateRoute();
-        }
-    }
-
-    async function getSuggestions(input, fieldId) {
-        const container = input.nextElementSibling;
-        if (input.value.length < 3) { 
-            if (input.value.length === 0 && fieldId === 'from') showGeoPrompt(input);
-            else container.style.display = 'none'; 
-            return; 
-        }
-        clearTimeout(input.timer);
-        input.timer = setTimeout(async () => {
-            const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "Authorization": "Token " + DADATA_API_KEY },
-                body: JSON.stringify({ query: input.value, count: 5 })
-            });
-            const data = await res.json();
-            container.innerHTML = '';
-            container.style.display = 'block';
-            data.suggestions.forEach(s => {
-                const div = document.createElement('div');
-                div.className = 'suggestion-item';
-                div.innerText = s.value;
-                div.onclick = () => {
-                    input.value = s.value;
-                    container.style.display = 'none';
-                    coords[fieldId] = [parseFloat(s.data.geo_lat), parseFloat(s.data.geo_lon)];
-                    if(fieldId === 'to') {
-                        markerTo.setLatLng(coords.to).addTo(map);
-                    } else {
-                        markerFrom.setLatLng(coords.from);
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                
+                try {
+                    const response = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Accept": "application/json",
+                            "Authorization": "Token " + DADATA_API_KEY
+                        },
+                        body: JSON.stringify({ lat: lat, lon: lon })
+                    });
+                    const result = await response.json();
+                    if (result.suggestions && result.suggestions.length > 0) {
+                        const addr = result.suggestions[0].value.replace("Россия, Свердловская обл, г Екатеринбург, ", "");
+                        fromInput.value = addr;
                     }
-                    updateRoute();
-                };
-                container.appendChild(div);
+                } catch (e) {
+                    console.error("Geo error");
+                }
+            }, () => {
+                alert("Разрешите доступ к GPS в настройках");
             });
-        }, 400);
-    }
-
-    async function updateRoute() {
-        if (!coords.from || !coords.to) return;
-        const url = `https://router.project-osrm.org/route/v1/driving/${coords.from[1]},${coords.from[0]};${coords.to[1]},${coords.to[0]}?overview=full`;
-        const res = await fetch(url);
-        const data = await res.json();
-        if (data.routes?.length) {
-            if (routePolyline) map.removeLayer(routePolyline);
-            const points = polyline.decode(data.routes[0].geometry);
-            routePolyline = L.polyline(points, {
-                color: '#0070ff', weight: 6, opacity: 0.8,
-                dashArray: '10, 15'
-            }).addTo(map);
-            map.fitBounds(routePolyline.getBounds(), { padding: [40, 40] });
         }
     }
 
-    function adjustPrice(val) {
-        currentPrice = Math.max(100, currentPrice + val);
-        document.getElementById('display_price').innerText = currentPrice + " ₽";
+    function adjustPrice(amount) {
+        if (currentPrice + amount >= 100) {
+            currentPrice += amount;
+            document.getElementById('display_price').innerText = currentPrice + " ₽";
+        }
+    }
+
+    function setPayment(method) {
+        paymentMethod = method;
+        document.getElementById('pay-cash').classList.toggle('active', method === 'Наличные');
+        document.getElementById('pay-online').classList.toggle('active', method === 'Онлайн перевод водителю');
+    }
+
+    function addExtraStop() {
+        const container = document.getElementById('extra-stops');
+        const div = document.createElement('div');
+        div.className = 'field-group';
+        div.id = 'stop-group';
+        div.innerHTML = `
+            <div class="label-row"><label>Заехать:</label><button class="remove-btn" onclick="removeStop()">✕</button></div>
+            <input type="text" class="extra-input" placeholder="Введите адрес" autocomplete="off" oninput="getSuggestions(this)">
+            <div class="suggestions"></div>
+        `;
+        container.appendChild(div);
+        document.getElementById('add-btn').style.display = 'none';
+    }
+
+    function removeStop() {
+        document.getElementById('stop-group').remove();
+        document.getElementById('add-btn').style.display = 'block';
+    }
+
+    async function getSuggestions(input) {
+        const query = input.value;
+        const container = input.nextElementSibling;
+        
+        if (query.length < 3) {
+            if (input.id === 'from' && query.length === 0) showGeoPrompt(input);
+            else container.style.display = 'none';
+            return;
+        }
+
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(async () => {
+            try {
+                const response = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "Authorization": "Token " + DADATA_API_KEY
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        count: 6,
+                        from_bound: { value: "city" },
+                        to_bound: { value: "house" },
+                        locations: [{ city: "Екатеринбург" }]
+                    })
+                });
+                const result = await response.json();
+                container.innerHTML = '';
+                if (result.suggestions && result.suggestions.length > 0) {
+                    container.style.display = 'block';
+                    result.suggestions.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'suggestion-item';
+                        const cleanAddr = item.value.replace("Россия, Свердловская обл, г Екатеринбург, ", "");
+                        div.innerText = cleanAddr;
+                        div.onclick = () => { 
+                            input.value = cleanAddr; 
+                            container.style.display = 'none'; 
+                        };
+                        container.appendChild(div);
+                    });
+                }
+            } catch (e) {}
+        }, 300);
+    }
+
+    function handlePhoto(input) {
+        if (input.files && input.files[0]) {
+            photoAdded = true;
+            document.getElementById('photo-preview').style.display = 'block';
+        }
     }
 
     function confirmOrder() {
         const from = document.getElementById('from').value;
         const to = document.getElementById('to').value;
-        if (!from || !to) return tg.showAlert("Заполните адреса");
-        tg.sendData(JSON.stringify({ from, to, price: currentPrice, coords }));
+        if (!from || !to) { alert("Заполните адреса"); return; }
+        
+        const extra = document.querySelector('.extra-input')?.value || "";
+        const orderData = {
+            route: extra ? `${from} ➔ ${extra} ➔ ${to}` : `${from} ➔ ${to}`,
+            price: currentPrice,
+            pay: paymentMethod,
+            comment: document.getElementById('comment').value,
+            photo: photoAdded ? "Прикреплено" : "Нет"
+        };
+        tg.sendData(JSON.stringify(orderData));
         tg.close();
     }
 </script>
