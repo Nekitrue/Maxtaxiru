@@ -194,7 +194,7 @@
     let photoAdded = false;
     let searchTimeout;
 
-    // ОБЪЕДИНЕННОЕ СКРЫТИЕ КЛАВИАТУРЫ (Клик по фону и Скролл)
+    // Скрытие клавиатуры
     document.addEventListener('click', function(e) {
         if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
             if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
@@ -217,6 +217,12 @@
         }
     }
 
+    // ОЧИСТКА АДРЕСА ОТ ГОРОДА
+    function cleanAddress(fullAddr) {
+        // Убираем страну, область и город (оставляет только улицу и дом)
+        return fullAddr.replace(/.*?г Екатеринбург,\s*/, "").replace(/Россия,\s*/, "").replace(/.*?обл,\s*/, "");
+    }
+
     function getCurrentLocation() {
         const fromInput = document.getElementById('from');
         fromInput.nextElementSibling.style.display = 'none';
@@ -232,7 +238,8 @@
                     });
                     const result = await response.json();
                     if (result.suggestions?.length > 0) {
-                        fromInput.value = result.suggestions[0].value.replace("Россия, Свердловская обл, г Екатеринбург, ", "");
+                        // Применяем функцию очистки адреса
+                        fromInput.value = cleanAddress(result.suggestions[0].value);
                     }
                 } catch (e) {}
             }, () => alert("Включите GPS"));
@@ -262,9 +269,10 @@
                     result.suggestions.forEach(item => {
                         const div = document.createElement('div');
                         div.className = 'suggestion-item';
-                        const cleanAddr = item.value.replace("Россия, Свердловская обл, г Екатеринбург, ", "");
-                        div.innerText = cleanAddr;
-                        div.onclick = () => { input.value = cleanAddr; container.style.display = 'none'; };
+                        // Также очищаем подсказки для единообразия
+                        const cleanAddrItem = cleanAddress(item.value);
+                        div.innerText = cleanAddrItem;
+                        div.onclick = () => { input.value = cleanAddrItem; container.style.display = 'none'; };
                         container.appendChild(div);
                     });
                 }
