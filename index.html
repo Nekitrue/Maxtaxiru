@@ -79,7 +79,6 @@
         }
         #photo-preview { font-size: 13px; color: #28a745; margin-top: 8px; display: none; text-align: center; font-weight: 600; }
 
-        /* БЛОК ЦЕНЫ */
         .price-section { 
             background: rgba(252, 194, 0, 0.03); 
             border: 2px solid var(--neon-yellow); 
@@ -102,7 +101,6 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* СПОСОБ ОПЛАТЫ - КНОПКИ В ОДНУ ЛИНИЮ */
         .pay-row { 
             display: flex; 
             gap: 10px; 
@@ -150,7 +148,7 @@
     </div>
 
     <div id="extra-stops"></div>
-    <button class="add-stop-btn" id="add-btn" onclick="addExtraStop()">+ Заехать еще куда-то</button>
+    <button class="add-stop-btn" id="add-btn" onclick="addExtraStop()">+ Добавить промежуточный адрес</button>
     
     <div class="field-group">
         <label>Куда:</label>
@@ -164,7 +162,7 @@
     </div>
 
     <div class="photo-block">
-        <label class="file-input-label" for="photo-upload">📷 Фото места (если нужно)</label>
+        <label class="file-input-label" for="photo-upload">📷 Фото места ожидания</label>
         <input type="file" id="photo-upload" accept="image/*" style="display:none" onchange="handlePhoto(this)">
         <div id="photo-preview">✓ Фото прикреплено</div>
     </div>
@@ -200,8 +198,6 @@
     let photoAdded = false;
     let searchTimeout;
 
-    // --- ФУНКЦИИ ГЕО И API ---
-
     function showGeoPrompt(input) {
         if (input.value.length === 0) {
             const container = input.nextElementSibling;
@@ -213,7 +209,6 @@
     function getCurrentLocation() {
         const fromInput = document.getElementById('from');
         fromInput.nextElementSibling.style.display = 'none';
-
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(async (position) => {
                 const lat = position.coords.latitude;
@@ -241,7 +236,6 @@
             else container.style.display = 'none';
             return;
         }
-
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(async () => {
             try {
@@ -267,8 +261,6 @@
         }, 300);
     }
 
-    // --- ЛОГИКА ИНТЕРФЕЙСА ---
-
     function adjustPrice(amount) {
         if (currentPrice + amount >= 100) {
             currentPrice += amount;
@@ -288,8 +280,8 @@
         div.className = 'field-group';
         div.id = 'stop-group';
         div.innerHTML = `
-            <div class="label-row"><label>Заехать:</label><button class="remove-btn" onclick="removeStop()">✕</button></div>
-            <input type="text" class="extra-input" placeholder="Адрес остановки" autocomplete="off" oninput="getSuggestions(this)">
+            <div class="label-row"><label>Промежуточный адрес:</label><button class="remove-btn" onclick="removeStop()">✕</button></div>
+            <input type="text" class="extra-input" placeholder="Введите адрес" autocomplete="off" oninput="getSuggestions(this)">
             <div class="suggestions"></div>
         `;
         container.appendChild(div);
@@ -312,7 +304,6 @@
         const from = document.getElementById('from').value;
         const to = document.getElementById('to').value;
         if (!from || !to) { tg.showAlert("Заполните основные адреса"); return; }
-        
         const extra = document.querySelector('.extra-input')?.value || "";
         const orderData = {
             route: extra ? `${from} -> ${extra} -> ${to}` : `${from} -> ${to}`,
