@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Такси MAX Neon</title>
+    <title>Такси MAX Neon Light</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -14,82 +14,80 @@
             --neon-pink: #ff00ff; 
             --bg-dark: #0d0d0d; 
             --card-bg: #1a1a1a;
-            --text-color: #e0e0e0;
+            --input-bg: rgba(255, 255, 255, 0.07);
         }
         
+        * { box-sizing: border-box; } /* Предотвращает наползание за счет учета внутренних отступов */
+
         body { 
             font-family: 'Segoe UI', Roboto, sans-serif; 
             background: var(--bg-dark); 
-            color: var(--text-color);
+            color: #e0e0e0;
             margin: 0; padding: 10px; 
             display: flex; flex-direction: column;
-            min-height: 100vh; overflow-x: hidden;
+            min-height: 100vh;
         }
 
         .container { 
             width: 100%; background: var(--card-bg); 
-            border-radius: 25px; padding: 20px; 
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
+            border-radius: 25px; padding: 15px; 
             border: 1px solid rgba(0, 242, 255, 0.2);
-            box-sizing: border-box;
+            padding-bottom: 30px; /* Отступ снизу для комфортного скролла */
         }
 
         #map { 
-            height: 250px; width: 100%; 
-            border-radius: 20px; margin-bottom: 15px; 
+            height: 220px; width: 100%; 
+            border-radius: 18px; margin-bottom: 20px; 
             border: 2px solid var(--neon-blue);
-            box-shadow: 0 0 15px var(--neon-blue);
-            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+            box-shadow: 0 0 10px var(--neon-blue);
             z-index: 1;
         }
 
-        .field-group { margin-bottom: 20px; position: relative; z-index: 10; }
-        label { font-size: 13px; color: var(--neon-blue); font-weight: bold; margin-bottom: 8px; display: block; text-transform: uppercase; }
+        .field-group { margin-bottom: 18px; position: relative; z-index: 5; }
+        label { font-size: 11px; color: var(--neon-blue); font-weight: bold; margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
         
         input { 
-            width: 100%; padding: 14px; 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 12px; font-size: 16px; 
-            box-sizing: border-box; outline: none; 
-            background: rgba(255, 255, 255, 0.05); 
-            color: var(--text-color); transition: 0.3s;
+            width: 100%; padding: 12px 15px; 
+            border: 1px solid rgba(255, 255, 255, 0.15); 
+            border-radius: 12px; font-size: 15px; 
+            outline: none; background: var(--input-bg); 
+            color: white; transition: 0.2s;
         }
-        input:focus { border-color: var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink); }
+        input:focus { border-color: var(--neon-pink); background: rgba(255, 255, 255, 0.1); }
 
         .suggestions { 
             position: absolute; top: 100%; left: 0; right: 0; 
-            background: #1a1a1a; border: 1px solid var(--neon-blue); 
-            border-radius: 12px; z-index: 1000; 
-            max-height: 200px; overflow-y: auto; 
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            background: #222; border: 1px solid var(--neon-blue); 
+            border-radius: 10px; z-index: 1000; 
+            max-height: 180px; overflow-y: auto; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
         }
-        .suggestion-item { padding: 12px; border-bottom: 1px solid #333; font-size: 14px; cursor: pointer; }
-        .suggestion-item:hover { background: #333; color: var(--neon-blue); }
-        .geo-item { color: var(--neon-blue); font-weight: bold; border-bottom: 2px solid var(--neon-blue); }
+        .suggestion-item { padding: 12px; border-bottom: 1px solid #333; font-size: 13px; cursor: pointer; }
+        .geo-item { color: var(--neon-blue); font-weight: bold; }
 
         .price-section { 
-            background: #111; border-radius: 20px; padding: 20px; 
+            background: #111; border-radius: 18px; padding: 15px; 
             text-align: center; border: 1px solid var(--neon-pink);
-            box-shadow: 0 0 15px rgba(255, 0, 255, 0.2); margin-bottom: 20px;
+            margin-top: 10px; margin-bottom: 20px;
         }
-        .price-display { font-size: 36px; font-weight: 900; color: var(--neon-pink); text-shadow: 0 0 10px var(--neon-pink); }
+        .price-display { font-size: 32px; font-weight: 900; color: var(--neon-pink); text-shadow: 0 0 8px var(--neon-pink); }
         
-        .controls { display: flex; justify-content: center; gap: 20px; margin-top: 10px; }
+        .controls { display: flex; justify-content: center; gap: 25px; margin-top: 8px; }
         .btn-round { 
-            width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--neon-blue); 
-            background: transparent; color: var(--neon-blue); font-size: 24px; cursor: pointer;
+            width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--neon-blue); 
+            background: transparent; color: var(--neon-blue); font-size: 22px; cursor: pointer;
         }
 
         .order-button { 
-            width: 100%; padding: 18px; background: transparent; 
+            width: 100%; padding: 16px; background: transparent; 
             color: var(--neon-blue); border: 2px solid var(--neon-blue); 
             border-radius: 15px; font-size: 18px; font-weight: 800; 
-            text-transform: uppercase; box-shadow: 0 0 15px var(--neon-blue);
+            text-transform: uppercase; box-shadow: 0 0 12px var(--neon-blue);
         }
 
         .custom-marker div {
             background: var(--neon-pink); width: 14px; height: 14px; 
-            border-radius: 50%; box-shadow: 0 0 10px var(--neon-pink); border: 2px solid #fff;
+            border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 8px var(--neon-pink);
         }
     </style>
 </head>
@@ -100,14 +98,13 @@
 
     <div class="field-group">
         <label>Откуда:</label>
-        <input type="text" id="from" placeholder="Выберите или введите" autocomplete="off" 
-               onclick="showGeoPrompt(this)" oninput="getSuggestions(this, 'from')">
+        <input type="text" id="from" placeholder="Точка А" autocomplete="off" onclick="showGeoPrompt(this)" oninput="getSuggestions(this, 'from')">
         <div class="suggestions" style="display:none"></div>
     </div>
 
     <div class="field-group">
         <label>Куда:</label>
-        <input type="text" id="to" placeholder="Куда едем?" autocomplete="off" oninput="getSuggestions(this, 'to')">
+        <input type="text" id="to" placeholder="Точка Б" autocomplete="off" oninput="getSuggestions(this, 'to')">
         <div class="suggestions" style="display:none"></div>
     </div>
 
@@ -119,7 +116,7 @@
         </div>
     </div>
 
-    <button class="order-button" onclick="confirmOrder()">Заказать такси</button>
+    <button class="order-button" onclick="confirmOrder()">Заказать</button>
 </div>
 
 <script>
@@ -133,13 +130,16 @@
     let markerFrom, markerTo;
     let coords = { from: null, to: null };
 
+    // Светлая карта с видимыми домами (CartoDB Voyager)
     const map = L.map('map', { zoomControl: false }).setView([56.8389, 60.6057], 13);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '©OpenStreetMap ©CartoDB'
+    }).addTo(map);
 
     function createIcon(color) {
         return L.divIcon({
             className: 'custom-marker',
-            html: `<div style="background:${color}; box-shadow: 0 0 10px ${color}"></div>`
+            html: `<div style="background:${color}"></div>`
         });
     }
 
@@ -152,30 +152,24 @@
         reverseGeocode(e.latlng.lat, e.latlng.lng, 'from');
     });
 
-    // Функция предложения геолокации
     function showGeoPrompt(input) {
         const container = input.nextElementSibling;
         if (input.value.length === 0) {
-            container.innerHTML = `<div class="suggestion-item geo-item" onclick="detectMyLocation()">📍 Определить моё местоположение</div>`;
+            container.innerHTML = `<div class="suggestion-item geo-item" onclick="detectMyLocation()">📍 Моё местоположение</div>`;
             container.style.display = 'block';
         }
     }
 
-    // Определение позиции через GPS
     function detectMyLocation() {
-        if (!navigator.geolocation) return tg.showAlert("Геолокация не поддерживается");
-        
+        if (!navigator.geolocation) return;
         document.getElementById('from').nextElementSibling.style.display = 'none';
-        
         navigator.geolocation.getCurrentPosition(pos => {
             const lat = pos.coords.latitude;
             const lon = pos.coords.longitude;
             coords.from = [lat, lon];
             markerFrom.setLatLng([lat, lon]);
-            map.setView([lat, lon], 15);
+            map.setView([lat, lon], 16);
             reverseGeocode(lat, lon, 'from');
-        }, err => {
-            tg.showAlert("Доступ к GPS отклонен");
         });
     }
 
@@ -199,7 +193,6 @@
             else container.style.display = 'none'; 
             return; 
         }
-
         clearTimeout(input.timer);
         input.timer = setTimeout(async () => {
             const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
@@ -217,7 +210,7 @@
                 div.onclick = () => {
                     input.value = s.value;
                     container.style.display = 'none';
-                    coords[fieldId] = [s.data.geo_lat, s.data.geo_lon];
+                    coords[fieldId] = [parseFloat(s.data.geo_lat), parseFloat(s.data.geo_lon)];
                     if(fieldId === 'to') {
                         markerTo.setLatLng(coords.to).addTo(map);
                     } else {
@@ -235,25 +228,14 @@
         const url = `https://router.project-osrm.org/route/v1/driving/${coords.from[1]},${coords.from[0]};${coords.to[1]},${coords.to[0]}?overview=full`;
         const res = await fetch(url);
         const data = await res.json();
-
         if (data.routes?.length) {
             if (routePolyline) map.removeLayer(routePolyline);
             const points = polyline.decode(data.routes[0].geometry);
             routePolyline = L.polyline(points, {
-                color: 'var(--neon-blue)', weight: 5, opacity: 0.7,
-                dashArray: '10, 15', lineCap: 'round'
+                color: '#0070ff', weight: 6, opacity: 0.8,
+                dashArray: '10, 15'
             }).addTo(map);
-
-            let offset = 0;
-            function animate() {
-                offset++;
-                if(routePolyline) {
-                    routePolyline.setStyle({ dashOffset: -offset });
-                    requestAnimationFrame(animate);
-                }
-            }
-            animate();
-            map.fitBounds(routePolyline.getBounds(), { padding: [30, 30] });
+            map.fitBounds(routePolyline.getBounds(), { padding: [40, 40] });
         }
     }
 
@@ -265,8 +247,8 @@
     function confirmOrder() {
         const from = document.getElementById('from').value;
         const to = document.getElementById('to').value;
-        if (!from || !to) return tg.showAlert("Укажите маршрут");
-        tg.sendData(JSON.stringify({ from, to, price: currentPrice, lat: coords.from[0], lon: coords.from[1] }));
+        if (!from || !to) return tg.showAlert("Заполните адреса");
+        tg.sendData(JSON.stringify({ from, to, price: currentPrice, coords }));
         tg.close();
     }
 </script>
