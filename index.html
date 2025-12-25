@@ -27,6 +27,41 @@
             letter-spacing: -0.2px;
         }
 
+        /* АНИМАЦИЯ ПЕСОЧНЫХ ЧАСОВ */
+        #search-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(13, 13, 13, 0.95);
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+
+        .hourglass {
+            font-size: 60px;
+            color: var(--neon-purple);
+            text-shadow: 0 0 15px var(--neon-purple), 0 0 30px var(--neon-yellow);
+            animation: flip 2s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes flip {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(180deg); }
+        }
+
+        .search-text {
+            font-weight: 800;
+            color: var(--neon-yellow);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-size: 14px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
         .container { 
             width: 100%; 
             background: var(--card-bg); 
@@ -137,6 +172,11 @@
 </head>
 <body>
 
+<div id="search-overlay">
+    <div class="hourglass">⌛</div>
+    <div class="search-text">Поиск водителя...</div>
+</div>
+
 <div class="container">
     <div class="field-group">
         <label>Откуда:</label>
@@ -194,7 +234,6 @@
     let photoAdded = false;
     let searchTimeout;
 
-    // Скрытие клавиатуры
     document.addEventListener('click', function(e) {
         if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
             if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
@@ -217,9 +256,7 @@
         }
     }
 
-    // ОЧИСТКА АДРЕСА ОТ ГОРОДА
     function cleanAddress(fullAddr) {
-        // Убираем страну, область и город (оставляет только улицу и дом)
         return fullAddr.replace(/.*?г Екатеринбург,\s*/, "").replace(/Россия,\s*/, "").replace(/.*?обл,\s*/, "");
     }
 
@@ -238,7 +275,6 @@
                     });
                     const result = await response.json();
                     if (result.suggestions?.length > 0) {
-                        // Применяем функцию очистки адреса
                         fromInput.value = cleanAddress(result.suggestions[0].value);
                     }
                 } catch (e) {}
@@ -269,7 +305,6 @@
                     result.suggestions.forEach(item => {
                         const div = document.createElement('div');
                         div.className = 'suggestion-item';
-                        // Также очищаем подсказки для единообразия
                         const cleanAddrItem = cleanAddress(item.value);
                         div.innerText = cleanAddrItem;
                         div.onclick = () => { input.value = cleanAddrItem; container.style.display = 'none'; };
@@ -323,6 +358,10 @@
         const from = document.getElementById('from').value;
         const to = document.getElementById('to').value;
         if (!from || !to) { tg.showAlert("Заполните адреса"); return; }
+        
+        // Показываем анимацию поиска
+        document.getElementById('search-overlay').style.display = 'flex';
+        
         const extra = document.querySelector('.extra-input')?.value || "";
         const orderData = {
             route: extra ? `${from} -> ${extra} -> ${to}` : `${from} -> ${to}`,
@@ -331,9 +370,14 @@
             comment: document.getElementById('comment').value,
             photo: photoAdded ? "Есть" : "Нет"
         };
-        tg.sendData(JSON.stringify(orderData));
-        tg.close();
+
+        // Задержка 3 секунды для имитации поиска, затем отправка данных
+        setTimeout(() => {
+            tg.sendData(JSON.stringify(orderData));
+            tg.close();
+        }, 3000);
     }
 </script>
 </body>
 </html>
+
