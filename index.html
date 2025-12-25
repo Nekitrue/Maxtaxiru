@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Такси MAX Neon Final</title>
+    <title>Такси MAX Neon Luxury</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -27,13 +27,6 @@
             letter-spacing: -0.2px;
         }
 
-        /* Оверлей успеха (исправлен слой) */
-        #success-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-dark); z-index: 9999;
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-        }
-
         .container { 
             width: 100%; 
             background: var(--card-bg); 
@@ -41,44 +34,46 @@
             padding: 20px; 
             box-shadow: 0 0 25px rgba(188, 19, 254, 0.12); 
             border: 1px solid rgba(192, 192, 192, 0.08);
-            position: relative;
-        }
-
-        /* Кнопка музыки (исправлено позиционирование) */
-        .header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
         }
         
-        #music-toggle {
-            width: 35px; height: 35px; border-radius: 50%;
-            border: 1px solid var(--neon-purple); background: var(--input-bg);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; box-shadow: 0 0 10px rgba(188, 19, 254, 0.3);
-        }
-
         .field-group { margin-bottom: 18px; position: relative; }
         .label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         
         label { 
-            font-size: 11px; font-weight: 800; color: var(--neon-yellow); 
-            text-transform: uppercase; letter-spacing: 1.5px;
+            font-size: 11px; 
+            font-weight: 800; 
+            color: var(--neon-yellow); 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px;
         }
 
         .remove-btn { color: #ff3b30; font-size: 18px; border: none; background: none; cursor: pointer; padding: 0 5px; }
         
         input, textarea { 
-            font-family: 'Montserrat', sans-serif; width: 100%; padding: 14px; 
-            border: 1px solid rgba(192, 192, 192, 0.2); border-radius: 12px; 
-            font-size: 15px; background: var(--input-bg); color: #fff; outline: none; transition: 0.3s; 
+            font-family: 'Montserrat', sans-serif;
+            width: 100%; 
+            padding: 14px; 
+            border: 1px solid rgba(192, 192, 192, 0.2); 
+            border-radius: 12px; 
+            font-size: 15px; 
+            font-weight: 400;
+            outline: none; 
+            background: var(--input-bg); 
+            color: #fff; 
+            transition: 0.3s; 
         }
         input:focus { border-color: var(--neon-purple); box-shadow: 0 0 10px rgba(188, 19, 254, 0.3); }
 
         .add-stop-btn { 
-            color: var(--neon-purple); font-size: 13px; font-weight: 600; 
-            border: none; background: none; padding: 5px 0 15px 0; cursor: pointer; display: block; 
+            font-family: 'Montserrat', sans-serif;
+            color: var(--neon-purple); 
+            font-size: 13px; 
+            font-weight: 600; 
+            border: none; 
+            background: none; 
+            padding: 10px 0; 
+            cursor: pointer; 
+            display: block; 
         }
 
         .suggestions { 
@@ -86,51 +81,63 @@
             background: #2a2a2a; border: 1px solid var(--neon-purple); 
             border-radius: 12px; z-index: 1000; display: none; 
             max-height: 200px; overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
         }
-        .suggestion-item { padding: 12px; border-bottom: 1px solid #333; color: #fff; font-size: 13px; }
-        .suggestion-item.geo-suggestion { color: var(--neon-yellow); font-weight: 800; }
+        .suggestion-item { padding: 12px; border-bottom: 1px solid #333; color: #fff; font-size: 13px; cursor: pointer; }
+        .suggestion-item.geo-suggestion { color: var(--neon-yellow); font-weight: 800; background: rgba(252, 194, 0, 0.08); }
 
         .file-input-label { 
             display: block; text-align: center; padding: 12px; 
-            background: var(--input-bg); border: 1px dashed var(--silver); 
-            border-radius: 10px; font-size: 13px; font-weight: 600; color: var(--silver); 
+            background: #252525; border: 1px dashed var(--silver); 
+            border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--silver); 
         }
         #photo-preview { font-size: 12px; color: #28a745; margin-top: 8px; display: none; text-align: center; font-weight: 800; }
 
         .price-section { 
-            background: rgba(252, 194, 0, 0.02); border: 2px solid var(--neon-yellow); 
-            border-radius: 18px; padding: 15px; margin: 20px 0; 
+            background: rgba(252, 194, 0, 0.02); 
+            border: 2px solid var(--neon-yellow); 
+            border-radius: 18px; 
+            padding: 15px; 
+            margin: 20px 0; 
         }
-        .price-container { display: flex; align-items: center; justify-content: space-between; }
-        .price-display { font-size: 38px; font-weight: 800; color: var(--neon-yellow); text-shadow: 0 0 12px rgba(252, 194, 0, 0.4); text-align: center; flex-grow: 1; }
-        .btn-round { width: 45px; height: 45px; border-radius: 50%; border: 1px solid var(--neon-purple); background: var(--input-bg); color: var(--neon-purple); font-size: 24px; }
+        .price-container { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .price-display { 
+            font-size: 38px; font-weight: 800; color: var(--neon-yellow); 
+            text-shadow: 0 0 12px rgba(252, 194, 0, 0.4);
+            flex-grow: 1; text-align: center;
+        }
+        
+        .btn-round { 
+            width: 50px; height: 50px; border-radius: 50%; border: 1px solid var(--neon-purple); 
+            background: #252525; color: var(--neon-purple); font-size: 24px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
 
         .pay-row { display: flex; gap: 10px; margin-top: 10px; }
-        .pay-btn { flex: 1; padding: 14px 5px; border-radius: 12px; border: 1px solid var(--silver); background: var(--input-bg); font-size: 13px; font-weight: 700; color: var(--silver); text-align: center; text-transform: uppercase; }
-        .pay-btn.active { border-color: var(--neon-purple); background: var(--neon-purple); color: #fff; box-shadow: 0 0 15px rgba(188, 19, 254, 0.4); }
+        .pay-btn { 
+            font-family: 'Montserrat', sans-serif; flex: 1;
+            padding: 14px 5px; border-radius: 12px; 
+            border: 1px solid var(--silver); background: var(--input-bg); 
+            font-size: 13px; font-weight: 700; color: var(--silver);
+            cursor: pointer; text-align: center; transition: 0.3s; text-transform: uppercase;
+        }
+        .pay-btn.active { 
+            border-color: var(--neon-purple); background: var(--neon-purple); 
+            color: #fff; box-shadow: 0 0 15px rgba(188, 19, 254, 0.4);
+        }
 
-        .order-button { width: 100%; padding: 20px; background: var(--neon-yellow); color: #000; border: none; border-radius: 16px; font-size: 18px; font-weight: 800; margin-top: 15px; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* SVG Checkmark Animation */
-        .checkmark { width: 80px; height: 80px; stroke-width: 2; stroke: var(--neon-yellow); fill: none; }
+        .order-button { 
+            font-family: 'Montserrat', sans-serif;
+            width: 100%; padding: 20px; background: var(--neon-yellow); 
+            color: #000; border: none; border-radius: 16px; font-size: 18px; 
+            font-weight: 800; cursor: pointer; box-shadow: 0 0 20px rgba(252, 194, 0, 0.4);
+            margin-top: 10px; text-transform: uppercase; letter-spacing: 1px;
+        }
     </style>
 </head>
 <body>
 
-<div id="success-overlay">
-    <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-        <circle cx="26" cy="26" r="25" stroke="var(--neon-yellow)" stroke-width="2" fill="none" />
-        <path d="M14.1 27.2l7.1 7.2 16.7-16.8" stroke="var(--neon-yellow)" stroke-width="3" fill="none" />
-    </svg>
-    <p style="color: var(--neon-yellow); font-weight: 800; margin-top: 20px; letter-spacing: 2px;">ЗАКАЗ ПРИНЯТ</p>
-</div>
-
 <div class="container">
-    <div class="header-row">
-        <label style="font-size: 14px;">Оформление заказа</label>
-        <div id="music-toggle" onclick="toggleMusic()"><span id="music-icon">🎵</span></div>
-    </div>
-
     <div class="field-group">
         <label>Откуда:</label>
         <input type="text" id="from" placeholder="Улица и дом" autocomplete="off" onfocus="showGeoPrompt(this)" oninput="getSuggestions(this)" onkeydown="if(event.keyCode==13) this.blur()">
@@ -182,33 +189,25 @@
     tg.setHeaderColor("#0d0d0d");
 
     const DADATA_API_KEY = "6f49e7177e36608d4139b823d71466c86bd7ca4f"; 
-    
-    // МУЗЫКА
-    const bgMusic = new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3");
-    bgMusic.loop = true;
-    bgMusic.volume = 0.3;
-    let musicStarted = false;
-
-    function toggleMusic() {
-        if (bgMusic.paused) { bgMusic.play(); document.getElementById('music-icon').innerText = '🔊'; }
-        else { bgMusic.pause(); document.getElementById('music-icon').innerText = '🔇'; }
-    }
-
-    document.addEventListener('click', () => {
-        if(!musicStarted) { bgMusic.play().catch(()=>{}); document.getElementById('music-icon').innerText = '🔊'; musicStarted = true; }
-    }, { once: true });
-
-    // КЛАВИАТУРА И ФУНКЦИИ
-    document.addEventListener('click', (e) => {
-        if (!['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
-            if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) document.activeElement.blur();
-        }
-    });
-
     let currentPrice = 300;
     let paymentMethod = 'Наличные';
     let photoAdded = false;
     let searchTimeout;
+
+    // Скрытие клавиатуры
+    document.addEventListener('click', function(e) {
+        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+                document.activeElement.blur();
+            }
+        }
+    });
+
+    window.addEventListener('scroll', function() {
+        if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+            document.activeElement.blur();
+        }
+    });
 
     function showGeoPrompt(input) {
         if (input.value.length === 0) {
@@ -218,7 +217,9 @@
         }
     }
 
+    // ОЧИСТКА АДРЕСА ОТ ГОРОДА
     function cleanAddress(fullAddr) {
+        // Убираем страну, область и город (оставляет только улицу и дом)
         return fullAddr.replace(/.*?г Екатеринбург,\s*/, "").replace(/Россия,\s*/, "").replace(/.*?обл,\s*/, "");
     }
 
@@ -226,45 +227,64 @@
         const fromInput = document.getElementById('from');
         fromInput.nextElementSibling.style.display = 'none';
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(async (pos) => {
-                const response = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address", {
-                    method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Token " + DADATA_API_KEY },
-                    body: JSON.stringify({ lat: pos.coords.latitude, lon: pos.coords.longitude })
-                });
-                const result = await response.json();
-                if (result.suggestions?.length > 0) fromInput.value = cleanAddress(result.suggestions[0].value);
-            });
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                try {
+                    const response = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": "Token " + DADATA_API_KEY },
+                        body: JSON.stringify({ lat, lon })
+                    });
+                    const result = await response.json();
+                    if (result.suggestions?.length > 0) {
+                        // Применяем функцию очистки адреса
+                        fromInput.value = cleanAddress(result.suggestions[0].value);
+                    }
+                } catch (e) {}
+            }, () => alert("Включите GPS"));
         }
     }
 
     async function getSuggestions(input) {
         const query = input.value;
         const container = input.nextElementSibling;
-        if (query.length < 3) { container.style.display = (input.id==='from' && query.length===0) ? 'block' : 'none'; return; }
+        if (query.length < 3) {
+            if (input.id === 'from' && query.length === 0) showGeoPrompt(input);
+            else container.style.display = 'none';
+            return;
+        }
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(async () => {
-            const response = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
-                method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Token " + DADATA_API_KEY },
-                body: JSON.stringify({ query, count: 5, locations: [{ city: "Екатеринбург" }] })
-            });
-            const result = await response.json();
-            container.innerHTML = '';
-            if (result.suggestions?.length > 0) {
-                container.style.display = 'block';
-                result.suggestions.forEach(item => {
-                    const div = document.createElement('div');
-                    div.className = 'suggestion-item';
-                    const addr = cleanAddress(item.value);
-                    div.innerText = addr;
-                    div.onclick = () => { input.value = addr; container.style.display = 'none'; };
-                    container.appendChild(div);
+            try {
+                const response = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": "Token " + DADATA_API_KEY },
+                    body: JSON.stringify({ query, count: 5, locations: [{ city: "Екатеринбург" }] })
                 });
-            }
+                const result = await response.json();
+                container.innerHTML = '';
+                if (result.suggestions?.length > 0) {
+                    container.style.display = 'block';
+                    result.suggestions.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'suggestion-item';
+                        // Также очищаем подсказки для единообразия
+                        const cleanAddrItem = cleanAddress(item.value);
+                        div.innerText = cleanAddrItem;
+                        div.onclick = () => { input.value = cleanAddrItem; container.style.display = 'none'; };
+                        container.appendChild(div);
+                    });
+                }
+            } catch (e) {}
         }, 300);
     }
 
     function adjustPrice(amount) {
-        if (currentPrice + amount >= 100) { currentPrice += amount; document.getElementById('display_price').innerText = currentPrice + " ₽"; }
+        if (currentPrice + amount >= 100) {
+            currentPrice += amount;
+            document.getElementById('display_price').innerText = currentPrice + " ₽";
+        }
     }
 
     function setPayment(method) {
@@ -274,27 +294,45 @@
     }
 
     function addExtraStop() {
+        const container = document.getElementById('extra-stops');
         const div = document.createElement('div');
         div.className = 'field-group';
         div.id = 'stop-group';
-        div.innerHTML = `<div class="label-row"><label>Промежуточный адрес:</label><button class="remove-btn" onclick="removeStop()">✕</button></div>
-                         <input type="text" class="extra-input" placeholder="Введите адрес" oninput="getSuggestions(this)" onkeydown="if(event.keyCode==13) this.blur()">
-                         <div class="suggestions"></div>`;
-        document.getElementById('extra-stops').appendChild(div);
+        div.innerHTML = `
+            <div class="label-row"><label>Промежуточный адрес:</label><button class="remove-btn" onclick="removeStop()">✕</button></div>
+            <input type="text" class="extra-input" placeholder="Введите адрес" autocomplete="off" oninput="getSuggestions(this)" onkeydown="if(event.keyCode==13) this.blur()">
+            <div class="suggestions"></div>
+        `;
+        container.appendChild(div);
         document.getElementById('add-btn').style.display = 'none';
     }
 
-    function removeStop() { document.getElementById('stop-group').remove(); document.getElementById('add-btn').style.display = 'block'; }
-    function handlePhoto(input) { if (input.files[0]) { photoAdded = true; document.getElementById('photo-preview').style.display = 'block'; } }
+    function removeStop() {
+        document.getElementById('stop-group').remove();
+        document.getElementById('add-btn').style.display = 'block';
+    }
+
+    function handlePhoto(input) {
+        if (input.files && input.files[0]) {
+            photoAdded = true;
+            document.getElementById('photo-preview').style.display = 'block';
+        }
+    }
 
     function confirmOrder() {
         const from = document.getElementById('from').value;
         const to = document.getElementById('to').value;
         if (!from || !to) { tg.showAlert("Заполните адреса"); return; }
-        document.getElementById('success-overlay').style.display = 'flex';
         const extra = document.querySelector('.extra-input')?.value || "";
-        const data = { route: extra ? `${from} -> ${extra} -> ${to}` : `${from} -> ${to}`, price: currentPrice, pay: paymentMethod, comment: document.getElementById('comment').value, photo: photoAdded ? "Есть" : "Нет" };
-        setTimeout(() => { tg.sendData(JSON.stringify(data)); tg.close(); }, 2200);
+        const orderData = {
+            route: extra ? `${from} -> ${extra} -> ${to}` : `${from} -> ${to}`,
+            price: currentPrice,
+            pay: paymentMethod,
+            comment: document.getElementById('comment').value,
+            photo: photoAdded ? "Есть" : "Нет"
+        };
+        tg.sendData(JSON.stringify(orderData));
+        tg.close();
     }
 </script>
 </body>
