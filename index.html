@@ -18,14 +18,18 @@
         
         input, textarea { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 12px; font-size: 16px; box-sizing: border-box; outline: none; background: #fafafa; transition: 0.3s; }
         input:focus, textarea:focus { border-color: var(--main-color); background: #fff; }
-        textarea { resize: none; font-family: inherit; }
 
         .add-stop-btn { color: #007bff; font-size: 15px; font-weight: 600; border: none; background: none; padding: 10px 0; cursor: pointer; margin-bottom: 15px; display: block; }
 
         .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 0 0 12px 12px; z-index: 1000; max-height: 180px; overflow-y: auto; box-shadow: 0 8px 15px rgba(0,0,0,0.1); display: none; }
         .suggestion-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #f5f5f5; font-size: 14px; color: #333; }
 
-        .photo-block { margin-top: 10px; }
+        /* Оплата */
+        .payment-options { display: flex; gap: 10px; margin-top: 10px; }
+        .pay-btn { flex: 1; padding: 12px; border-radius: 10px; border: 1.5px solid #eee; background: #fafafa; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .pay-btn.active { border-color: var(--main-color); background: var(--main-color); color: #000; }
+
+        .photo-block { margin-top: 15px; }
         .file-input-label { display: inline-block; padding: 10px 15px; background: #eee; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; color: #555; }
         #photo-preview { font-size: 12px; color: #28a745; margin-top: 5px; display: none; }
 
@@ -58,17 +62,22 @@
     </div>
 
     <div class="field-group">
-        <label>Комментарий водителю</label>
-        <textarea id="comment" rows="2" placeholder="Напр: 3-й подъезд, сдача с 5000"></textarea>
+        <label>Комментарий и оплата</label>
+        <textarea id="comment" rows="2" placeholder="Уточнения для водителя..."></textarea>
+        
+        <div class="payment-options">
+            <button class="pay-btn active" onclick="setPayment('Наличные', this)">💵 Наличные</button>
+            <button class="pay-btn" onclick="setPayment('СБП', this)">📲 СБП</button>
+        </div>
+
         <div class="photo-block">
-            <label class="file-input-label" for="photo-upload">📷 Сфоткать место / Прикрепить фото</label>
+            <label class="file-input-label" for="photo-upload">📷 Прикрепить фото места</label>
             <input type="file" id="photo-upload" accept="image/*" style="display:none" onchange="handlePhoto(this)">
             <div id="photo-preview">✓ Фото прикреплено</div>
         </div>
     </div>
 
     <div class="price-section">
-        <div style="font-size: 13px; color: #886b00; margin-bottom: 8px; font-weight: 600;">Ваша цена за поездку</div>
         <div class="price-display" id="display_price">300 ₽</div>
         <div class="controls">
             <button class="btn-round" onclick="adjustPrice(-100)">−</button>
@@ -84,8 +93,8 @@
     tg.expand();
 
     let currentPrice = 300;
-    let locationRequested = false;
-    let photoData = null;
+    let paymentMethod = 'Наличные';
+    let photoUploaded = false;
 
     function adjustPrice(amount) {
         if (currentPrice + amount >= 100) {
@@ -94,16 +103,19 @@
         }
     }
 
+    function setPayment(method, btn) {
+        paymentMethod = method;
+        document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
     function addExtraStop() {
         const container = document.getElementById('extra-stops');
         const div = document.createElement('div');
         div.className = 'field-group';
         div.id = 'stop-group';
         div.innerHTML = `
-            <div class="label-row">
-                <label>Промежуточный адрес</label>
-                <button class="remove-btn" onclick="removeStop()">Удалить ✕</button>
-            </div>
+            <div class="label-row"><label>Промежуточный адрес</label><button class="remove-btn" onclick="removeStop()">Удалить ✕</button></div>
             <input type="text" class="extra-input" placeholder="Заехать по пути..." autocomplete="off" oninput="getSuggestions(this)">
             <div class="suggestions"></div>
         `;
@@ -117,24 +129,21 @@
     }
 
     function tryAutoLocation() {
-        if (locationRequested) return;
-        locationRequested = true;
         navigator.geolocation.getCurrentPosition(async (pos) => {
             const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
             const data = await res.json();
             if (data.address) {
                 const street = data.address.road || "";
                 const house = data.address.house_number || "";
-                document.getElementById('from').value = `${street} ${house}`.trim();
+                document.getElementById('from').value = `${street}, ${house}`.trim();
             }
-        }, () => { locationRequested = false; });
+        });
     }
 
     async function getSuggestions(input) {
         const query = input.value;
         const container = input.nextElementSibling;
         if (query.length < 3) { container.style.display = 'none'; return; }
-
         try {
             const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=Екатеринбург+${query}&addressdetails=1&limit=5`);
             const data = await res.json();
@@ -142,12 +151,9 @@
             if (data.length > 0) {
                 container.style.display = 'block';
                 data.forEach(item => {
-                    const addr = item.address;
-                    // Формат: Улица + Дом
-                    const street = addr.road || addr.pedestrian || addr.suburb || "";
-                    const house = addr.house_number || "";
+                    const street = item.address.road || item.address.pedestrian || "";
+                    const house = item.address.house_number || "";
                     const display = house ? `${street}, ${house}` : street;
-                    
                     if (street) {
                         const div = document.createElement('div');
                         div.className = 'suggestion-item';
@@ -157,14 +163,13 @@
                     }
                 });
             } else { container.style.display = 'none'; }
-        } catch (e) { console.error(e); }
+        } catch (e) {}
     }
 
     function handlePhoto(input) {
         if (input.files && input.files[0]) {
+            photoUploaded = true;
             document.getElementById('photo-preview').style.display = 'block';
-            // В реальном боте здесь можно конвертировать в Base64 или отправлять на сервер
-            photoData = "Прикреплено"; 
         }
     }
 
@@ -173,16 +178,15 @@
         const to = document.getElementById('to').value;
         const extra = document.querySelector('.extra-input')?.value || "";
         const comment = document.getElementById('comment').value;
-        
         if (!from || !to) { alert("Заполните адреса"); return; }
         
         const orderInfo = {
-            route: extra ? `${from} ➔ ${extra} ➔ ${to}` : `${from} ➔ ${to}`,
+            route: extra ? `${from} -> ${extra} -> ${to}` : `${from} -> ${to}`,
             price: currentPrice,
+            payment: paymentMethod,
             comment: comment,
-            hasPhoto: !!photoData
+            photo: photoUploaded ? "Да" : "Нет"
         };
-        
         tg.sendData(JSON.stringify(orderInfo));
         tg.close();
     }
