@@ -3,136 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Такси MAX New Year</title>
+    <title>Такси MAX</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { 
-            --ny-red: #d42426; 
-            --ny-gold: #fcc200; 
-            --ny-blue: #1a472a; /* Темно-зеленый елочный */
-            --bg-color: #0a192f; 
-        }
-        
-        body { 
-            font-family: -apple-system, system-ui, sans-serif; 
-            background: var(--bg-color); 
-            margin: 0; 
-            padding: 10px 15px;
-            overflow-x: hidden;
-            color: #fff;
-        }
-
-        /* Анимация снега */
-        .snowflake {
-            color: #fff; font-size: 1.2em; position: fixed; top: -10%; z-index: 9999;
-            user-select: none; cursor: default; animation: snow 10s linear infinite;
-        }
-        @keyframes snow {
-            0% { top: -10%; transform: translateX(0); }
-            100% { top: 100%; transform: translateX(20vw); }
-        }
-
-        .container { 
-            width: 100%; 
-            background: rgba(255, 255, 255, 0.95); 
-            border-radius: 25px; 
-            padding: 20px; 
-            box-shadow: 0 0 20px rgba(212, 36, 38, 0.3); 
-            box-sizing: border-box; 
-            margin-top: 10px;
-            color: #333;
-            position: relative;
-            z-index: 10;
-            border: 2px solid var(--ny-gold);
-        }
+        :root { --main-color: #fcc200; --bg-color: #f7f7f7; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg-color); margin: 0; padding: 10px 15px; }
+        .container { width: 100%; background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); box-sizing: border-box; margin-top: 5px; }
         
         .field-group { margin-bottom: 18px; position: relative; }
         .label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        label { font-size: 14px; font-weight: 600; color: var(--ny-blue); }
-        .remove-btn { color: var(--ny-red); font-size: 12px; font-weight: 600; border: none; background: none; }
+        label { font-size: 14px; font-weight: 600; color: #444; }
+        .remove-btn { color: #ff3b30; font-size: 12px; font-weight: 600; border: none; background: none; cursor: pointer; }
         
-        input, textarea { 
-            width: 100%; padding: 14px; border: 1.5px solid #ddd; border-radius: 12px; 
-            font-size: 16px; box-sizing: border-box; outline: none; background: #fff; 
-        }
-        input:focus { border-color: var(--ny-red); box-shadow: 0 0 5px rgba(212, 36, 38, 0.2); }
+        input, textarea { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 12px; font-size: 16px; box-sizing: border-box; outline: none; background: #fafafa; }
+        input:focus, textarea:focus { border-color: var(--main-color); background: #fff; }
 
-        .add-stop-btn { color: #1a73e8; font-size: 15px; font-weight: 600; border: none; background: none; padding: 10px 0; cursor: pointer; }
+        .add-stop-btn { color: #007bff; font-size: 15px; font-weight: 600; border: none; background: none; padding: 10px 0; cursor: pointer; margin-bottom: 15px; display: block; }
 
-        .suggestions { 
-            position: absolute; top: 100%; left: 0; right: 0; background: white; 
-            border: 1px solid #ddd; border-radius: 0 0 12px 12px; z-index: 1000; 
-            max-height: 200px; overflow-y: auto; box-shadow: 0 8px 15px rgba(0,0,0,0.1); display: none; 
-        }
-        .suggestion-item { padding: 12px 15NYpx; cursor: pointer; border-bottom: 1px solid #f5f5f5; font-size: 14px; color: #333; }
+        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 0 0 12px 12px; z-index: 1000; max-height: 200px; overflow-y: auto; box-shadow: 0 8px 15px rgba(0,0,0,0.1); display: none; }
+        .suggestion-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #f5f5f5; font-size: 14px; color: #333; line-height: 1.4; }
+        .suggestion-item:active { background: #f0f0f0; }
 
-        .price-section { 
-            background: linear-gradient(135deg, #fffcf0 0%, #fff4d1 100%); 
-            border: 2px dashed var(--ny-red); border-radius: 18px; 
-            padding: 20px; text-align: center; margin-top: 25px; margin-bottom: 25px; 
-        }
-        .price-display { font-size: 38px; font-weight: 800; color: var(--ny-red); margin-bottom: 15px; }
-        
-        .controls { display: flex; justify-content: center; gap: 25px; }
-        .btn-round { 
-            width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--ny-red); 
-            background: #fff; font-size: 24px; color: var(--ny-red); cursor: pointer;
-        }
-        
         .payment-options { display: flex; flex-direction: column; gap: 8px; margin: 15px 0 25px 0; }
-        .pay-btn { 
-            width: 100%; padding: 12px; border-radius: 10px; border: 1.5px solid #eee; 
-            background: #fafafa; font-size: 14px; font-weight: 600; cursor: pointer; 
-        }
-        .pay-btn.active { border-color: var(--ny-red); background: var(--ny-red); color: #fff; }
+        .pay-btn { width: 100%; padding: 12px; border-radius: 10px; border: 1.5px solid #eee; background: #fafafa; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; text-align: center;}
+        .pay-btn.active { border-color: var(--main-color); background: var(--main-color); color: #000; }
 
-        .order-button { 
-            width: 100%; padding: 18px; background: var(--ny-red); color: white; 
-            border: none; border-radius: 15px; font-size: 18px; font-weight: 700; 
-            box-shadow: 0 4px 15px rgba(212, 36, 38, 0.4); cursor: pointer;
-        }
+        .photo-block { margin-top: 15px; }
+        .file-input-label { display: block; text-align: center; padding: 12px; background: #eee; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; color: #555; }
+        #photo-preview { font-size: 12px; color: #28a745; margin-top: 5px; display: none; text-align: center; }
 
-        .file-input-label { 
-            display: block; text-align: center; padding: 12px; background: #e8f0fe; 
-            border-radius: 10px; font-size: 13px; font-weight: 600; color: #1a73e8; margin-top: 10px;
-        }
+        .price-section { background: #fffcf0; border: 2px solid var(--main-color); border-radius: 18px; padding: 20px; text-align: center; margin-top: 30px; margin-bottom: 25px; }
+        .price-display { font-size: 38px; font-weight: 800; margin-bottom: 15px; }
+        .controls { display: flex; justify-content: center; gap: 25px; }
+        .btn-round { width: 50px; height: 50px; border-radius: 50%; border: none; background: #fff; font-size: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer; }
+        
+        .order-button { width: 100%; padding: 18px; background: #000; color: white; border: none; border-radius: 15px; font-size: 18px; font-weight: 700; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="snowflake" style="left:10%; animation-delay:0s;">❄</div>
-<div class="snowflake" style="left:30%; animation-delay:2s;">❅</div>
-<div class="snowflake" style="left:50%; animation-delay:4s;">❆</div>
-<div class="snowflake" style="left:70%; animation-delay:1s;">❄</div>
-<div class="snowflake" style="left:90%; animation-delay:3s;">❅</div>
-
 <div class="container">
     <div class="field-group">
-        <label>🎄 Откуда:</label>
-        <input type="text" id="from" placeholder="Улица и дом" autocomplete="off" onfocus="tryAutoLocation()" oninput="getSuggestions(this)">
+        <label>Откуда:</label>
+        <input type="text" id="from" placeholder="Начните вводить улицу..." autocomplete="off" onfocus="tryAutoLocation()" oninput="getSuggestions(this)">
         <div class="suggestions"></div>
     </div>
 
     <div id="extra-stops"></div>
-    <button class="add-stop-btn" id="add-btn" onclick="addExtraStop()">🎁 Добавить адрес</button>
+    <button class="add-stop-btn" id="add-btn" onclick="addExtraStop()">+ Добавить адрес</button>
     
     <div class="field-group">
-        <label>📍 Куда:</label>
+        <label>Куда:</label>
         <input type="text" id="to" placeholder="Куда едем?" autocomplete="off" oninput="getSuggestions(this)">
         <div class="suggestions"></div>
     </div>
 
     <div class="field-group">
-        <label>✉️ Комментарий водителю:</label>
-        <textarea id="comment" rows="2" placeholder="Напр: 3-й подъезд, у елочки..."></textarea>
+        <label>Комментарий водителю:</label>
+        <textarea id="comment" rows="2" placeholder="Напр: 3-й подъезд..."></textarea>
     </div>
 
-    <label class="file-input-label" for="photo-upload">📸 Сфоткать местоположение</label>
-    <input type="file" id="photo-upload" accept="image/*" style="display:none" onchange="document.getElementById('photo-ok').style.display='block'">
-    <div id="photo-ok" style="display:none; color:green; text-align:center; font-size:12px; margin-top:5px;">✓ Фото готово</div>
+    <div class="photo-block">
+        <label class="file-input-label" for="photo-upload">📷 Прикрепить фото места</label>
+        <input type="file" id="photo-upload" accept="image/*" style="display:none" onchange="handlePhoto(this)">
+        <div id="photo-preview">✓ Фото прикреплено</div>
+    </div>
 
     <div class="price-section">
-        <div style="font-size:12px; color:var(--ny-red); font-weight:700; letter-spacing:1px;">НОВОГОДНИЙ ТАРИФ</div>
         <div class="price-display" id="display_price">300 ₽</div>
         <div class="controls">
             <button class="btn-round" onclick="adjustPrice(-100)">−</button>
@@ -140,23 +77,26 @@
         </div>
     </div>
 
-    <label>💳 Способ оплаты:</label>
+    <label>Способ оплаты:</label>
     <div class="payment-options">
         <div id="pay-cash" class="pay-btn active" onclick="setPayment('Наличные')">💵 Наличные</div>
-        <div id="pay-online" class="pay-btn" onclick="setPayment('Онлайн перевод')">📲 Онлайн перевод водителю</div>
+        <div id="pay-online" class="pay-btn" onclick="setPayment('Онлайн перевод водителю')">📲 Онлайн перевод водителю</div>
     </div>
 
-    <button class="order-button" onclick="confirmOrder()">❄️ ЗАКАЗАТЬ ТАКСИ</button>
+    <button class="order-button" onclick="confirmOrder()">ЗАКАЗАТЬ</button>
 </div>
 
 <script>
     let tg = window.Telegram.WebApp;
     tg.expand();
-    tg.setHeaderColor('#0a192f');
 
     let currentPrice = 300;
     let paymentMethod = 'Наличные';
+    let photoAdded = false;
+
+    // ГЕО-НАСТРОЙКИ (Екатеринбург как приоритет)
     const CITY_QUERY = "Екатеринбург";
+    const VIEWBOX = "60.40,56.70,60.80,56.95"; // Ограничение поиска районом города
 
     function adjustPrice(amount) {
         if (currentPrice + amount >= 100) {
@@ -168,7 +108,7 @@
     function setPayment(method) {
         paymentMethod = method;
         document.getElementById('pay-cash').classList.toggle('active', method === 'Наличные');
-        document.getElementById('pay-online').classList.toggle('active', method === 'Онлайн перевод');
+        document.getElementById('pay-online').classList.toggle('active', method === 'Онлайн перевод водителю');
     }
 
     function addExtraStop() {
@@ -176,13 +116,19 @@
         const div = document.createElement('div');
         div.className = 'field-group';
         div.id = 'stop-group';
-        div.innerHTML = `<div class="label-row"><label>🤶 Промежуточный адрес:</label><button class="remove-btn" onclick="removeStop()">Удалить ✕</button></div>
-            <input type="text" class="extra-input" placeholder="Заехать по пути..." autocomplete="off" oninput="getSuggestions(this)"><div class="suggestions"></div>`;
+        div.innerHTML = `
+            <div class="label-row"><label>Промежуточный адрес:</label><button class="remove-btn" onclick="removeStop()">Удалить ✕</button></div>
+            <input type="text" class="extra-input" placeholder="Заехать по пути..." autocomplete="off" oninput="getSuggestions(this)">
+            <div class="suggestions"></div>
+        `;
         container.appendChild(div);
         document.getElementById('add-btn').style.display = 'none';
     }
 
-    function removeStop() { document.getElementById('stop-group').remove(); document.getElementById('add-btn').style.display = 'block'; }
+    function removeStop() {
+        document.getElementById('stop-group').remove();
+        document.getElementById('add-btn').style.display = 'block';
+    }
 
     function tryAutoLocation() {
         navigator.geolocation.getCurrentPosition(async (pos) => {
@@ -193,46 +139,66 @@
                 const house = data.address.house_number || "";
                 document.getElementById('from').value = house ? `${street}, ${house}` : street;
             }
-        });
+        }, null, {enableHighAccuracy: true});
     }
 
     async function getSuggestions(input) {
         const query = input.value;
         const container = input.nextElementSibling;
         if (query.length < 2) { container.style.display = 'none'; return; }
+
         try {
-            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(CITY_QUERY + ' ' + query)}&addressdetails=1&limit=5&accept-language=ru`;
+            // Ищем сначала в пределах города через viewbox и bounded=1
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(CITY_QUERY + ' ' + query)}&addressdetails=1&limit=6&viewbox=${VIEWBOX}&bounded=0&accept-language=ru`;
             const res = await fetch(url);
             const data = await res.json();
+            
             container.innerHTML = '';
             if (data && data.length > 0) {
                 container.style.display = 'block';
                 data.forEach(item => {
-                    const street = item.address.road || item.address.pedestrian || "";
-                    const house = item.address.house_number || "";
+                    const addr = item.address;
+                    const street = addr.road || addr.pedestrian || addr.suburb || addr.city_district || "";
+                    const house = addr.house_number || "";
+                    
                     if (street) {
+                        const displayLabel = house ? `${street}, ${house}` : street;
                         const div = document.createElement('div');
                         div.className = 'suggestion-item';
-                        div.innerText = house ? `${street}, ${house}` : street;
-                        div.onclick = () => { input.value = div.innerText; container.style.display = 'none'; };
+                        div.innerText = displayLabel;
+                        div.onclick = () => { 
+                            input.value = displayLabel; 
+                            container.style.display = 'none'; 
+                        };
                         container.appendChild(div);
                     }
                 });
+            } else {
+                container.style.display = 'none';
             }
-        } catch (e) {}
+        } catch (e) { console.error(e); }
+    }
+
+    function handlePhoto(input) {
+        if (input.files && input.files[0]) {
+            photoAdded = true;
+            document.getElementById('photo-preview').style.display = 'block';
+        }
     }
 
     function confirmOrder() {
         const from = document.getElementById('from').value;
         const to = document.getElementById('to').value;
-        if (!from || !to) { alert("Введите адреса"); return; }
         const extra = document.querySelector('.extra-input')?.value || "";
+        const comment = document.getElementById('comment').value;
+        if (!from || !to) { alert("Заполните адреса"); return; }
         
         const orderData = {
             route: extra ? `${from} ➔ ${extra} ➔ ${to}` : `${from} ➔ ${to}`,
             price: currentPrice,
             pay: paymentMethod,
-            comment: document.getElementById('comment').value
+            comment: comment,
+            photo: photoAdded ? "Прикреплено" : "Нет"
         };
         tg.sendData(JSON.stringify(orderData));
         tg.close();
