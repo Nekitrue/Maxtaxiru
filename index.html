@@ -23,8 +23,8 @@
         .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 0 0 12px 12px; z-index: 1000; max-height: 180px; overflow-y: auto; box-shadow: 0 8px 15px rgba(0,0,0,0.1); display: none; }
         .suggestion-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #f5f5f5; font-size: 14px; color: #333; }
 
-        .payment-options { display: flex; gap: 10px; margin: 15px 0; }
-        .pay-btn { flex: 1; padding: 12px; border-radius: 10px; border: 1.5px solid #eee; background: #fafafa; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; text-align: center;}
+        .payment-options { display: flex; flex-direction: column; gap: 8px; margin: 15px 0 25px 0; }
+        .pay-btn { width: 100%; padding: 12px; border-radius: 10px; border: 1.5px solid #eee; background: #fafafa; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; text-align: center;}
         .pay-btn.active { border-color: var(--main-color); background: var(--main-color); color: #000; }
 
         .photo-block { margin-top: 15px; }
@@ -44,7 +44,7 @@
 <div class="container">
     
     <div class="field-group">
-        <label>Откуда</label>
+        <label>Откуда:</label>
         <input type="text" id="from" placeholder="Улица, дом" autocomplete="off" onfocus="tryAutoLocation()" oninput="getSuggestions(this)">
         <div class="suggestions"></div>
     </div>
@@ -53,20 +53,14 @@
     <button class="add-stop-btn" id="add-btn" onclick="addExtraStop()">+ Добавить адрес</button>
     
     <div class="field-group">
-        <label>Куда</label>
+        <label>Куда:</label>
         <input type="text" id="to" placeholder="Куда едем?" autocomplete="off" oninput="getSuggestions(this)">
         <div class="suggestions"></div>
     </div>
 
     <div class="field-group">
-        <label>Комментарий водителю</label>
+        <label>Комментарий водителю:</label>
         <textarea id="comment" rows="2" placeholder="Напр: 3-й подъезд..."></textarea>
-    </div>
-
-    <label>Способ оплаты</label>
-    <div class="payment-options">
-        <div id="pay-cash" class="pay-btn active" onclick="setPayment('Наличные')">💵 Наличные</div>
-        <div id="pay-sbp" class="pay-btn" onclick="setPayment('СБП')">📲 СБП</div>
     </div>
 
     <div class="photo-block">
@@ -81,6 +75,12 @@
             <button class="btn-round" onclick="adjustPrice(-100)">−</button>
             <button class="btn-round" onclick="adjustPrice(100)">+</button>
         </div>
+    </div>
+
+    <label>Способ оплаты:</label>
+    <div class="payment-options">
+        <div id="pay-cash" class="pay-btn active" onclick="setPayment('Наличные')">💵 Наличные</div>
+        <div id="pay-online" class="pay-btn" onclick="setPayment('Онлайн перевод водителю')">📲 Онлайн перевод водителю</div>
     </div>
 
     <button class="order-button" onclick="confirmOrder()">ЗАКАЗАТЬ</button>
@@ -104,7 +104,7 @@
     function setPayment(method) {
         paymentMethod = method;
         document.getElementById('pay-cash').classList.toggle('active', method === 'Наличные');
-        document.getElementById('pay-sbp').classList.toggle('active', method === 'СБП');
+        document.getElementById('pay-online').classList.toggle('active', method === 'Онлайн перевод водителю');
     }
 
     function addExtraStop() {
@@ -113,7 +113,7 @@
         div.className = 'field-group';
         div.id = 'stop-group';
         div.innerHTML = `
-            <div class="label-row"><label>Промежуточный адрес</label><button class="remove-btn" onclick="removeStop()">Удалить ✕</button></div>
+            <div class="label-row"><label>Промежуточный адрес:</label><button class="remove-btn" onclick="removeStop()">Удалить ✕</button></div>
             <input type="text" class="extra-input" placeholder="Заехать по пути..." autocomplete="off" oninput="getSuggestions(this)">
             <div class="suggestions"></div>
         `;
