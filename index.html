@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Такси MAX Neon Luxury - v1.2.3</title>
+    <title>Такси MAX Neon Luxury - v1.2.4</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -17,7 +17,6 @@
             margin: 0; padding: 10px 15px 60px 15px; min-height: 100vh;
         }
 
-        /* ОВЕРЛЕЙ ПЕСОЧНЫЕ ЧАСЫ */
         #search-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(13, 13, 13, 0.98); display: none; flex-direction: column; 
@@ -28,8 +27,6 @@
             animation: flip 2.5s ease-in-out infinite; margin-bottom: 25px;
         }
         @keyframes flip { 0% { transform: rotate(0deg); } 100% { transform: rotate(180deg); } }
-        .search-text { font-weight: 800; color: var(--neon-yellow); text-transform: uppercase; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
         .container { background: var(--card-bg); border-radius: 20px; padding: 20px; box-shadow: 0 0 25px rgba(188, 19, 254, 0.12); margin-bottom: 20px; }
         .field-group { margin-bottom: 18px; position: relative; }
@@ -38,14 +35,12 @@
         input, textarea { width: 100%; padding: 14px; border: 1px solid rgba(192, 192, 192, 0.2); border-radius: 12px; background: var(--input-bg); color: #fff; outline: none; font-size: 15px; }
         input:focus { border-color: var(--neon-purple); }
 
-        /* КНОПКА ДОБАВИТЬ ТОЧКУ (Цвет Purple) */
         .btn-add-point { color: var(--neon-purple); font-size: 13px; font-weight: 800; border: none; background: none; cursor: pointer; padding: 5px 0 15px 0; display: block; text-transform: uppercase; }
         .remove-point { color: #ff4d4d; font-size: 11px; font-weight: 800; border: none; background: none; cursor: pointer; float: right; }
 
         .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #2a2a2a; border: 1px solid var(--neon-purple); border-radius: 12px; z-index: 1000; display: none; max-height: 250px; overflow-y: auto; }
         .suggestion-item { padding: 12px; border-bottom: 1px solid #333; color: #fff; font-size: 13px; cursor: pointer; }
         
-        /* КНОПКА ФОТО (Цвет Purple) */
         .photo-block { margin-bottom: 18px; }
         .file-input-label { display: block; text-align: center; padding: 14px; background: var(--input-bg); border: 1px solid var(--neon-purple); border-radius: 12px; font-size: 12px; font-weight: 800; color: var(--neon-purple); cursor: pointer; text-transform: uppercase; }
         #photo-preview { font-size: 11px; color: #28a745; margin-top: 8px; display: none; text-align: center; font-weight: 800; }
@@ -60,7 +55,9 @@
         .pay-btn.active { background: var(--neon-purple); border-color: var(--neon-purple); color: #fff; }
         
         .order-button { width: 100%; padding: 20px; background: var(--neon-yellow); color: #000; border: none; border-radius: 16px; font-size: 18px; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-top: 20px; }
-        #city-status { font-size: 9px; color: var(--silver); margin-bottom: 5px; font-weight: 800; text-align: right; }
+        
+        /* Стили для выбора города */
+        #city-status { font-size: 9px; color: var(--silver); margin-bottom: 5px; font-weight: 800; text-align: right; text-decoration: underline; cursor: pointer; }
     </style>
 </head>
 <body ontouchmove="handleScrollHide()" onclick="closeAllUI(event)">
@@ -68,7 +65,7 @@
 <div id="search-overlay"><div class="hourglass">⌛</div><div class="search-text">Поиск машины...</div></div>
 
 <div class="container">
-    <div id="city-status">ОПРЕДЕЛЕНИЕ ГОРОДА...</div>
+    <div id="city-status" onclick="changeCity()">ОПРЕДЕЛЕНИЕ ГОРОДА...</div>
     
     <div class="field-group">
         <label>Откуда:</label>
@@ -135,6 +132,20 @@
         }
     }
 
+    // Функция очистки адреса от города и области
+    function cleanAddressString(fullAddr, city) {
+        if (!fullAddr) return "";
+        let clean = fullAddr.replace("Россия, ", "");
+        if (city) {
+            // Удаляем название города, поселка и региона
+            const parts = clean.split(', ');
+            // Оставляем только те части, которые не являются городом или областью
+            const filtered = parts.filter(p => !p.includes(city) && !p.includes("обл") && !p.includes("край") && !p.includes("респ"));
+            return filtered.join(', ');
+        }
+        return clean;
+    }
+
     function autoLocate(fillFrom) {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(async (pos) => {
@@ -150,11 +161,19 @@
                         detectedCity = s.data.city || s.data.settlement;
                         document.getElementById('city-status').innerText = "ГОРОД: " + detectedCity.toUpperCase();
                         if (fillFrom) {
-                            document.getElementById('from').value = s.value.replace(s.data.country + ", " + s.data.region + ", ", "");
+                            document.getElementById('from').value = cleanAddressString(s.value, detectedCity);
                         }
                     }
                 } catch (e) {}
             });
+        }
+    }
+
+    function changeCity() {
+        const newCity = prompt("Введите название города:");
+        if (newCity) {
+            detectedCity = newCity;
+            document.getElementById('city-status').innerText = "ГОРОД: " + detectedCity.toUpperCase();
         }
     }
 
@@ -193,7 +212,8 @@
                     data.suggestions.forEach(s => {
                         const div = document.createElement('div');
                         div.className = 'suggestion-item';
-                        const clean = s.value.replace(/^.*?,\s*.*?,\s*/, "");
+                        // Используем функцию очистки для подсказок
+                        const clean = cleanAddressString(s.value, detectedCity);
                         div.innerText = clean;
                         div.onclick = () => { input.value = clean; container.style.display = 'none'; input.blur(); };
                         container.appendChild(div);
@@ -213,13 +233,14 @@
         if (!from || !to) { alert("Укажите маршрут"); return; }
         
         document.getElementById('search-overlay').style.display = 'flex';
-        const stops = Array.from(document.querySelectorAll('.stop-input')).map(i => i.value).join(' -> ');
+        const stopsArr = Array.from(document.querySelectorAll('.stop-input')).map(i => i.value).filter(v => v);
+        const fullRoute = [from, ...stopsArr, to].join(' -> ');
         
         setTimeout(() => {
             tg.sendData(JSON.stringify({
-                route: from + (stops ? " -> " + stops : "") + " -> " + to,
+                route: fullRoute,
                 price: currentPrice, pay: paymentMethod, comment: document.getElementById('comment').value,
-                photo: photoAdded, v: "1.2.3"
+                city: detectedCity, photo: photoAdded, v: "1.2.4"
             }));
             tg.close();
         }, 8000);
