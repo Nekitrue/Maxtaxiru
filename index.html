@@ -27,7 +27,6 @@
             letter-spacing: -0.2px;
         }
 
-        /* АНИМАЦИЯ ПЕСОЧНЫХ ЧАСОВ */
         #search-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(13, 13, 13, 0.98);
@@ -190,7 +189,7 @@
     
     <div class="field-group">
         <label>Куда:</label>
-        <input type="text" id="to" placeholder="Конечный адрес" autocomplete="off" oninput="getSuggestions(this)" onkeydown="if(event.keyCode==13) this.blur()">
+        <input type="text" id="to" placeholder="Название объекта или адрес" autocomplete="off" oninput="getSuggestions(this)" onkeydown="if(event.keyCode==13) this.blur()">
         <div class="suggestions"></div>
     </div>
 
@@ -235,10 +234,7 @@
     let photoAdded = false;
     let searchTimeout;
 
-    // --- АВТО-ГЕОЛОКАЦИЯ ПРИ ВХОДЕ ---
-    window.onload = function() {
-        autoGetLocation();
-    };
+    window.onload = function() { autoGetLocation(); };
 
     function autoGetLocation() {
         const fromInput = document.getElementById('from');
@@ -255,31 +251,63 @@
                     const result = await response.json();
                     if (result.suggestions?.length > 0) {
                         fromInput.value = cleanAddress(result.suggestions[0].value);
-                    } else {
-                        fromInput.placeholder = "Улица и дом";
-                    }
+                    } else { fromInput.placeholder = "Улица и дом"; }
                 } catch (e) { fromInput.placeholder = "Улица и дом"; }
-            }, () => {
-                fromInput.placeholder = "Улица и дом";
-                console.log("Геопозиция недоступна");
-            }, { enableHighAccuracy: true, timeout: 5000 });
+            }, () => { fromInput.placeholder = "Улица и дом"; }, { enableHighAccuracy: true, timeout: 5000 });
         }
     }
 
-    // Скрытие клавиатуры
-    document.addEventListener('click', function(e) {
-        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-            if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
-                document.activeElement.blur();
-            }
+    function cleanAddress(fullAddr) {
+        if (!fullAddr) return "";
+        const parts = fullAddr.split(', ');
+        // Если это аэропорт, ТЦ или вокзал, оставляем как есть (минус страна/область)
+        if (fullAddr.toLowerCase().includes("аэропорт") || fullAddr.toLowerCase().includes("вокзал") || fullAddr.toLowerCase().includes("тц ") || fullAddr.toLowerCase().includes("торговый центр")) {
+            // Убираем только первые части (Россия, обл Свердловская, г Екатеринбург)
+            return parts.slice(-2).join(', ');
         }
-    });
+        // Для обычных адресов берем Улицу и Дом
+        if (parts.length >= 2) {
+            const last = parts[parts.length - 1]; 
+            const prev = parts[parts.length - 2];
+            if (last.match(/\d/)) return prev + ", " + last;
+            return last;
+        }
+        return fullAddr;
+    }
 
-    window.addEventListener('scroll', function() {
-        if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
-            document.activeElement.blur();
+    async function getSuggestions(input) {
+        const query = input.value;
+        const container = input.nextElementSibling;
+        if (query.length < 3) {
+            if (input.id === 'from' && query.length === 0) showGeoPrompt(input);
+            else container.style.display = 'none';
+            return;
         }
-    });
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(async () => {
+            try {
+                const response = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": "Token " + DADATA_API_KEY },
+                    // Убраны границы bounds, чтобы находить ТЦ и Аэропорты
+                    body: JSON.stringify({ query, count: 5 }) 
+                });
+                const result = await response.json();
+                container.innerHTML = '';
+                if (result.suggestions?.length > 0) {
+                    container.style.display = 'block';
+                    result.suggestions.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'suggestion-item';
+                        const cleanAddrItem = cleanAddress(item.value);
+                        div.innerText = cleanAddrItem;
+                        div.onclick = () => { input.value = cleanAddrItem; container.style.display = 'none'; };
+                        container.appendChild(div);
+                    });
+                }
+            } catch (e) {}
+        }, 300);
+    }
 
     function showGeoPrompt(input) {
         if (input.value.length === 0) {
@@ -289,14 +317,9 @@
         }
     }
 
-    function cleanAddress(fullAddr) {
-        return fullAddr.replace(/.*?г Екатеринбург,\s*/, "").replace(/Россия,\s*/, "").replace(/.*?обл,\s*/, "");
-    }
-
     function getCurrentLocation() {
         const fromInput = document.getElementById('from');
         fromInput.nextElementSibling.style.display = 'none';
-        fromInput.placeholder = "Определяю...";
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(async (position) => {
                 const lat = position.coords.latitude;
@@ -314,39 +337,6 @@
                 } catch (e) {}
             }, () => alert("Включите GPS"));
         }
-    }
-
-    async function getSuggestions(input) {
-        const query = input.value;
-        const container = input.nextElementSibling;
-        if (query.length < 3) {
-            if (input.id === 'from' && query.length === 0) showGeoPrompt(input);
-            else container.style.display = 'none';
-            return;
-        }
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(async () => {
-            try {
-                const response = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": "Token " + DADATA_API_KEY },
-                    body: JSON.stringify({ query, count: 5, locations: [{ city: "Екатеринбург" }] })
-                });
-                const result = await response.json();
-                container.innerHTML = '';
-                if (result.suggestions?.length > 0) {
-                    container.style.display = 'block';
-                    result.suggestions.forEach(item => {
-                        const div = document.createElement('div');
-                        div.className = 'suggestion-item';
-                        const cleanAddrItem = cleanAddress(item.value);
-                        div.innerText = cleanAddrItem;
-                        div.onclick = () => { input.value = cleanAddrItem; container.style.display = 'none'; };
-                        container.appendChild(div);
-                    });
-                }
-            } catch (e) {}
-        }, 300);
     }
 
     function adjustPrice(amount) {
@@ -369,30 +359,21 @@
         div.id = 'stop-group';
         div.innerHTML = `
             <div class="label-row"><label>Промежуточный адрес:</label><button class="remove-btn" onclick="removeStop()">✕</button></div>
-            <input type="text" class="extra-input" placeholder="Введите адрес" autocomplete="off" oninput="getSuggestions(this)" onkeydown="if(event.keyCode==13) this.blur()">
+            <input type="text" class="extra-input" placeholder="Введите адрес" autocomplete="off" oninput="getSuggestions(this)">
             <div class="suggestions"></div>
         `;
         container.appendChild(div);
         document.getElementById('add-btn').style.display = 'none';
     }
 
-    function removeStop() {
-        document.getElementById('stop-group').remove();
-        document.getElementById('add-btn').style.display = 'block';
-    }
+    function removeStop() { document.getElementById('stop-group').remove(); document.getElementById('add-btn').style.display = 'block'; }
 
-    function handlePhoto(input) {
-        if (input.files && input.files[0]) {
-            photoAdded = true;
-            document.getElementById('photo-preview').style.display = 'block';
-        }
-    }
+    function handlePhoto(input) { if (input.files && input.files[0]) { photoAdded = true; document.getElementById('photo-preview').style.display = 'block'; } }
 
     function confirmOrder() {
         const from = document.getElementById('from').value;
         const to = document.getElementById('to').value;
         if (!from || !to) { tg.showAlert("Заполните адреса"); return; }
-        
         const extra = document.querySelector('.extra-input')?.value || "";
         const orderData = {
             route: extra ? `${from} -> ${extra} -> ${to}` : `${from} -> ${to}`,
@@ -401,7 +382,6 @@
             comment: document.getElementById('comment').value,
             photo: photoAdded ? "Есть" : "Нет"
         };
-
         tg.sendData(JSON.stringify(orderData));
         document.getElementById('search-overlay').style.display = 'flex';
         setTimeout(() => { tg.close(); }, 10000);
