@@ -3,78 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Такси MAX - v1.2.1</title>
+    <title>Такси MAX Neon Luxury - v1.2.2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --main-color: #fcc200; --bg-color: #f7f7f7; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg-color); margin: 0; padding: 10px 15px 80px 15px; }
-        .container { width: 100%; background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); box-sizing: border-box; }
-        
-        /* Песочные часы */
+        :root { 
+            --neon-yellow: #fcc200; --neon-purple: #bc13fe; --silver: #c0c0c0; 
+            --bg-dark: #0d0d0d; --card-bg: #1a1a1a; --input-bg: #252525;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            font-family: 'Montserrat', sans-serif; background: var(--bg-dark); color: var(--silver); 
+            margin: 0; padding: 10px 15px 60px 15px; min-height: 100vh;
+        }
+
+        /* ОВЕРЛЕЙ ПЕСОЧНЫЕ ЧАСЫ */
         #search-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.95); display: none; flex-direction: column; 
+            background: rgba(13, 13, 13, 0.98); display: none; flex-direction: column; 
             align-items: center; justify-content: center; z-index: 9999;
         }
-        .hourglass { font-size: 70px; animation: flip 2.5s infinite; margin-bottom: 25px; }
+        .hourglass {
+            font-size: 70px; color: var(--neon-purple); text-shadow: 0 0 20px var(--neon-purple);
+            animation: flip 2.5s ease-in-out infinite; margin-bottom: 25px;
+        }
         @keyframes flip { 0% { transform: rotate(0deg); } 100% { transform: rotate(180deg); } }
+        .search-text { font-weight: 800; color: var(--neon-yellow); text-transform: uppercase; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
+        .container { background: var(--card-bg); border-radius: 20px; padding: 20px; box-shadow: 0 0 25px rgba(188, 19, 254, 0.12); margin-bottom: 20px; }
         .field-group { margin-bottom: 18px; position: relative; }
-        label { font-size: 14px; font-weight: 600; color: #444; display: block; margin-bottom: 8px; }
+        label { font-size: 11px; font-weight: 800; color: var(--neon-yellow); text-transform: uppercase; display: block; margin-bottom: 8px; }
         
-        input, textarea { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 12px; font-size: 16px; box-sizing: border-box; outline: none; background: #fafafa; }
-        input:focus { border-color: var(--main-color); background: #fff; }
+        input, textarea { width: 100%; padding: 14px; border: 1px solid rgba(192, 192, 192, 0.2); border-radius: 12px; background: var(--input-bg); color: #fff; outline: none; font-size: 15px; }
+        input:focus { border-color: var(--neon-purple); }
 
-        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 0 0 12px 12px; z-index: 1000; max-height: 220px; overflow-y: auto; display: none; }
-        .suggestion-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #f5f5f5; font-size: 14px; }
-        .suggestion-item.geo-suggestion { color: #007bff; font-weight: 600; background: #f0f7ff; }
+        .btn-add-point { color: #007bff; font-size: 13px; font-weight: 800; border: none; background: none; cursor: pointer; padding: 5px 0 15px 0; display: block; text-transform: uppercase; }
+        .remove-point { color: #ff4d4d; font-size: 11px; font-weight: 800; border: none; background: none; cursor: pointer; float: right; }
 
-        .price-section { background: #fffcf0; border: 2px solid var(--main-color); border-radius: 18px; padding: 20px; text-align: center; margin: 20px 0; }
-        .price-display { font-size: 38px; font-weight: 800; margin-bottom: 15px; }
-        .btn-round { width: 50px; height: 50px; border-radius: 50%; border: none; background: #fff; font-size: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #2a2a2a; border: 1px solid var(--neon-purple); border-radius: 12px; z-index: 1000; display: none; max-height: 250px; overflow-y: auto; }
+        .suggestion-item { padding: 12px; border-bottom: 1px solid #333; color: #fff; font-size: 13px; cursor: pointer; }
         
-        .pay-btn { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid #eee; background: #fafafa; font-weight: 600; margin-bottom: 10px; }
-        .pay-btn.active { border-color: var(--main-color); background: var(--main-color); }
-
-        .order-button { width: 100%; padding: 18px; background: #000; color: white; border: none; border-radius: 15px; font-size: 18px; font-weight: 700; }
-        #city-badge { font-size: 10px; color: #28a745; font-weight: 800; margin-bottom: 5px; text-transform: uppercase; display: none; }
+        .price-section { border: 2px solid var(--neon-yellow); border-radius: 18px; padding: 15px; margin: 25px 0; }
+        .price-row { display: flex; align-items: center; justify-content: space-between; }
+        .price-display { font-size: 30px; font-weight: 800; color: var(--neon-yellow); }
+        .btn-round { width: 45px; height: 45px; border-radius: 50%; border: 1px solid var(--neon-purple); background: #252525; color: var(--neon-purple); font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        
+        .pay-row { display: flex; gap: 10px; margin-top: 10px; }
+        .pay-btn { flex: 1; padding: 14px; border-radius: 12px; border: 1px solid var(--silver); text-align: center; font-weight: 700; color: var(--silver); cursor: pointer; font-size: 13px; }
+        .pay-btn.active { background: var(--neon-purple); border-color: var(--neon-purple); color: #fff; }
+        
+        .order-button { width: 100%; padding: 20px; background: var(--neon-yellow); color: #000; border: none; border-radius: 16px; font-size: 18px; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-top: 20px; }
+        #city-status { font-size: 9px; color: #28a745; margin-bottom: 5px; font-weight: 800; text-align: right; }
     </style>
 </head>
 <body ontouchmove="handleScrollHide()" onclick="closeAllUI(event)">
 
-<div id="search-overlay"><div class="hourglass">⌛</div><div class="search-text">Ищем машину...</div></div>
+<div id="search-overlay"><div class="hourglass">⌛</div><div class="search-text">Поиск машины...</div></div>
 
 <div class="container">
-    <div id="city-badge">📍 Город определен</div>
+    <div id="city-status">ОПРЕДЕЛЕНИЕ ГОРОДА...</div>
+    
     <div class="field-group">
         <label>Откуда:</label>
-        <input type="text" id="from" placeholder="Улица и дом" autocomplete="off" onfocus="showGeoPrompt(this)" oninput="getSuggestions(this)">
+        <input type="text" id="from" placeholder="Улица и дом" autocomplete="off" oninput="getSuggestions(this)">
         <div class="suggestions"></div>
     </div>
 
     <div id="extra-stops"></div>
-    <button style="color: #007bff; border:none; background:none; font-weight:600; margin-bottom:15px;" id="add-btn" onclick="addExtraStop()">+ Заехать куда-то</button>
+    <button class="btn-add-point" id="add-btn" onclick="addStopField()">+ Добавить промежуточную точку</button>
     
     <div class="field-group">
         <label>Куда:</label>
-        <input type="text" id="to" placeholder="Куда едем?" autocomplete="off" oninput="getSuggestions(this)">
+        <input type="text" id="to" placeholder="Место назначения" autocomplete="off" oninput="getSuggestions(this)">
         <div class="suggestions"></div>
     </div>
 
+    <div class="field-group">
+        <label>Комментарий:</label>
+        <input type="text" id="comment" placeholder="Пожелания водителю..." onkeydown="if(event.key==='Enter'){this.blur();}">
+    </div>
+
     <div class="price-section">
-        <div class="price-display" id="display_price">300 ₽</div>
-        <div style="display:flex; justify-content:center; gap:20px;">
+        <div class="price-row">
             <button class="btn-round" onclick="adjustPrice(-100)">−</button>
+            <div class="price-display" id="display_price">300 ₽</div>
             <button class="btn-round" onclick="adjustPrice(100)">+</button>
         </div>
     </div>
 
     <div class="payment-container">
-        <div id="pay-cash" class="pay-btn active" onclick="setPayment('Наличные')">💵 Наличные</div>
-        <div id="pay-online" class="pay-btn" onclick="setPayment('Перевод')">📲 Перевод</div>
+        <label>Оплата:</label>
+        <div class="pay-row">
+            <div id="pay-cash" class="pay-btn active" onclick="setPayment('Наличные')">НАЛИЧНЫЕ</div>
+            <div id="pay-online" class="pay-btn" onclick="setPayment('ПЕРЕВОД')">ПЕРЕВОД</div>
+        </div>
     </div>
 
-    <button class="order-button" onclick="confirmOrder()">ЗАКАЗАТЬ</button>
+    <button class="order-button" onclick="confirmOrder()">ЗАКАЗАТЬ ТАКСИ</button>
 </div>
 
 <script>
@@ -82,10 +108,9 @@
     tg.expand();
 
     const DADATA_API_KEY = "6f49e7177e36608d4139b823d71466c86bd7ca4f"; 
-    let currentPrice = 300, paymentMethod = 'Наличные', searchTimeout;
-    let detectedCity = null; // Здесь будем хранить город для фильтрации
+    let currentPrice = 300, paymentMethod = 'Наличные', searchTimeout, detectedCity = null;
 
-    window.onload = function() { getCurrentLocation(false); }; // Тихий поиск города при входе
+    window.onload = function() { autoLocate(true); };
 
     function handleScrollHide() {
         if (document.activeElement) document.activeElement.blur();
@@ -98,39 +123,39 @@
         }
     }
 
-    function showGeoPrompt(input) {
-        if (input.value.length === 0 && !detectedCity) {
-            const container = input.nextElementSibling;
-            container.innerHTML = '<div class="suggestion-item geo-suggestion" onclick="getCurrentLocation(true)">📍 Определить мой город и адрес</div>';
-            container.style.display = 'block';
-        }
-    }
-
-    function getCurrentLocation(fillInput = true) {
+    function autoLocate(fillFrom) {
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(async (position) => {
-                const lat = position.coords.latitude, lon = position.coords.longitude;
+            navigator.geolocation.getCurrentPosition(async (pos) => {
                 try {
-                    const response = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address", {
+                    const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address", {
                         method: "POST",
                         headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": "Token " + DADATA_API_KEY },
-                        body: JSON.stringify({ lat: lat, lon: lon })
+                        body: JSON.stringify({ lat: pos.coords.latitude, lon: pos.coords.longitude })
                     });
-                    const result = await response.json();
+                    const result = await res.json();
                     if (result.suggestions && result.suggestions.length > 0) {
-                        const data = result.suggestions[0].data;
-                        detectedCity = data.city || data.settlement; // Сохраняем город
-                        
-                        document.getElementById('city-badge').innerText = `📍 ${detectedCity}`;
-                        document.getElementById('city-badge').style.display = 'block';
-
-                        if (fillInput) {
-                            document.getElementById('from').value = result.suggestions[0].value.replace(data.country + ", " + data.region + ", ", "");
+                        const s = result.suggestions[0];
+                        detectedCity = s.data.city || s.data.settlement;
+                        document.getElementById('city-status').innerText = "ГОРОД: " + detectedCity.toUpperCase();
+                        if (fillFrom) {
+                            document.getElementById('from').value = s.value.replace(s.data.country + ", " + s.data.region + ", ", "");
                         }
                     }
                 } catch (e) {}
             });
         }
+    }
+
+    function addStopField() {
+        const container = document.getElementById('extra-stops');
+        const div = document.createElement('div');
+        div.className = 'field-group';
+        div.innerHTML = `
+            <label>Промежуточная точка: <span class="remove-point" onclick="this.parentElement.parentElement.remove()">УДАЛИТЬ ✕</span></label>
+            <input type="text" class="stop-input" placeholder="Адрес остановки" oninput="getSuggestions(this)">
+            <div class="suggestions"></div>
+        `;
+        container.appendChild(div);
     }
 
     async function getSuggestions(input) {
@@ -141,41 +166,24 @@
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(async () => {
             try {
-                // ПАРАМЕТРЫ ФИЛЬТРАЦИИ
-                const body = {
-                    query: query,
-                    count: 7,
-                    from_bound: { value: "city" }, // Ищем от города
-                    to_bound: { value: "house" }   // До номера дома
-                };
+                const body = { query: query, count: 6, from_bound: {value: "city"}, to_bound: {value: "house"} };
+                if (detectedCity) body.locations = [{ city: detectedCity }];
 
-                // Если город определен, жестко ограничиваем поиск этим городом
-                if (detectedCity) {
-                    body.locations = [{ "city": detectedCity }];
-                    body.restrict_value = true; // Не показывать город в строке подсказки
-                }
-
-                const response = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
+                const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
                     method: "POST",
                     headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": "Token " + DADATA_API_KEY },
                     body: JSON.stringify(body)
                 });
-                
-                const result = await response.json();
+                const data = await res.json();
                 container.innerHTML = '';
-                if (result.suggestions) {
+                if (data.suggestions) {
                     container.style.display = 'block';
-                    result.suggestions.forEach(item => {
+                    data.suggestions.forEach(s => {
                         const div = document.createElement('div');
                         div.className = 'suggestion-item';
-                        // Убираем регион и страну из подсказки для красоты
-                        const cleanAddr = item.value.replace(/^.*?,\s*.*?,\s*/, ""); 
-                        div.innerText = cleanAddr;
-                        div.onclick = () => { 
-                            input.value = cleanAddr; 
-                            container.style.display = 'none'; 
-                            input.blur(); 
-                        };
+                        const clean = s.value.replace(/^.*?,\s*.*?,\s*/, "");
+                        div.innerText = clean;
+                        div.onclick = () => { input.value = clean; container.style.display = 'none'; input.blur(); };
                         container.appendChild(div);
                     });
                 }
@@ -183,14 +191,22 @@
         }, 300);
     }
 
-    function adjustPrice(amount) { if (currentPrice + amount >= 100) { currentPrice += amount; document.getElementById('display_price').innerText = currentPrice + " ₽"; } }
-    function setPayment(method) { paymentMethod = method; document.getElementById('pay-cash').classList.toggle('active', method === 'Наличные'); document.getElementById('pay-online').classList.toggle('active', method === 'Перевод'); }
+    function adjustPrice(v) { if (currentPrice + v >= 100) { currentPrice += v; document.getElementById('display_price').innerText = currentPrice + " ₽"; } }
+    function setPayment(m) { paymentMethod = m; document.getElementById('pay-cash').classList.toggle('active', m === 'Наличные'); document.getElementById('pay-online').classList.toggle('active', m === 'ПЕРЕВОД'); }
     
     function confirmOrder() {
-        if (!document.getElementById('from').value || !document.getElementById('to').value) { alert("Заполните адреса"); return; }
+        const from = document.getElementById('from').value;
+        const to = document.getElementById('to').value;
+        if (!from || !to) { alert("Укажите маршрут"); return; }
+        
         document.getElementById('search-overlay').style.display = 'flex';
+        const stops = Array.from(document.querySelectorAll('.stop-input')).map(i => i.value).join(' -> ');
+        
         setTimeout(() => {
-            tg.sendData(JSON.stringify({ from: document.getElementById('from').value, to: document.getElementById('to').value, price: currentPrice, city: detectedCity }));
+            tg.sendData(JSON.stringify({
+                route: from + (stops ? " -> " + stops : "") + " -> " + to,
+                price: currentPrice, pay: paymentMethod, comment: document.getElementById('comment').value
+            }));
             tg.close();
         }, 8000);
     }
