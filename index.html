@@ -14,60 +14,52 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
             font-family: 'Montserrat', sans-serif; background: var(--bg-dark); color: var(--silver); 
-            margin: 0; padding: 10px 15px 60px 15px; min-height: 100vh;
+            margin: 0; padding: 10px 15px; min-height: 100vh; position: relative;
         }
+        #app-version { position: absolute; bottom: 5px; right: 10px; font-size: 9px; color: #444; }
 
-        /* ОВЕРЛЕЙ С ЧАСАМИ */
-        #search-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(13, 13, 13, 0.98); display: none; flex-direction: column; 
-            align-items: center; justify-content: center; z-index: 9999;
-        }
-        .hourglass {
-            font-size: 70px; color: var(--neon-purple); text-shadow: 0 0 20px var(--neon-purple), 0 0 40px var(--neon-yellow);
-            animation: flip 2.5s ease-in-out infinite; margin-bottom: 25px;
-        }
-        @keyframes flip { 0% { transform: rotate(0deg); } 100% { transform: rotate(180deg); } }
-        .search-text { font-weight: 800; color: var(--neon-yellow); text-transform: uppercase; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-
-        .container { background: var(--card-bg); border-radius: 20px; padding: 20px; box-shadow: 0 0 25px rgba(188, 19, 254, 0.12); margin-bottom: 20px; }
+        .container { background: var(--card-bg); border-radius: 20px; padding: 20px; box-shadow: 0 0 25px rgba(188, 19, 254, 0.12); margin-bottom: 30px; }
+        
         .field-group { margin-bottom: 18px; position: relative; }
         label { font-size: 11px; font-weight: 800; color: var(--neon-yellow); text-transform: uppercase; display: block; margin-bottom: 8px; }
+        
+        /* Исправленное положение кнопок в строках */
         .input-row { display: flex; gap: 8px; align-items: center; width: 100%; }
-        input, textarea { flex: 1; padding: 14px; border: 1px solid rgba(192, 192, 192, 0.2); border-radius: 12px; background: var(--input-bg); color: #fff; outline: none; font-size: 15px; min-width: 0; }
-        input:focus, textarea:focus { border-color: var(--neon-purple); }
+        
+        input, textarea { 
+            flex: 1; padding: 14px; border: 1px solid rgba(192, 192, 192, 0.2); 
+            border-radius: 12px; background: var(--input-bg); color: #fff; outline: none; font-size: 15px;
+            min-width: 0; /* Важно для flex-контейнеров */
+        }
+        input:focus { border-color: var(--neon-purple); }
 
         .btn-add { background: none; border: 1px solid var(--neon-yellow); color: var(--neon-yellow); border-radius: 8px; padding: 10px 15px; font-weight: 800; cursor: pointer; flex-shrink: 0; }
         .btn-remove { background: none; border: 1px solid #ff4d4d; color: #ff4d4d; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; flex-shrink: 0; font-size: 20px; display: flex; align-items: center; justify-content: center; }
 
-        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #2a2a2a; border: 1px solid var(--neon-purple); border-radius: 12px; z-index: 1000; display: none; max-height: 250px; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .suggestions { 
+            position: absolute; top: 100%; left: 0; right: 0; background: #2a2a2a; 
+            border: 1px solid var(--neon-purple); border-radius: 12px; z-index: 1000; display: none; max-height: 200px; overflow-y: auto;
+        }
         .suggestion-item { padding: 12px; border-bottom: 1px solid #333; color: #fff; font-size: 13px; cursor: pointer; }
         
         .photo-block { margin-top: 10px; }
         .file-input-label { display: block; text-align: center; padding: 12px; background: #252525; border: 1px dashed var(--silver); border-radius: 10px; font-size: 13px; color: var(--silver); cursor: pointer; }
         #photo-preview { font-size: 12px; color: #28a745; margin-top: 8px; display: none; text-align: center; font-weight: 800; }
 
-        .price-section { border: 2px solid var(--neon-yellow); border-radius: 18px; padding: 15px; margin: 25px 0; }
+        /* Исправленное положение кнопок цены */
+        .price-section { border: 2px solid var(--neon-yellow); border-radius: 18px; padding: 15px; margin: 20px 0; }
         .price-container { display: flex; align-items: center; justify-content: space-between; }
         .price-display { font-size: 34px; font-weight: 800; color: var(--neon-yellow); flex: 1; text-align: center; }
         .btn-round { width: 50px; height: 50px; border-radius: 50%; border: 1px solid var(--neon-purple); background: #252525; color: var(--neon-purple); font-size: 24px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
         
-        .payment-container { margin-bottom: 25px; }
         .pay-row { display: flex; gap: 10px; margin-top: 10px; }
         .pay-btn { flex: 1; padding: 14px; border-radius: 12px; border: 1px solid var(--silver); text-align: center; font-weight: 700; color: var(--silver); cursor: pointer; }
         .pay-btn.active { background: var(--neon-purple); border-color: var(--neon-purple); color: #fff; }
         
-        .order-button { width: 100%; padding: 20px; background: var(--neon-yellow); color: #000; border: none; border-radius: 16px; font-size: 18px; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-top: 10px; }
-        #app-version { text-align: center; font-size: 9px; color: #444; margin-top: 20px; }
+        .order-button { width: 100%; padding: 20px; background: var(--neon-yellow); color: #000; border: none; border-radius: 16px; font-size: 18px; font-weight: 800; text-transform: uppercase; cursor: pointer; }
     </style>
 </head>
-<body onclick="closeAllUI(event)" ontouchmove="handleScrollHide()">
-
-<div id="search-overlay">
-    <div class="hourglass">⌛</div>
-    <div class="search-text">Поиск водителя...</div>
-</div>
+<body>
 
 <div class="container">
     <div class="field-group">
@@ -84,14 +76,14 @@
     <div class="field-group">
         <label>Куда:</label>
         <div class="input-row">
-            <input type="text" id="to" placeholder="ТЦ, аэропорт или улица" autocomplete="off" oninput="getOSMSuggestions(this)">
+            <input type="text" id="to" placeholder="Адрес или место" autocomplete="off" oninput="getOSMSuggestions(this)">
         </div>
         <div class="suggestions"></div>
     </div>
 
     <div class="field-group">
         <label>Комментарий:</label>
-        <textarea id="comment" rows="1" placeholder="Пожелания..." onkeydown="if(event.key==='Enter'){this.blur(); return false;}"></textarea>
+        <textarea id="comment" rows="1" placeholder="Ваши пожелания..."></textarea>
     </div>
 
     <div class="photo-block">
@@ -119,10 +111,10 @@
     <button class="order-button" onclick="confirmOrder()">ЗАКАЗАТЬ ТАКСИ</button>
 </div>
 
-<div id="app-version">v 1.1.2 - Hourglass Restore</div>
+<div id="app-version">v 1.0.9 - Layout Fixed</div>
 
 <script>
-    const APP_VERSION = "1.1.2 - Hourglass Restore";
+    const APP_VERSION = "1.0.9 - Layout Fixed";
     let tg = window.Telegram.WebApp;
     tg.expand();
     
@@ -131,24 +123,11 @@
 
     window.onload = function() { autoGetLocation(); };
 
-    function handleScrollHide() {
-        if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
-            document.activeElement.blur();
-        }
-        document.querySelectorAll('.suggestions').forEach(s => s.style.display = 'none');
-    }
-
-    function closeAllUI(e) {
-        if (!e.target.closest('.field-group')) {
-            document.querySelectorAll('.suggestions').forEach(s => s.style.display = 'none');
-            if (document.activeElement) document.activeElement.blur();
-        }
-    }
-
     function autoGetLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(async (pos) => {
-                userLat = pos.coords.latitude; userLon = pos.coords.longitude;
+                userLat = pos.coords.latitude;
+                userLon = pos.coords.longitude;
                 try {
                     const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${userLat}&lon=${userLon}&format=json&accept-language=ru`);
                     const data = await res.json();
@@ -157,54 +136,62 @@
                         document.getElementById('from').value = (addr.road && addr.house_number) ? `${addr.road}, ${addr.house_number}` : (addr.road || data.display_name.split(',')[0]);
                     }
                 } catch (e) {}
-            }, null, {enableHighAccuracy: true});
+            });
         }
     }
 
     function addStop() {
         const div = document.createElement('div');
         div.className = 'field-group';
-        div.innerHTML = `<label>Заехать:</label><div class="input-row"><input type="text" class="stop-input" placeholder="Адрес остановки" oninput="getOSMSuggestions(this)"><button class="btn-remove" onclick="this.parentElement.parentElement.remove()">×</button></div><div class="suggestions"></div>`;
+        div.innerHTML = `
+            <label>Заехать:</label>
+            <div class="input-row">
+                <input type="text" class="stop-input" placeholder="Адрес остановки" oninput="getOSMSuggestions(this)">
+                <button class="btn-remove" onclick="this.parentElement.parentElement.remove()">×</button>
+            </div>
+            <div class="suggestions"></div>`;
         document.getElementById('extra-stops').appendChild(div);
     }
 
     async function getOSMSuggestions(input) {
         const query = input.value;
         const container = input.closest('.field-group').querySelector('.suggestions');
-        if (query.length < 2) { container.style.display = 'none'; return; }
+        if (query.length < 3) { container.style.display = 'none'; return; }
+
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(async () => {
             try {
-                let url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=10&countrycodes=ru&accept-language=ru`;
-                if (userLat) url += `&viewbox=${userLon-0.5},${userLat+0.5},${userLon+0.5},${userLat-0.5}`;
+                let url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=8&countrycodes=ru&accept-language=ru`;
+                if (userLat) url += `&viewbox=${userLon-0.2},${userLat+0.2},${userLon+0.2},${userLat-0.2}`;
+
                 const response = await fetch(url);
                 const results = await response.json();
                 container.innerHTML = '';
-                if (results && results.length > 0) {
+                
+                if (results.length > 0) {
                     container.style.display = 'block';
                     results.forEach(item => {
                         const addr = item.address;
-                        const poiName = addr.amenity || addr.aeroway || addr.railway || addr.leisure || addr.shop || addr.tourism || addr.office || addr.mall || addr.historic;
+                        const poiName = addr.amenity || addr.aeroway || addr.railway || addr.leisure || addr.shop || addr.tourism || addr.office;
                         const road = addr.road || "";
                         const house = addr.house_number || "";
-                        const city = addr.city || addr.town || addr.village || "";
+                        
                         let mainText = poiName ? poiName : (road ? `${road}${house ? ', ' + house : ''}` : item.display_name.split(',')[0]);
-                        let subText = `${city ? city + ', ' : ''}${road ? road : ''}${house ? ' ' + house : ''}`;
-                        if (mainText === road) subText = item.display_name.split(',').slice(1, 3).join(', ');
+                        let subText = item.display_name.split(',').slice(1, 3).join(', ');
+
                         const div = document.createElement('div');
                         div.className = 'suggestion-item';
-                        div.innerHTML = `<div style="font-weight:800; color: #fff;">${mainText}</div><div style="font-size:10px; opacity:0.6; color: var(--silver);">${subText}</div>`;
-                        div.onclick = (e) => {
-                            e.stopPropagation();
-                            input.value = mainText + (house ? ', ' + house : '');
-                            container.style.display = 'none';
-                            input.blur();
+                        div.innerHTML = `<div style="font-weight:800">${mainText}</div><div style="font-size:10px; opacity:0.6">${subText}</div>`;
+                        
+                        div.onclick = () => { 
+                            input.value = mainText; 
+                            container.style.display = 'none'; 
                         };
                         container.appendChild(div);
                     });
                 }
             } catch (e) {}
-        }, 400);
+        }, 500);
     }
 
     function handlePhoto(input) { if (input.files[0]) { photoAdded = true; document.getElementById('photo-preview').style.display = 'block'; } }
@@ -217,15 +204,9 @@
         const stops = Array.from(document.querySelectorAll('.stop-input')).map(i => i.value).filter(v => v);
         if (!from || !to) { tg.showAlert("Заполните адреса"); return; }
         
-        tg.sendData(JSON.stringify({ 
-            route: `${from} ${stops.length ? '-> ' + stops.join(' -> ') : ''} -> ${to}`, 
-            price: currentPrice, pay: paymentMethod, 
-            comment: document.getElementById('comment').value, 
-            photo: photoAdded, v: APP_VERSION 
-        }));
-        
-        document.getElementById('search-overlay').style.display = 'flex';
-        setTimeout(() => { tg.close(); }, 8000);
+        const routeData = `${from} ${stops.length ? '-> ' + stops.join(' -> ') : ''} -> ${to}`;
+        tg.sendData(JSON.stringify({ route: routeData, price: currentPrice, pay: paymentMethod, v: APP_VERSION }));
+        tg.close();
     }
 </script>
 </body>
