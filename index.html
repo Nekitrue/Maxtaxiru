@@ -8,129 +8,68 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { 
-            --neon-yellow: #fcc200; 
-            --neon-purple: #bc13fe; 
-            --silver: #c0c0c0; 
-            --bg-dark: #0d0d0d; 
-            --card-bg: #1a1a1a;
-            --input-bg: #252525;
+            --neon-yellow: #fcc200; --neon-purple: #bc13fe; --silver: #c0c0c0; 
+            --bg-dark: #0d0d0d; --card-bg: #1a1a1a; --input-bg: #252525;
         }
-
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
         body { 
-            font-family: 'Montserrat', sans-serif; 
-            background: var(--bg-dark); 
-            color: var(--silver); 
-            margin: 0; 
-            padding: 10px 15px; 
-            letter-spacing: -0.2px;
-            overflow-x: hidden;
+            font-family: 'Montserrat', sans-serif; background: var(--bg-dark); color: var(--silver); 
+            margin: 0; padding: 10px 15px; letter-spacing: -0.2px; overflow-x: hidden;
         }
-
         #search-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(13, 13, 13, 0.98);
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 9999;
+            background: rgba(13, 13, 13, 0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999;
         }
-
         .hourglass {
-            font-size: 70px;
-            color: var(--neon-purple);
-            text-shadow: 0 0 20px var(--neon-purple), 0 0 40px var(--neon-yellow);
-            animation: flip 2.5s ease-in-out infinite;
-            margin-bottom: 25px;
+            font-size: 70px; color: var(--neon-purple); text-shadow: 0 0 20px var(--neon-purple), 0 0 40px var(--neon-yellow);
+            animation: flip 2.5s ease-in-out infinite; margin-bottom: 25px;
         }
-
         @keyframes flip { 0% { transform: rotate(0deg); } 100% { transform: rotate(180deg); } }
-
-        .search-text {
-            font-weight: 800; color: var(--neon-yellow); letter-spacing: 4px;
-            text-transform: uppercase; font-size: 15px; animation: pulse 1.5s infinite;
-        }
-
+        .search-text { font-weight: 800; color: var(--neon-yellow); text-transform: uppercase; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-
         .container { 
-            width: 100%; background: var(--card-bg); border-radius: 20px; 
-            padding: 20px; box-shadow: 0 0 25px rgba(188, 19, 254, 0.12); 
-            border: 1px solid rgba(192, 192, 192, 0.08);
+            width: 100%; background: var(--card-bg); border-radius: 20px; padding: 20px; 
+            box-shadow: 0 0 25px rgba(188, 19, 254, 0.12); border: 1px solid rgba(192, 192, 192, 0.08);
         }
-        
         .field-group { margin-bottom: 18px; position: relative; }
-        .label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        
-        label { font-size: 11px; font-weight: 800; color: var(--neon-yellow); text-transform: uppercase; letter-spacing: 1.5px; }
-        .remove-btn { color: #ff3b30; font-size: 18px; border: none; background: none; cursor: pointer; padding: 0 5px; }
-        
+        label { font-size: 11px; font-weight: 800; color: var(--neon-yellow); text-transform: uppercase; display: block; margin-bottom: 8px; }
         input, textarea { 
-            font-family: 'Montserrat', sans-serif; width: 100%; padding: 14px; 
-            border: 1px solid rgba(192, 192, 192, 0.2); border-radius: 12px; 
-            font-size: 15px; background: var(--input-bg); color: #fff; outline: none; transition: 0.3s; 
+            font-family: 'Montserrat', sans-serif; width: 100%; padding: 14px; border: 1px solid rgba(192, 192, 192, 0.2); 
+            border-radius: 12px; background: var(--input-bg); color: #fff; outline: none; font-size: 15px;
         }
-        input:focus { border-color: var(--neon-purple); box-shadow: 0 0 10px rgba(188, 19, 254, 0.3); }
-
-        .add-stop-btn { color: var(--neon-purple); font-size: 13px; font-weight: 600; border: none; background: none; padding: 10px 0; cursor: pointer; }
-
+        input:focus { border-color: var(--neon-purple); }
         .suggestions { 
-            position: absolute; top: 100%; left: 0; right: 0; 
-            background: #2a2a2a; border: 1px solid var(--neon-purple); 
-            border-radius: 12px; z-index: 1000; display: none; 
-            max-height: 200px; overflow-y: auto;
+            position: absolute; top: 100%; left: 0; right: 0; background: #2a2a2a; 
+            border: 1px solid var(--neon-purple); border-radius: 12px; z-index: 1000; display: none; max-height: 200px; overflow-y: auto;
         }
         .suggestion-item { padding: 12px; border-bottom: 1px solid #333; color: #fff; font-size: 13px; cursor: pointer; }
-        .suggestion-item.geo-suggestion { color: var(--neon-yellow); font-weight: 800; background: rgba(252, 194, 0, 0.08); }
-
-        .file-input-label { display: block; text-align: center; padding: 12px; background: #252525; border: 1px dashed var(--silver); border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
-        #photo-preview { font-size: 12px; color: #28a745; margin-top: 8px; display: none; text-align: center; font-weight: 800; }
-
         .price-section { background: rgba(252, 194, 0, 0.02); border: 2px solid var(--neon-yellow); border-radius: 18px; padding: 15px; margin: 20px 0; }
-        .price-container { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-        .price-display { font-size: 38px; font-weight: 800; color: var(--neon-yellow); flex-grow: 1; text-align: center; }
-        .btn-round { width: 50px; height: 50px; border-radius: 50%; border: 1px solid var(--neon-purple); background: #252525; color: var(--neon-purple); font-size: 24px; cursor: pointer; }
-
+        .price-container { display: flex; align-items: center; justify-content: space-between; }
+        .price-display { font-size: 38px; font-weight: 800; color: var(--neon-yellow); }
+        .btn-round { width: 50px; height: 50px; border-radius: 50%; border: 1px solid var(--neon-purple); background: #252525; color: var(--neon-purple); font-size: 24px; }
         .pay-row { display: flex; gap: 10px; margin-top: 10px; }
-        .pay-btn { flex: 1; padding: 14px 5px; border-radius: 12px; border: 1px solid var(--silver); background: var(--input-bg); font-size: 13px; font-weight: 700; color: var(--silver); cursor: pointer; text-align: center; text-transform: uppercase; }
-        .pay-btn.active { border-color: var(--neon-purple); background: var(--neon-purple); color: #fff; }
-
-        .order-button { width: 100%; padding: 20px; background: var(--neon-yellow); color: #000; border: none; border-radius: 16px; font-size: 18px; font-weight: 800; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
+        .pay-btn { flex: 1; padding: 14px; border-radius: 12px; border: 1px solid var(--silver); text-align: center; font-weight: 700; font-size: 13px; }
+        .pay-btn.active { background: var(--neon-purple); border-color: var(--neon-purple); color: #fff; }
+        .order-button { width: 100%; padding: 20px; background: var(--neon-yellow); color: #000; border: none; border-radius: 16px; font-size: 18px; font-weight: 800; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-<div id="search-overlay">
-    <div class="hourglass">⌛</div>
-    <div class="search-text">Поиск водителя...</div>
-</div>
+<div id="search-overlay"><div class="hourglass">⌛</div><div class="search-text">Поиск водителя...</div></div>
 
 <div class="container">
     <div class="field-group">
         <label>Откуда:</label>
-        <input type="text" id="from" placeholder="Определяем адрес..." autocomplete="off" onfocus="showGeoPrompt(this)" oninput="getSuggestions(this)" onkeydown="if(event.keyCode==13) this.blur()">
+        <input type="text" id="from" placeholder="Определяем город..." autocomplete="off" oninput="getSuggestions(this)">
         <div class="suggestions"></div>
     </div>
-
     <div id="extra-stops"></div>
-    <button class="add-stop-btn" id="add-btn" onclick="addExtraStop()">+ Добавить промежуточный адрес</button>
-    
     <div class="field-group">
         <label>Куда:</label>
-        <input type="text" id="to" placeholder="ТЦ, Аэропорт или адрес" autocomplete="off" oninput="getSuggestions(this)" onkeydown="if(event.keyCode==13) this.blur()">
+        <input type="text" id="to" placeholder="ТЦ, Аэропорт или улица" autocomplete="off" oninput="getSuggestions(this)">
         <div class="suggestions"></div>
     </div>
-
-    <div class="field-group">
-        <label>Комментарий:</label>
-        <textarea id="comment" rows="1" placeholder="Ваши пожелания..." onkeydown="if(event.keyCode==13) { this.blur(); return false; }"></textarea>
-    </div>
-
-    <div class="photo-block">
-        <label class="file-input-label" for="photo-upload">📷 Фото места ожидания</label>
-        <input type="file" id="photo-upload" accept="image/*" style="display:none" onchange="handlePhoto(this)">
-        <div id="photo-preview">✓ ФОТО ПРИКРЕПЛЕНО</div>
-    </div>
-
+    <div class="field-group"><label>Комментарий:</label><textarea id="comment" rows="1" placeholder="Ваши пожелания..."></textarea></div>
     <div class="price-section">
         <div class="price-container">
             <button class="btn-round" onclick="adjustPrice(-100)">−</button>
@@ -138,51 +77,47 @@
             <button class="btn-round" onclick="adjustPrice(100)">+</button>
         </div>
     </div>
-
     <div class="payment-container">
-        <label>Способ оплаты:</label>
+        <label>Оплата:</label>
         <div class="pay-row">
             <div id="pay-cash" class="pay-btn active" onclick="setPayment('Наличные')">Наличные</div>
             <div id="pay-online" class="pay-btn" onclick="setPayment('Перевод')">Перевод</div>
         </div>
     </div>
-
     <button class="order-button" onclick="confirmOrder()">ЗАКАЗАТЬ ТАКСИ</button>
 </div>
 
 <script>
     let tg = window.Telegram.WebApp;
     tg.expand();
-    tg.setHeaderColor("#0d0d0d");
-
-    const DADATA_API_KEY = "6f49e7177e36608d4139b823d71466c86bd7ca4f"; 
-    let currentPrice = 300;
-    let paymentMethod = 'Наличные';
-    let photoAdded = false;
-    let searchTimeout;
-    let userCity = ""; // Сюда сохраним город при автоопределении
+    const DADATA_API_KEY = "6f49e7177e36608d4139b823d71466c86bd7ca4f";
+    let currentPrice = 300, paymentMethod = 'Наличные', searchTimeout;
+    
+    // Хранилище данных о текущем городе
+    let currentCity = "";
+    let currentCityFiasId = "";
 
     window.onload = function() { autoGetLocation(); };
 
     function autoGetLocation() {
-        const fromInput = document.getElementById('from');
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(async (position) => {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
                 try {
                     const response = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address", {
                         method: "POST",
                         headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": "Token " + DADATA_API_KEY },
-                        body: JSON.stringify({ lat, lon })
+                        body: JSON.stringify({ lat: position.coords.latitude, lon: position.coords.longitude })
                     });
                     const result = await response.json();
                     if (result.suggestions?.length > 0) {
-                        const data = result.suggestions[0].data;
-                        userCity = data.city || data.settlement || ""; 
-                        fromInput.value = cleanAddress(result.suggestions[0].value);
+                        const d = result.suggestions[0].data;
+                        // Запоминаем город для жесткой фильтрации
+                        currentCity = d.city || d.settlement;
+                        currentCityFiasId = d.city_fias_id || d.settlement_fias_id;
+                        
+                        document.getElementById('from').value = cleanAddress(result.suggestions[0].value);
                     }
-                } catch (e) { fromInput.placeholder = "Улица и дом"; }
+                } catch (e) {}
             }, null, { enableHighAccuracy: true });
         }
     }
@@ -191,16 +126,13 @@
         if (!fullAddr) return "";
         const low = fullAddr.toLowerCase();
         const parts = fullAddr.split(', ');
-        // Если это аэропорт, ТЦ или вокзал - берем только название и город/улицу
-        if (low.includes("аэропорт") || low.includes("вокзал") || low.includes("тц ") || low.includes("центр") || low.includes("тк ")) {
+        if (low.includes("аэропорт") || low.includes("вокзал") || low.includes("тц ") || low.includes("центр")) {
             return parts.slice(-2).join(', ');
         }
-        // Для обычных адресов: берем Улицу и Дом
         if (parts.length >= 2) {
-            const last = parts[parts.length - 1]; 
+            const last = parts[parts.length - 1];
             const prev = parts[parts.length - 2];
-            if (last.match(/\d/)) return prev + ", " + last;
-            return last;
+            return last.match(/\d/) ? prev + ", " + last : last;
         }
         return fullAddr;
     }
@@ -208,24 +140,26 @@
     async function getSuggestions(input) {
         const query = input.value;
         const container = input.nextElementSibling;
-        if (query.length < 3) {
-            if (input.id === 'from' && query.length === 0) showGeoPrompt(input);
-            else container.style.display = 'none';
-            return;
-        }
+        if (query.length < 2) { container.style.display = 'none'; return; }
+
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(async () => {
             try {
-                let body = { query, count: 5 };
-                // Добавляем приоритет города, если он известен
-                if (userCity) {
-                    body.locations_boost = [{ "city": userCity }];
+                let body = { query: query, count: 5 };
+                
+                // ЖЕСТКАЯ ФИЛЬТРАЦИЯ: если город определен, ищем только в нем
+                if (currentCity) {
+                    body.locations = [{ "city": currentCity }];
+                    // Если есть Fias ID, поиск будет еще точнее
+                    if (currentCityFiasId) {
+                        body.locations = [{ "city_fias_id": currentCityFiasId }];
+                    }
                 }
 
                 const response = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
                     method: "POST",
                     headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": "Token " + DADATA_API_KEY },
-                    body: JSON.stringify(body) 
+                    body: JSON.stringify(body)
                 });
                 const result = await response.json();
                 container.innerHTML = '';
@@ -234,9 +168,9 @@
                     result.suggestions.forEach(item => {
                         const div = document.createElement('div');
                         div.className = 'suggestion-item';
-                        const cleanAddrItem = cleanAddress(item.value);
-                        div.innerText = cleanAddrItem;
-                        div.onclick = () => { input.value = cleanAddrItem; container.style.display = 'none'; };
+                        const val = cleanAddress(item.value);
+                        div.innerText = val;
+                        div.onclick = () => { input.value = val; container.style.display = 'none'; };
                         container.appendChild(div);
                     });
                 }
@@ -244,76 +178,16 @@
         }, 300);
     }
 
-    function showGeoPrompt(input) {
-        if (input.value.length === 0) {
-            const container = input.nextElementSibling;
-            container.innerHTML = '<div class="suggestion-item geo-suggestion" onclick="getCurrentLocation()">📍 Моё местоположение</div>';
-            container.style.display = 'block';
-        }
-    }
-
-    function getCurrentLocation() {
-        const fromInput = document.getElementById('from');
-        fromInput.nextElementSibling.style.display = 'none';
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(async (position) => {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
-                try {
-                    const response = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": "Token " + DADATA_API_KEY },
-                        body: JSON.stringify({ lat, lon })
-                    });
-                    const result = await response.json();
-                    if (result.suggestions?.length > 0) {
-                        fromInput.value = cleanAddress(result.suggestions[0].value);
-                    }
-                } catch (e) {}
-            }, () => alert("Включите GPS"));
-        }
-    }
-
-    function adjustPrice(amount) {
-        if (currentPrice + amount >= 100) {
-            currentPrice += amount;
-            document.getElementById('display_price').innerText = currentPrice + " ₽";
-        }
-    }
-
-    function setPayment(method) {
-        paymentMethod = method;
-        document.getElementById('pay-cash').classList.toggle('active', method === 'Наличные');
-        document.getElementById('pay-online').classList.toggle('active', method === 'Перевод');
-    }
-
-    function addExtraStop() {
-        const container = document.getElementById('extra-stops');
-        const div = document.createElement('div');
-        div.className = 'field-group'; div.id = 'stop-group';
-        div.innerHTML = `<div class="label-row"><label>Заехать:</label><button class="remove-btn" onclick="this.parentElement.parentElement.remove(); document.getElementById('add-btn').style.display='block';">✕</button></div>
-            <input type="text" class="extra-input" placeholder="Введите адрес" autocomplete="off" oninput="getSuggestions(this)">
-            <div class="suggestions"></div>`;
-        container.appendChild(div);
-        document.getElementById('add-btn').style.display = 'none';
-    }
-
-    function handlePhoto(input) { if (input.files && input.files[0]) { photoAdded = true; document.getElementById('photo-preview').style.display = 'block'; } }
-
+    function adjustPrice(amount) { if (currentPrice + amount >= 100) { currentPrice += amount; document.getElementById('display_price').innerText = currentPrice + " ₽"; } }
+    function setPayment(method) { paymentMethod = method; document.getElementById('pay-cash').classList.toggle('active', method === 'Наличные'); document.getElementById('pay-online').classList.toggle('active', method === 'Перевод'); }
+    
     function confirmOrder() {
         const from = document.getElementById('from').value;
         const to = document.getElementById('to').value;
         if (!from || !to) { tg.showAlert("Заполните адреса"); return; }
-        const extra = document.querySelector('.extra-input')?.value || "";
-        const orderData = {
-            route: extra ? `${from} -> ${extra} -> ${to}` : `${from} -> ${to}`,
-            price: currentPrice, pay: paymentMethod,
-            comment: document.getElementById('comment').value,
-            photo: photoAdded ? "Есть" : "Нет"
-        };
-        tg.sendData(JSON.stringify(orderData));
+        tg.sendData(JSON.stringify({ route: `${from} -> ${to}`, price: currentPrice, pay: paymentMethod }));
         document.getElementById('search-overlay').style.display = 'flex';
-        setTimeout(() => { tg.close(); }, 10000);
+        setTimeout(() => { tg.close(); }, 8000);
     }
 </script>
 </body>
