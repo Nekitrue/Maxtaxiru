@@ -5,7 +5,7 @@ from aiogram.filters import CommandStart
 
 # --- ЗАПОЛНИТЕ ЭТИ ДАННЫЕ ---
 API_TOKEN = '8200947498:AAHkXrN4ypCsRwtBCS1CJGfOiSW1R8Zf-0s' # Возьмите у @BotFather
-ADMIN_ID = 583029481         # Ваш ID (узнайте у @userinfobot)
+ADMIN_ID = Id: 7778609997         # Ваш ID (узнайте у @userinfobot)
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
