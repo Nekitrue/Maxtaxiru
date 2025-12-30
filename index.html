@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -310,9 +310,8 @@
             return;
         }
         
-        // 1. МОМЕНТАЛЬНАЯ ОТПРАВКА ДАННЫХ
+        // 1. МОМЕНТАЛЬНАЯ ОТПРАВКА
         const stopsArr = Array.from(document.querySelectorAll('.stop-input')).map(i => i.value).filter(v => v);
-        
         tg.sendData(JSON.stringify({
             from: fromInp.value,
             to: toInp.value,
@@ -323,14 +322,15 @@
             city: detectedCity || "Не определен"
         }));
 
-        // 2. ЗАПУСК АНИМАЦИИ НА 3 СЕКУНДЫ
+        // 2. ВКЛЮЧАЕМ ЧАСЫ
         document.getElementById('search-overlay').style.display = 'flex';
         
+        // 3. ПАУЗА 3 СЕКУНДЫ
         setTimeout(() => {
             document.getElementById('search-overlay').style.display = 'none';
-            // 3. ОКНО БЛАГОДАРНОСТИ
+            // 4. ОКНО "ЗАКАЗ ПРИНЯТ"
             alert("Спасибо за заказ! Водитель скоро свяжется с вами.");
-            // 4. ЗАКРЫТИЕ
+            // 5. ЗАКРЫВАЕМ
             tg.close();
         }, 3000);
     }
