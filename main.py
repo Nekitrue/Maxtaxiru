@@ -4,7 +4,7 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
 
 # --- ЗАПОЛНИТЕ ЭТИ ДАННЫЕ ---
-API_TOKEN = 'ВАШ_ТОКЕН_БОТА' # Возьмите у @BotFather
+API_TOKEN = '8200947498:AAHkXrN4ypCsRwtBCS1CJGfOiSW1R8Zf-0s' # Возьмите у @BotFather
 ADMIN_ID = 123456789         # Ваш ID (узнайте у @userinfobot)
 
 bot = Bot(token=API_TOKEN)
