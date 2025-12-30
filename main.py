@@ -1,50 +1,85 @@
-import json
 import asyncio
+import json
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
 
-# ДАННЫЕ ДЛЯ СВЯЗИ
-API_TOKEN = '8200947498:AAHkXrN4ypCsRwtBCS1CJGfOiSW1R8Zf-0s'
-ADMIN_ID = 7778609997 
+# ================= НАСТРОЙКИ =================
 
-bot = Bot(token=API_TOKEN)
+API_TOKEN = "8200947498:AAHkXrN4ypCsRwtBCS1CJGfOiSW1R8Zf-0s"
+ADMIN_ID = 7778609997
+
+WEBAPP_URL = "https://nekitrue.github.io/Maxtaxiru/"
+
+# =============================================
+
+bot = Bot(token=API_TOKEN, parse_mode="Markdown")
 dp = Dispatcher()
 
-@dp.message(CommandStart())
-async def cmd_start(message: types.Message):
-    await message.answer("🚕 Такси MAX приветствует вас! Используйте меню для заказа.")
 
-@dp.message(F.web_app_data)
+# ---------- /start ----------
+@dp.message(CommandStart())
+async def start(message: types.Message):
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=[
+            [
+                types.KeyboardButton(
+                    text="🚖 Заказать такси",
+                    web_app=types.WebAppInfo(url=WEBAPP_URL)
+                )
+            ]
+        ],
+        resize_keyboard=True
+    )
+
+    await message.answer(
+        "🚕 *Такси MAX приветствует вас!*\n\n"
+        "Нажмите кнопку ниже, чтобы оформить заказ 👇",
+        reply_markup=keyboard
+    )
+
+
+# ---------- ПРИЁМ ЗАКАЗА ИЗ WEB APP ----------
+@dp.message(F.web_app_data.data)
 async def handle_webapp_data(message: types.Message):
     try:
-        # Распаковка данных из HTML
         data = json.loads(message.web_app_data.data)
-        
-        order_text = (
-            f"🚕 **НОВЫЙ ЗАКАЗ!**\n"
-            f"━━━━━━━━━━━━━━\n"
-            f"📍 **ОТКУДА:** {data.get('from')}\n"
-            f"🏁 **КУДА:** {data.get('to')}\n"
-            f"🛑 **ОСТАНОВКИ:** {data.get('inter')}\n"
-            f"💰 **ЦЕНА:** {data.get('price')} ₽\n"
-            f"💳 **ОПЛАТА:** {data.get('pay')}\n"
-            f"💬 **КОММЕНТ:** {data.get('comment') or 'Нет'}\n"
-            f"🏙 **ГОРОД:** {data.get('city')}\n"
-            f"━━━━━━━━━━━━━━\n"
-            f"👤 **КЛИЕНТ:** @{message.from_user.username or 'скрыт'}"
-        )
-        
-        # Отправка вам
-        await bot.send_message(chat_id=ADMIN_ID, text=order_text, parse_mode="Markdown")
-        # Ответ клиенту
-        await message.answer("✅ **Заказ принят!** Водитель свяжется с вами.")
-        
-    except Exception as e:
-        await bot.send_message(chat_id=ADMIN_ID, text=f"❌ Ошибка: {e}")
 
+        order_text = (
+            f"🚕 *НОВЫЙ ЗАКАЗ!*\n"
+            f"━━━━━━━━━━━━━━\n"
+            f"🏙 *Город:* {data.get('city')}\n"
+            f"📍 *Откуда:* {data.get('from')}\n"
+            f"🏁 *Куда:* {data.get('to')}\n"
+            f"🛑 *Остановки:* {data.get('inter')}\n"
+            f"💬 *Комментарий:* {data.get('comment') or 'Нет'}\n"
+            f"💰 *Цена:* {data.get('price')} ₽\n"
+            f"💳 *Оплата:* {data.get('pay')}\n"
+            f"━━━━━━━━━━━━━━\n"
+            f"👤 *Клиент:* @{message.from_user.username or 'скрыт'}\n"
+            f"🆔 *ID:* `{message.from_user.id}`"
+        )
+
+        # Отправка админу
+        await bot.send_message(ADMIN_ID, order_text)
+
+        # Ответ клиенту
+        await message.answer(
+            "✅ *Заказ принят!*\n"
+            "Ожидайте, водитель скоро свяжется с вами 🚗"
+        )
+
+    except Exception as e:
+        await bot.send_message(
+            ADMIN_ID,
+            f"❌ *Ошибка при обработке заказа:*\n`{e}`"
+        )
+
+
+# ---------- ЗАПУСК ----------
 async def main():
-    print("Сервер запущен...")
+    print("🤖 Бот запущен и ждёт заказы")
     await dp.start_polling(bot)
+
 
 if __name__ == "__main__":
     asyncio.run(main())
