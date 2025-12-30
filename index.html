@@ -32,15 +32,11 @@
         label { font-size: 11px; font-weight: 800; color: var(--neon-yellow); text-transform: uppercase; display: block; margin-bottom: 8px; }
         .input-wrapper { position: relative; display: flex; align-items: center; }
         input { width: 100%; padding: 14px 40px 14px 14px; border: 1px solid rgba(192, 192, 192, 0.2); border-radius: 12px; background: var(--input-bg); color: #fff; outline: none; font-size: 15px; }
-        input.error { border-color: #ff4d4d; box-shadow: 0 0 10px rgba(255, 77, 77, 0.2); }
         .clear-btn { position: absolute; right: 12px; color: #fff; font-size: 18px; cursor: pointer; display: none; padding: 5px; }
         .btn-add-point { color: var(--neon-purple); font-size: 13px; font-weight: 800; border: none; background: none; cursor: pointer; padding: 5px 0 15px 0; display: block; text-transform: uppercase; }
         .remove-point { color: #ff4d4d; font-size: 11px; font-weight: 800; border: none; background: none; cursor: pointer; float: right; }
         .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #2a2a2a; border: 1px solid var(--neon-purple); border-radius: 12px; z-index: 1000; display: none; max-height: 250px; overflow-y: auto; }
         .suggestion-item { padding: 12px; border-bottom: 1px solid #333; color: #fff; font-size: 13px; cursor: pointer; }
-        .photo-block { margin-bottom: 18px; }
-        .file-input-label { display: block; text-align: center; padding: 14px; background: var(--input-bg); border: 1px solid var(--neon-purple); border-radius: 12px; font-size: 12px; font-weight: 800; color: var(--neon-purple); cursor: pointer; text-transform: uppercase; }
-        #photo-preview { font-size: 11px; color: #28a745; margin-top: 8px; display: none; text-align: center; font-weight: 800; }
         .price-section { border: 2px solid var(--neon-yellow); border-radius: 18px; padding: 15px; margin: 25px 0; }
         .price-row { display: flex; align-items: center; justify-content: space-between; }
         .price-display { font-size: 30px; font-weight: 800; color: var(--neon-yellow); }
@@ -51,9 +47,9 @@
         #city-selector-box { display: none; margin-bottom: 15px; }
     </style>
 </head>
-<body ontouchmove="handleScrollHide()" onclick="closeAllUI(event)">
+<body onclick="closeAllUI(event)">
 
-<div id="search-overlay"><div class="hourglass">⌛</div><div class="search-text">Поиск машины...</div></div>
+<div id="search-overlay"><div class="hourglass">⌛</div><div class="search-text">Отправка заказа...</div></div>
 
 <div class="container">
     <div class="top-info-row">
@@ -99,12 +95,6 @@
         </div>
     </div>
 
-    <div class="photo-block">
-        <label class="file-input-label" for="photo-upload">📷 Фото местоположения</label>
-        <input type="file" id="photo-upload" accept="image/*" style="display:none" onchange="handlePhoto(this)">
-        <div id="photo-preview">✓ ФОТО ПРИКРЕПЛЕНО</div>
-    </div>
-
     <div class="price-section">
         <div class="price-row">
             <button class="btn-round" onclick="adjustPrice(-100)">−</button>
@@ -126,26 +116,15 @@
     tg.expand();
 
     const DADATA_API_KEY = "6f49e7177e36608d4139b823d71466c86bd7ca4f"; 
-    let currentPrice = 300, paymentMethod = 'Наличные', searchTimeout, detectedCity = null, photoAdded = false;
+    let currentPrice = 300, paymentMethod = 'Наличные', searchTimeout, detectedCity = null;
 
     window.onload = function() { autoLocate(true); };
 
-    function handleScrollHide() { if (document.activeElement) document.activeElement.blur(); }
     function closeAllUI(e) { if (!e.target.closest('.field-group')) { document.querySelectorAll('.suggestions').forEach(s => s.style.display = 'none'); } }
     function toggleX(input) { input.nextElementSibling.style.display = input.value.length > 0 ? 'block' : 'none'; }
     function clearField(id) { const i = document.getElementById(id); i.value = ''; toggleX(i); i.focus(); }
     function toggleCitySelector() { const b = document.getElementById('city-selector-box'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; }
     
-    function cleanAddressString(fullAddr, city) {
-        if (!fullAddr) return "";
-        let clean = fullAddr.replace("Россия, ", "");
-        if (city) {
-            const parts = clean.split(', ');
-            return parts.filter(p => !p.includes(city) && !p.includes("обл") && !p.includes("край")).join(', ');
-        }
-        return clean;
-    }
-
     async function autoLocate(fillFrom) {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(async (pos) => {
@@ -158,7 +137,7 @@
                     if (r.suggestions && r.suggestions.length > 0) {
                         detectedCity = r.suggestions[0].data.city || r.suggestions[0].data.settlement;
                         document.getElementById('city-status').innerText = "ГОРОД: " + detectedCity.toUpperCase();
-                        if (fillFrom) { document.getElementById('from').value = cleanAddressString(r.suggestions[0].value, detectedCity); toggleX(document.getElementById('from')); }
+                        if (fillFrom) { document.getElementById('from').value = r.suggestions[0].value; toggleX(document.getElementById('from')); }
                     }
                 } catch (e) {}
             });
@@ -182,8 +161,8 @@
                 container.style.display = 'block';
                 data.suggestions.forEach(s => {
                     const div = document.createElement('div'); div.className = 'suggestion-item';
-                    const clean = cleanAddressString(s.value, detectedCity); div.innerText = clean;
-                    div.onclick = () => { input.value = clean; container.style.display = 'none'; toggleX(input); };
+                    div.innerText = s.value;
+                    div.onclick = () => { input.value = s.value; container.style.display = 'none'; toggleX(input); };
                     container.appendChild(div);
                 });
             }
@@ -203,25 +182,24 @@
         const to = document.getElementById('to').value;
         if (!from || !to) { alert("Укажите адреса!"); return; }
 
-        document.getElementById('search-overlay').style.display = 'flex';
+        // Мгновенная отправка данных
         const stopsArr = Array.from(document.querySelectorAll('.stop-input')).map(i => i.value).filter(v => v);
         
-        // Мгновенная отправка в Telegram
-        setTimeout(() => {
-            tg.sendData(JSON.stringify({
-                from: from,
-                to: to,
-                inter: stopsArr.length > 0 ? stopsArr.join(', ') : 'Нет',
-                price: currentPrice,
-                pay: paymentMethod,
-                comment: document.getElementById('comment').value,
-                city: detectedCity || "Не определен"
-            }));
-            tg.close();
-        }, 1000); 
+        tg.sendData(JSON.stringify({
+            from: from,
+            to: to,
+            inter: stopsArr.length > 0 ? stopsArr.join(', ') : 'Нет',
+            price: currentPrice,
+            pay: paymentMethod,
+            comment: document.getElementById('comment').value,
+            city: detectedCity || "Не определен"
+        }));
+
+        // Окно благодарности и мгновенное закрытие
+        alert("Спасибо за заказ! Водитель скоро свяжется с вами.");
+        tg.close(); 
     }
 
-    function handlePhoto(input) { if (input.files[0]) { photoAdded = true; document.getElementById('photo-preview').style.display = 'block'; } }
     function adjustPrice(v) { if (currentPrice + v >= 100) { currentPrice += v; document.getElementById('display_price').innerText = currentPrice + " ₽"; } }
     function setPayment(m) { paymentMethod = m; document.getElementById('pay-cash').classList.toggle('active', m === 'Наличные'); document.getElementById('pay-online').classList.toggle('active', m === 'ПЕРЕВОД'); }
 </script>
