@@ -3,37 +3,47 @@ import asyncio
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
 
-# Вставьте сюда ваши данные аккуратно (в кавычках)
+# ДАННЫЕ ДЛЯ СВЯЗИ
 API_TOKEN = '8200947498:AAHkXrN4ypCsRwtBCS1CJGfOiSW1R8Zf-0s'
-ADMIN_ID = 7778609997
+ADMIN_ID = 7778609997 
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
 @dp.message(CommandStart())
 async def cmd_start(message: types.Message):
-    await message.answer("✅ Связь установлена! Бот работает. Ожидаю заказы из Web App.")
+    await message.answer("🚕 Такси MAX приветствует вас! Используйте меню для заказа.")
 
 @dp.message(F.web_app_data)
 async def handle_webapp_data(message: types.Message):
     try:
+        # Распаковка данных из HTML
         data = json.loads(message.web_app_data.data)
-        order_card = (
-            f"🚕 НОВЫЙ ЗАКАЗ!\n"
-            f"📍 Откуда: {data.get('from')}\n"
-            f"🏁 Куда: {data.get('to')}\n"
-            f"🛑 Остановка: {data.get('inter')}\n"
-            f"💰 Цена: {data.get('price')} ₽\n"
-            f"💳 Оплата: {data.get('pay')}\n"
-            f"💬 Коммент: {data.get('comment')}"
+        
+        order_text = (
+            f"🚕 **НОВЫЙ ЗАКАЗ!**\n"
+            f"━━━━━━━━━━━━━━\n"
+            f"📍 **ОТКУДА:** {data.get('from')}\n"
+            f"🏁 **КУДА:** {data.get('to')}\n"
+            f"🛑 **ОСТАНОВКИ:** {data.get('inter')}\n"
+            f"💰 **ЦЕНА:** {data.get('price')} ₽\n"
+            f"💳 **ОПЛАТА:** {data.get('pay')}\n"
+            f"💬 **КОММЕНТ:** {data.get('comment') or 'Нет'}\n"
+            f"🏙 **ГОРОД:** {data.get('city')}\n"
+            f"━━━━━━━━━━━━━━\n"
+            f"👤 **КЛИЕНТ:** @{message.from_user.username or 'скрыт'}"
         )
-        await bot.send_message(chat_id=ADMIN_ID, text=order_card)
-        await message.answer("✅ Заказ принят! Водитель свяжется с вами.")
+        
+        # Отправка вам
+        await bot.send_message(chat_id=ADMIN_ID, text=order_text, parse_mode="Markdown")
+        # Ответ клиенту
+        await message.answer("✅ **Заказ принят!** Водитель свяжется с вами.")
+        
     except Exception as e:
-        await bot.send_message(chat_id=ADMIN_ID, text=f"❌ Ошибка данных: {e}")
+        await bot.send_message(chat_id=ADMIN_ID, text=f"❌ Ошибка: {e}")
 
 async def main():
-    print("Приемник запущен...")
+    print("Сервер запущен...")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
