@@ -17,68 +17,44 @@
             margin: 0; padding: 10px 15px 60px 15px; min-height: 100vh;
         }
 
-        /* Оверлей поиска */
-        #search-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(13, 13, 13, 0.98); display: none; flex-direction: column; 
-            align-items: center; justify-content: center; z-index: 9999;
-        }
-        .hourglass { font-size: 70px; color: var(--neon-purple); animation: flip 2.5s infinite; margin-bottom: 25px; }
-        @keyframes flip { 0% { transform: rotate(0deg); } 100% { transform: rotate(180deg); } }
-        .search-text { font-weight: 800; color: var(--neon-yellow); text-transform: uppercase; letter-spacing: 1px; }
-
-        /* Шапка */
         .top-info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
         .version-label { font-size: 9px; color: rgba(192, 192, 192, 0.4); font-weight: 600; }
         #city-status { font-size: 9px; color: var(--silver); font-weight: 800; text-decoration: underline; cursor: pointer; text-transform: uppercase; }
 
-        /* Поля ввода */
         .container { background: var(--card-bg); border-radius: 20px; padding: 20px; box-shadow: 0 0 25px rgba(188, 19, 254, 0.12); }
         .field-group { margin-bottom: 18px; position: relative; }
         label { font-size: 11px; font-weight: 800; color: var(--neon-yellow); text-transform: uppercase; display: block; margin-bottom: 8px; }
         
         .input-wrapper { position: relative; display: flex; align-items: center; }
-        input { width: 100%; padding: 14px 40px 14px 14px; border: 1px solid rgba(192, 192, 192, 0.2); border-radius: 12px; background: var(--input-bg); color: #fff; outline: none; font-size: 15px; transition: 0.3s; }
-        input:focus { border-color: var(--neon-purple); }
+        input { width: 100%; padding: 14px 40px 14px 14px; border: 1px solid rgba(192, 192, 192, 0.2); border-radius: 12px; background: var(--input-bg); color: #fff; outline: none; font-size: 15px; }
         input.error { border-color: #ff4d4d; box-shadow: 0 0 10px rgba(255, 77, 77, 0.2); }
         
-        .clear-btn { position: absolute; right: 12px; color: #fff; font-size: 18px; cursor: pointer; display: none; padding: 5px; opacity: 0.7; }
+        .clear-btn { position: absolute; right: 12px; color: #fff; font-size: 18px; cursor: pointer; display: none; padding: 5px; }
 
         .btn-add-point { color: var(--neon-purple); font-size: 13px; font-weight: 800; border: none; background: none; cursor: pointer; padding: 5px 0 15px 0; display: block; text-transform: uppercase; }
         .remove-point { color: #ff4d4d; font-size: 11px; font-weight: 800; border: none; background: none; cursor: pointer; float: right; }
 
-        /* Подсказки */
-        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #2a2a2a; border: 1px solid var(--neon-purple); border-radius: 12px; z-index: 1000; display: none; max-height: 250px; overflow-y: auto; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #2a2a2a; border: 1px solid var(--neon-purple); border-radius: 12px; z-index: 1000; display: none; max-height: 250px; overflow-y: auto; }
         .suggestion-item { padding: 12px; border-bottom: 1px solid #333; color: #fff; font-size: 13px; cursor: pointer; }
-        .suggestion-item:last-child { border-bottom: none; }
         
-        /* Фото */
         .photo-block { margin-bottom: 18px; }
         .file-input-label { display: block; text-align: center; padding: 14px; background: var(--input-bg); border: 1px solid var(--neon-purple); border-radius: 12px; font-size: 12px; font-weight: 800; color: var(--neon-purple); cursor: pointer; text-transform: uppercase; }
         #photo-preview { font-size: 11px; color: #28a745; margin-top: 8px; display: none; text-align: center; font-weight: 800; }
 
-        /* Цена */
         .price-section { border: 2px solid var(--neon-yellow); border-radius: 18px; padding: 15px; margin: 25px 0; }
         .price-row { display: flex; align-items: center; justify-content: space-between; }
         .price-display { font-size: 30px; font-weight: 800; color: var(--neon-yellow); }
         .btn-round { width: 45px; height: 45px; border-radius: 50%; border: 1px solid var(--neon-purple); background: #252525; color: var(--neon-purple); font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         
-        /* Оплата */
-        .pay-btn { flex: 1; padding: 14px; border-radius: 12px; border: 1px solid var(--silver); text-align: center; font-weight: 700; color: var(--silver); cursor: pointer; font-size: 13px; transition: 0.2s; }
+        .pay-btn { flex: 1; padding: 14px; border-radius: 12px; border: 1px solid var(--silver); text-align: center; font-weight: 700; color: var(--silver); cursor: pointer; font-size: 13px; }
         .pay-btn.active { background: var(--neon-purple); border-color: var(--neon-purple); color: #fff; }
         
-        .order-button { width: 100%; padding: 20px; background: var(--neon-yellow); color: #000; border: none; border-radius: 16px; font-size: 18px; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-top: 20px; transition: transform 0.1s; }
-        .order-button:active { transform: scale(0.98); }
+        .order-button { width: 100%; padding: 20px; background: var(--neon-yellow); color: #000; border: none; border-radius: 16px; font-size: 18px; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-top: 20px; }
         
         #city-selector-box { display: none; margin-bottom: 15px; }
     </style>
 </head>
 <body ontouchmove="handleScrollHide()" onclick="closeAllUI(event)">
-
-<div id="search-overlay">
-    <div class="hourglass">⌛</div>
-    <div class="search-text">Поиск машины...</div>
-</div>
 
 <div class="container">
     <div class="top-info-row">
@@ -105,7 +81,7 @@
     </div>
 
     <div id="extra-stops"></div>
-    <button class="btn-add-point" onclick="addStopField()">+ Добавить точку</button>
+    <button class="btn-add-point" onclick="addStopField()">+ Добавить промежуточную точку</button>
     
     <div class="field-group">
         <label>Куда:</label>
@@ -119,13 +95,13 @@
     <div class="field-group">
         <label>Комментарий:</label>
         <div class="input-wrapper">
-            <input type="text" id="comment" placeholder="Доп. информация" oninput="toggleX(this)">
+            <input type="text" id="comment" placeholder="Информация для водителя" oninput="toggleX(this)" onkeydown="if(event.key==='Enter'){this.blur();}">
             <span class="clear-btn" onclick="clearField('comment')">✕</span>
         </div>
     </div>
 
     <div class="photo-block">
-        <label class="file-input-label" for="photo-upload">📷 Фото местоположения</label>
+        <label class="file-input-label" for="photo-upload">📷 Сфотографировать местоположение</label>
         <input type="file" id="photo-upload" accept="image/*" style="display:none" onchange="handlePhoto(this)">
         <div id="photo-preview">✓ ФОТО ПРИКРЕПЛЕНО</div>
     </div>
@@ -138,9 +114,11 @@
         </div>
     </div>
 
-    <div style="display:flex; gap:10px;">
-        <div id="pay-cash" class="pay-btn active" onclick="setPayment('Наличные')">НАЛИЧНЫЕ</div>
-        <div id="pay-online" class="pay-btn" onclick="setPayment('ПЕРЕВОД')">ПЕРЕВОД</div>
+    <div class="payment-container">
+        <div style="display:flex; gap:10px;">
+            <div id="pay-cash" class="pay-btn active" onclick="setPayment('Наличные')">НАЛИЧНЫЕ</div>
+            <div id="pay-online" class="pay-btn" onclick="setPayment('ПЕРЕВОД')">ПЕРЕВОД</div>
+        </div>
     </div>
 
     <button class="order-button" onclick="confirmOrder()">ЗАКАЗАТЬ ТАКСИ</button>
@@ -151,9 +129,9 @@
     tg.expand();
 
     const DADATA_API_KEY = "6f49e7177e36608d4139b823d71466c86bd7ca4f"; 
-    let currentPrice = 300, paymentMethod = 'Наличные', searchTimeout, detectedCity = null;
+    let currentPrice = 300, paymentMethod = 'Наличные', searchTimeout, detectedCity = null, photoAdded = false;
 
-    window.onload = () => autoLocate(true);
+    window.onload = function() { autoLocate(true); };
 
     function handleScrollHide() {
         if (document.activeElement) document.activeElement.blur();
@@ -187,7 +165,9 @@
         if (!fullAddr) return "";
         let clean = fullAddr.replace("Россия, ", "");
         if (city) {
-            return clean.split(', ').filter(p => !p.includes(city) && !p.includes("обл") && !p.includes("край")).join(', ');
+            const parts = clean.split(', ');
+            const filtered = parts.filter(p => !p.includes(city) && !p.includes("обл") && !p.includes("край") && !p.includes("респ"));
+            return filtered.join(', ');
         }
         return clean;
     }
@@ -198,19 +178,18 @@
                 try {
                     const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address", {
                         method: "POST",
-                        headers: { "Content-Type": "application/json", "Authorization": "Token " + DADATA_API_KEY },
+                        headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": "Token " + DADATA_API_KEY },
                         body: JSON.stringify({ lat: pos.coords.latitude, lon: pos.coords.longitude })
                     });
                     const result = await res.json();
-                    if (result.suggestions?.length > 0) {
+                    if (result.suggestions && result.suggestions.length > 0) {
                         const s = result.suggestions[0];
                         detectedCity = s.data.city || s.data.settlement;
                         document.getElementById('city-status').innerText = "ГОРОД: " + detectedCity.toUpperCase();
                         if (fillFrom) {
                             const cleaned = cleanAddressString(s.value, detectedCity);
-                            const fromField = document.getElementById('from');
-                            fromField.value = cleaned;
-                            toggleX(fromField);
+                            document.getElementById('from').value = cleaned;
+                            toggleX(document.getElementById('from'));
                         }
                     }
                 } catch (e) {}
@@ -220,16 +199,18 @@
 
     async function getCitySuggestions(input) {
         toggleX(input);
-        if (input.value.length < 2) return;
+        const query = input.value;
+        const container = input.parentElement.nextElementSibling;
+        if (query.length < 2) { container.style.display = 'none'; return; }
+
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(async () => {
             const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
                 method: "POST",
-                headers: { "Content-Type": "application/json", "Authorization": "Token " + DADATA_API_KEY },
-                body: JSON.stringify({ query: input.value, from_bound: {value: "city"}, to_bound: {value: "city"} })
+                headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": "Token " + DADATA_API_KEY },
+                body: JSON.stringify({ query: query, count: 5, from_bound: {value: "city"}, to_bound: {value: "city"} })
             });
             const data = await res.json();
-            const container = input.parentElement.nextElementSibling;
             container.innerHTML = '';
             if (data.suggestions) {
                 container.style.display = 'block';
@@ -252,19 +233,21 @@
 
     async function getSuggestions(input) {
         toggleX(input);
-        if (input.value.length < 3) return;
+        const query = input.value;
+        const container = input.parentElement.nextElementSibling;
+        if (query.length < 3) { container.style.display = 'none'; return; }
+
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(async () => {
-            const body = { query: input.value, count: 6 };
+            const body = { query: query, count: 6, from_bound: {value: "city"}, to_bound: {value: "house"} };
             if (detectedCity) body.locations = [{ city: detectedCity }];
 
             const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
                 method: "POST",
-                headers: { "Content-Type": "application/json", "Authorization": "Token " + DADATA_API_KEY },
+                headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": "Token " + DADATA_API_KEY },
                 body: JSON.stringify(body)
             });
             const data = await res.json();
-            const container = input.parentElement.nextElementSibling;
             container.innerHTML = '';
             if (data.suggestions) {
                 container.style.display = 'block';
@@ -273,7 +256,7 @@
                     div.className = 'suggestion-item';
                     const clean = cleanAddressString(s.value, detectedCity);
                     div.innerText = clean;
-                    div.onclick = () => { input.value = clean; container.style.display = 'none'; toggleX(input); };
+                    div.onclick = () => { input.value = clean; container.style.display = 'none'; input.blur(); toggleX(input); };
                     container.appendChild(div);
                 });
             }
@@ -285,9 +268,10 @@
         const div = document.createElement('div');
         div.className = 'field-group';
         div.innerHTML = `
-            <label>Остановка: <span class="remove-point" onclick="this.parentElement.parentElement.remove()">✕</span></label>
+            <label>Промежуточная точка: <span class="remove-point" onclick="this.parentElement.parentElement.remove()">УДАЛИТЬ ✕</span></label>
             <div class="input-wrapper">
                 <input type="text" class="stop-input" placeholder="Адрес остановки" oninput="getSuggestions(this)">
+                <span class="clear-btn" onclick="this.previousElementSibling.value=''; this.style.display='none';">✕</span>
             </div>
             <div class="suggestions"></div>
         `;
@@ -299,12 +283,11 @@
     function confirmOrder() {
         const fromInp = document.getElementById('from');
         const toInp = document.getElementById('to');
-        const stopsArr = Array.from(document.querySelectorAll('.stop-input')).map(i => i.value).filter(v => v);
-        
-        // Проверка заполнения и наличия дома
         let valid = true;
+
+        // Проверка наличия номера дома
         [fromInp, toInp, ...document.querySelectorAll('.stop-input')].forEach(inp => {
-            if (!inp.value || !hasHouse(inp.value)) {
+            if (!hasHouse(inp.value)) {
                 inp.classList.add('error');
                 valid = false;
             } else {
@@ -313,14 +296,14 @@
         });
 
         if (!valid) {
-            alert("Пожалуйста, укажите полный адрес (улица и номер дома)!");
+            alert("Пожалуйста, укажите НОМЕР ДОМА в каждом адресе.");
             return;
         }
-
-        // --- ЛОГИКА ОТПРАВКИ ---
         
-        // 1. Сначала подготавливаем данные
-        const orderData = {
+        const stopsArr = Array.from(document.querySelectorAll('.stop-input')).map(i => i.value).filter(v => v);
+        
+        // МОМЕНТАЛЬНАЯ ОТПРАВКА
+        tg.sendData(JSON.stringify({
             from: fromInp.value,
             to: toInp.value,
             inter: stopsArr.length > 0 ? stopsArr.join(', ') : 'Нет',
@@ -328,23 +311,14 @@
             pay: paymentMethod,
             comment: document.getElementById('comment').value,
             city: detectedCity || "Не определен"
-        };
+        }));
 
-        // 2. Показываем песочные часы
-        document.getElementById('search-overlay').style.display = 'flex';
-
-        // 3. Через 3 секунды отправляем данные, показываем спасибо и закрываем
-        setTimeout(() => {
-            tg.sendData(JSON.stringify(orderData)); // Отправка боту
-            
-            document.getElementById('search-overlay').style.display = 'none';
-            alert("Спасибо за заказ! Водитель скоро свяжется с вами.");
-            
-            tg.close(); // Закрытие окна
-        }, 3000);
+        // МГНОВЕННОЕ СООБЩЕНИЕ И ЗАКРЫТИЕ
+        alert("Спасибо за заказ! Водитель скоро свяжется с вами.");
+        tg.close();
     }
 
-    function handlePhoto(input) { if (input.files[0]) document.getElementById('photo-preview').style.display = 'block'; }
+    function handlePhoto(input) { if (input.files[0]) { photoAdded = true; document.getElementById('photo-preview').style.display = 'block'; } }
     function adjustPrice(v) { if (currentPrice + v >= 100) { currentPrice += v; document.getElementById('display_price').innerText = currentPrice + " ₽"; } }
     function setPayment(m) { paymentMethod = m; document.getElementById('pay-cash').classList.toggle('active', m === 'Наличные'); document.getElementById('pay-online').classList.toggle('active', m === 'ПЕРЕВОД'); }
 </script>
