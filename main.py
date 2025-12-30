@@ -85,6 +85,9 @@ async def handle_webapp_data(message: types.Message):
 
 # ---------- ЗАПУСК ----------
 async def main():
+    # 🔥 ВАЖНО: удаляем webhook, чтобы не было конфликта getUpdates
+    await bot.delete_webhook(drop_pending_updates=True)
+
     print("🤖 Бот запущен и ждёт заказы")
     await dp.start_polling(bot)
 
