@@ -1,7 +1,9 @@
 import asyncio
 import json
+
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
+from aiogram.client.default import DefaultBotProperties
 
 # ================= НАСТРОЙКИ =================
 
@@ -12,7 +14,13 @@ WEBAPP_URL = "https://nekitrue.github.io/Maxtaxiru/"
 
 # =============================================
 
-bot = Bot(token=API_TOKEN, parse_mode="Markdown")
+
+# Инициализация бота (aiogram 3.7+)
+bot = Bot(
+    token=API_TOKEN,
+    default=DefaultBotProperties(parse_mode="Markdown")
+)
+
 dp = Dispatcher()
 
 
@@ -38,7 +46,7 @@ async def start(message: types.Message):
     )
 
 
-# ---------- ПРИЁМ ЗАКАЗА ИЗ WEB APP ----------
+# ---------- ПРИЁМ ДАННЫХ ИЗ WEB APP ----------
 @dp.message(F.web_app_data.data)
 async def handle_webapp_data(message: types.Message):
     try:
@@ -71,7 +79,7 @@ async def handle_webapp_data(message: types.Message):
     except Exception as e:
         await bot.send_message(
             ADMIN_ID,
-            f"❌ *Ошибка при обработке заказа:*\n`{e}`"
+            f"❌ *Ошибка обработки заказа:*\n`{e}`"
         )
 
 
