@@ -10,10 +10,10 @@ from aiogram.client.default import DefaultBotProperties
 API_TOKEN = "8200947498:AAHkXrN4ypCsRwtBCS1CJGfOiSW1R8Zf-0s"
 ADMIN_ID = 7778609997
 
+# Убедитесь, что эта ссылка совпадает с вашим GitHub Pages
 WEBAPP_URL = "https://nekitrue.github.io/Maxtaxiru/"
 
 # =============================================
-
 
 # Инициализация бота (aiogram 3.7+)
 bot = Bot(
@@ -23,10 +23,19 @@ bot = Bot(
 
 dp = Dispatcher()
 
-
 # ---------- /start ----------
 @dp.message(CommandStart())
 async def start(message: types.Message):
+    # Установка синей кнопки (Menu Button) для этого пользователя
+    await bot.set_chat_menu_button(
+        chat_id=message.chat.id,
+        menu_button=types.MenuButtonWebApp(
+            text="Заказать такси",
+            web_app=types.WebAppInfo(url=WEBAPP_URL)
+        )
+    )
+
+    # Обычная кнопка в чате для подстраховки
     keyboard = types.ReplyKeyboardMarkup(
         keyboard=[
             [
@@ -41,7 +50,7 @@ async def start(message: types.Message):
 
     await message.answer(
         "🚕 *Такси MAX приветствует вас!*\n\n"
-        "Нажмите кнопку ниже, чтобы оформить заказ 👇",
+        "Синяя кнопка заказа теперь всегда доступна в углу меню 👇",
         reply_markup=keyboard
     )
 
@@ -50,8 +59,10 @@ async def start(message: types.Message):
 @dp.message(F.web_app_data.data)
 async def handle_webapp_data(message: types.Message):
     try:
+        # Распаковываем JSON от index.html
         data = json.loads(message.web_app_data.data)
 
+        # Формируем сообщение для администратора (вас)
         order_text = (
             f"🚕 *НОВЫЙ ЗАКАЗ!*\n"
             f"━━━━━━━━━━━━━━\n"
@@ -67,30 +78,28 @@ async def handle_webapp_data(message: types.Message):
             f"🆔 *ID:* `{message.from_user.id}`"
         )
 
-        # Отправка админу
+        # Отправка администратору
         await bot.send_message(ADMIN_ID, order_text)
 
-        # Ответ клиенту
+        # Ответ клиенту (согласно вашему требованию)
         await message.answer(
-            "✅ *Заказ принят!*\n"
-            "Ожидайте, водитель скоро свяжется с вами 🚗"
+            "✅ *Спасибо за заказ!*\n"
+            "Водитель скоро свяжется с вами 🚗"
         )
 
     except Exception as e:
-        await bot.send_message(
-            ADMIN_ID,
-            f"❌ *Ошибка обработки заказа:*\n`{e}`"
-        )
+        # Уведомление об ошибке в лог и администратору
+        await bot.send_message(ADMIN_ID, f"❌ Ошибка обработки: {e}")
 
 
-# ---------- ЗАПУСК ----------
 async def main():
-    # 🔥 ВАЖНО: удаляем webhook, чтобы не было конфликта getUpdates
-    await bot.delete_webhook(drop_pending_updates=True)
-
-    print("🤖 Бот запущен и ждёт заказы")
+    print("Сервер запущен...")
+    # Запуск бота в режиме polling
     await dp.start_polling(bot)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("Бот выключен")
