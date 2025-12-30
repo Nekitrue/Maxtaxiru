@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -65,7 +65,7 @@
 </head>
 <body ontouchmove="handleScrollHide()" onclick="closeAllUI(event)">
 
-<div id="search-overlay"><div class="hourglass">⌛</div><div class="search-text">Обработка заказа...</div></div>
+<div id="search-overlay"><div class="hourglass">⌛</div><div class="search-text">Поиск машины...</div></div>
 
 <div class="container">
     <div class="top-info-row">
@@ -310,28 +310,27 @@
             return;
         }
         
-        document.getElementById('search-overlay').style.display = 'flex';
+        // 1. МОМЕНТАЛЬНАЯ ОТПРАВКА ДАННЫХ
         const stopsArr = Array.from(document.querySelectorAll('.stop-input')).map(i => i.value).filter(v => v);
         
-        // Таймер на 3 секунды (3000 мс)
+        tg.sendData(JSON.stringify({
+            from: fromInp.value,
+            to: toInp.value,
+            inter: stopsArr.length > 0 ? stopsArr.join(', ') : 'Нет',
+            price: currentPrice,
+            pay: paymentMethod,
+            comment: document.getElementById('comment').value,
+            city: detectedCity || "Не определен"
+        }));
+
+        // 2. ЗАПУСК АНИМАЦИИ НА 3 СЕКУНДЫ
+        document.getElementById('search-overlay').style.display = 'flex';
+        
         setTimeout(() => {
             document.getElementById('search-overlay').style.display = 'none';
-
-            // Отправка данных в Telegram
-            tg.sendData(JSON.stringify({
-                from: fromInp.value,
-                to: toInp.value,
-                inter: stopsArr.length > 0 ? stopsArr.join(', ') : 'Нет',
-                price: currentPrice,
-                pay: paymentMethod,
-                comment: document.getElementById('comment').value,
-                city: detectedCity || "Не определен"
-            }));
-
-            // Показ окна благодарности
+            // 3. ОКНО БЛАГОДАРНОСТИ
             alert("Спасибо за заказ! Водитель скоро свяжется с вами.");
-            
-            // Закрытие приложения
+            // 4. ЗАКРЫТИЕ
             tg.close();
         }, 3000);
     }
