@@ -26,7 +26,6 @@
         @keyframes flip { 0% { transform: rotate(0deg); } 100% { transform: rotate(180deg); } }
         .search-text { font-weight: 800; color: var(--neon-yellow); text-transform: uppercase; }
 
-        /* Шапка с версией и городом */
         .top-info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
         .version-label { font-size: 9px; color: rgba(192, 192, 192, 0.4); font-weight: 600; }
         #city-status { font-size: 9px; color: var(--silver); font-weight: 800; text-decoration: underline; cursor: pointer; text-transform: uppercase; }
@@ -66,7 +65,7 @@
 </head>
 <body ontouchmove="handleScrollHide()" onclick="closeAllUI(event)">
 
-<div id="search-overlay"><div class="hourglass">⌛</div><div class="search-text">Поиск машины...</div></div>
+<div id="search-overlay"><div class="hourglass">⌛</div><div class="search-text">Обработка заказа...</div></div>
 
 <div class="container">
     <div class="top-info-row">
@@ -314,21 +313,27 @@
         document.getElementById('search-overlay').style.display = 'flex';
         const stopsArr = Array.from(document.querySelectorAll('.stop-input')).map(i => i.value).filter(v => v);
         
+        // Таймер на 3 секунды (3000 мс)
         setTimeout(() => {
             document.getElementById('search-overlay').style.display = 'none';
-            alert("Заказ принят! Водитель свяжется с вами в ближайшее время.");
 
+            // Отправка данных в Telegram
             tg.sendData(JSON.stringify({
-                city: detectedCity,
-                route: [fromInp.value, ...stopsArr, toInp.value].join(' -> '),
+                from: fromInp.value,
+                to: toInp.value,
+                inter: stopsArr.length > 0 ? stopsArr.join(', ') : 'Нет',
                 price: currentPrice,
                 pay: paymentMethod,
                 comment: document.getElementById('comment').value,
-                photo: photoAdded,
-                v: "1.2.7"
+                city: detectedCity || "Не определен"
             }));
+
+            // Показ окна благодарности
+            alert("Спасибо за заказ! Водитель скоро свяжется с вами.");
+            
+            // Закрытие приложения
             tg.close();
-        }, 8000);
+        }, 3000);
     }
 
     function handlePhoto(input) { if (input.files[0]) { photoAdded = true; document.getElementById('photo-preview').style.display = 'block'; } }
