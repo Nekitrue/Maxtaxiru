@@ -39,12 +39,6 @@
         .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #2a2a2a; border: 1px solid var(--neon-purple); border-radius: 12px; z-index: 1000; display: none; max-height: 250px; overflow-y: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         .suggestion-item { padding: 12px; border-bottom: 1px solid #333; color: #fff; font-size: 13px; cursor: pointer; }
         
-        .photo-block { margin-bottom: 18px; }
-        .file-input-label { display: block; text-align: center; padding: 14px; background: var(--input-bg); border: 1px solid var(--neon-purple); border-radius: 12px; font-size: 12px; font-weight: 800; color: var(--neon-purple); cursor: pointer; text-transform: uppercase; transition: 0.2s; }
-        .file-input-label:active { transform: scale(0.98); }
-        #photo-preview { font-size: 11px; color: #28a745; margin-top: 8px; display: none; text-align: center; font-weight: 800; }
-
-        /* --- НОВЫЙ БЛОК: КЛАССЫ АВТО --- */
         .class-selector { display: flex; gap: 8px; margin-bottom: 20px; }
         .class-btn { flex: 1; padding: 10px 5px; background: var(--input-bg); border: 1px solid var(--silver); border-radius: 10px; color: var(--silver); font-size: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; text-align: center; transition: 0.2s; }
         .class-btn.active { background: var(--neon-purple); border-color: var(--neon-purple); color: #fff; box-shadow: 0 0 10px rgba(188, 19, 254, 0.4); }
@@ -56,7 +50,7 @@
         .btn-round:active { transform: scale(0.9); }
         
         .payment-container { margin-bottom: 20px; }
-        .pay-btn { flex: 1; padding: 14px; border-radius: 12px; border: 1px solid var(--silver); text-align: center; font-weight: 700; color: var(--silver); cursor: pointer; font-size: 13px; transition: 0.2s; }
+        .pay-btn { flex: 1; padding: 14px; border-radius: 12px; border: 1px solid var(--silver); text-align: center; font-weight: 700; color: var(--silver); cursor: pointer; font-size: 12px; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .pay-btn.active { background: var(--neon-purple); border-color: var(--neon-purple); color: #fff; }
         
         .order-button { width: 100%; padding: 20px; background: var(--neon-yellow); color: #000; border: none; border-radius: 16px; font-size: 18px; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-top: 10px; transition: transform 0.1s; box-shadow: 0 0 15px rgba(252, 194, 0, 0.4); }
@@ -106,38 +100,34 @@
     <div class="field-group">
         <label>Класс автомобиля:</label>
         <div class="class-selector">
-            <div class="class-btn active" onclick="selectClass('econom', 300)">Эконом</div>
-            <div class="class-btn" onclick="selectClass('comfort', 450)">Комфорт</div>
-            <div class="class-btn" onclick="selectClass('business', 800)">Бизнес</div>
+            <div class="class-btn active" onclick="selectClass('econom', 500)">Эконом</div>
+            <div class="class-btn" onclick="selectClass('comfort', 700)">Комфорт</div>
+            <div class="class-btn" onclick="selectClass('business', 900)">Бизнес</div>
         </div>
     </div>
 
     <div class="field-group">
         <label>Комментарий:</label>
         <div class="input-wrapper">
-            <input type="text" id="comment" placeholder="Подъезд, детское кресло..." oninput="toggleX(this)" onkeydown="if(event.key==='Enter'){this.blur();}">
+            <input type="text" id="comment" placeholder="Информация для водителя" oninput="toggleX(this)" onkeydown="if(event.key==='Enter'){this.blur();}">
             <span class="clear-btn" onclick="clearField('comment')">✕</span>
         </div>
     </div>
 
-    <div class="photo-block">
-        <label class="file-input-label" for="photo-upload">📷 Фото места (опция)</label>
-        <input type="file" id="photo-upload" accept="image/*" style="display:none" onchange="handlePhoto(this)">
-        <div id="photo-preview">✓ ФОТО ВЫБРАНО</div>
-    </div>
-
     <div class="price-section">
         <div class="price-row">
-            <button class="btn-round" onclick="adjustPrice(-50)">−</button>
-            <div class="price-display" id="display_price">300 ₽</div>
-            <button class="btn-round" onclick="adjustPrice(50)">+</button>
+            <button class="btn-round" onclick="adjustPrice(-100)">−</button>
+            <div class="price-display" id="display_price">500 ₽</div>
+            <button class="btn-round" onclick="adjustPrice(100)">+</button>
         </div>
     </div>
 
     <div class="payment-container">
         <div style="display:flex; gap:10px;">
             <div id="pay-cash" class="pay-btn active" onclick="setPayment('Наличные')">НАЛИЧНЫЕ</div>
-            <div id="pay-online" class="pay-btn" onclick="setPayment('ПЕРЕВОД')">ПЕРЕВОД</div>
+            <div id="pay-online" class="pay-btn" onclick="setPayment('ПЕРЕВОД СБП')">
+                <span style="font-size:16px;">📲</span> ПЕРЕВОД СБП
+            </div>
         </div>
     </div>
 
@@ -150,16 +140,15 @@
 
     const DADATA_API_KEY = "6f49e7177e36608d4139b823d71466c86bd7ca4f"; 
     
-    // Переменные состояния
-    let basePrice = 300;
+    // Начальные настройки по вашему запросу
+    let basePrice = 500;
     let manualAdjustment = 0;
     let paymentMethod = 'Наличные';
     let selectedClass = 'Эконом';
-    let searchTimeout, detectedCity = null, photoAdded = false;
+    let searchTimeout, detectedCity = null;
 
     window.onload = function() { autoLocate(true); };
 
-    // --- Интерфейсные функции ---
     function handleScrollHide() {
         if (document.activeElement) document.activeElement.blur();
         document.querySelectorAll('.suggestions').forEach(s => s.style.display = 'none');
@@ -176,8 +165,9 @@
         if (x) x.style.display = input.value.length > 0 ? 'block' : 'none';
     }
 
-    function clearField(id) {
-        const input = document.getElementById(id);
+    // Универсальная очистка
+    function clearField(target) {
+        const input = (typeof target === 'string') ? document.getElementById(target) : target;
         input.value = '';
         toggleX(input);
         input.focus();
@@ -188,22 +178,18 @@
         box.style.display = box.style.display === 'block' ? 'none' : 'block';
     }
 
-    // --- Логика Такси ---
-
     function selectClass(className, price) {
         selectedClass = className === 'econom' ? 'Эконом' : (className === 'comfort' ? 'Комфорт' : 'Бизнес');
         basePrice = price;
-        manualAdjustment = 0; // Сброс ручной корректировки при смене класса
+        manualAdjustment = 0; 
         
-        // Обновляем UI кнопок
         document.querySelectorAll('.class-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
+        event.currentTarget.classList.add('active');
         
         updatePriceDisplay();
     }
 
     function adjustPrice(v) {
-        // Защита: цена не может быть ниже 100р
         if ((basePrice + manualAdjustment + v) >= 100) {
             manualAdjustment += v;
             updatePriceDisplay();
@@ -218,17 +204,10 @@
     function setPayment(m) { 
         paymentMethod = m; 
         document.getElementById('pay-cash').classList.toggle('active', m === 'Наличные'); 
-        document.getElementById('pay-online').classList.toggle('active', m === 'ПЕРЕВОД'); 
+        document.getElementById('pay-online').classList.toggle('active', m === 'ПЕРЕВОД СБП'); 
     }
 
-    function handlePhoto(input) { 
-        if (input.files[0]) { 
-            photoAdded = true; 
-            document.getElementById('photo-preview').style.display = 'block'; 
-        } 
-    }
-
-    // --- DaData и Адреса ---
+    // --- DaData Логика ---
 
     function cleanAddressString(fullAddr, city) {
         if (!fullAddr) return "";
@@ -341,7 +320,7 @@
             <label>Промежуточная точка: <span class="remove-point" onclick="this.parentElement.parentElement.remove()">УДАЛИТЬ ✕</span></label>
             <div class="input-wrapper">
                 <input type="text" class="stop-input" placeholder="Адрес остановки" oninput="getSuggestions(this)">
-                <span class="clear-btn" onclick="this.previousElementSibling.value=''; this.style.display='none';">✕</span>
+                <span class="clear-btn" onclick="clearField(this.previousElementSibling)">✕</span>
             </div>
             <div class="suggestions"></div>
         `;
@@ -351,6 +330,11 @@
     function hasHouse(str) { return /\d/.test(str); }
 
     function confirmOrder() {
+        if (!tg.initData && !tg.initDataUnsafe.query_id) {
+            alert("Пожалуйста, откройте приложение через Telegram бота.");
+            return;
+        }
+
         const fromInp = document.getElementById('from');
         const toInp = document.getElementById('to');
         let valid = true;
@@ -370,11 +354,6 @@
         }
         
         const stopsArr = Array.from(document.querySelectorAll('.stop-input')).map(i => i.value).filter(v => v);
-        
-        // --- ОТПРАВКА ---
-        // Мы отправляем текстовые данные. 
-        // Если фото выбрано, передаем флаг 'has_photo', чтобы админ знал.
-        
         const finalPrice = basePrice + manualAdjustment;
 
         tg.sendData(JSON.stringify({
@@ -382,16 +361,14 @@
             from: fromInp.value,
             to: toInp.value,
             inter: stopsArr.length > 0 ? stopsArr.join(', ') : 'Нет',
-            car_class: selectedClass, // НОВОЕ ПОЛЕ
+            car_class: selectedClass,
             price: finalPrice,
             pay: paymentMethod,
-            comment: document.getElementById('comment').value,
-            has_photo: photoAdded ? "ДА (Запросите в чате)" : "Нет" // ФЛАГ ФОТО
+            comment: document.getElementById('comment').value
         }));
 
-        alert("Спасибо! Ваш заказ (" + selectedClass + ") принят.");
         tg.close();
     }
 </script>
 </body>
-</html
+</html>
