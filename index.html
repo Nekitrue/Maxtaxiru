@@ -52,6 +52,14 @@
         .payment-container { margin-bottom: 20px; }
         .pay-btn { flex: 1; padding: 14px; border-radius: 12px; border: 1px solid var(--silver); text-align: center; font-weight: 700; color: var(--silver); cursor: pointer; font-size: 12px; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .pay-btn.active { background: var(--neon-purple); border-color: var(--neon-purple); color: #fff; }
+
+        /* Стиль для новой иконки оплаты */
+        .pay-icon {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            vertical-align: middle;
+        }
         
         .order-button { width: 100%; padding: 20px; background: var(--neon-yellow); color: #000; border: none; border-radius: 16px; font-size: 18px; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-top: 10px; transition: transform 0.1s; box-shadow: 0 0 15px rgba(252, 194, 0, 0.4); }
         .order-button:active { transform: scale(0.98); }
@@ -126,7 +134,7 @@
         <div style="display:flex; gap:10px;">
             <div id="pay-cash" class="pay-btn active" onclick="setPayment('Наличные')">НАЛИЧНЫЕ</div>
             <div id="pay-online" class="pay-btn" onclick="setPayment('ПЕРЕВОД СБП')">
-                <span style="font-size:16px;">📲</span> ПЕРЕВОД СБП
+                <img src="IMG_4580.jpeg" alt="SB" class="pay-icon"> ПЕРЕВОД СБП
             </div>
         </div>
     </div>
