@@ -13,7 +13,6 @@
             --neon-blue: #94d2bd;
             --glass-bg: rgba(255, 255, 255, 0.08);
             --glass-border: rgba(255, 255, 255, 0.15);
-            --text-white: #e9d8a6;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -21,10 +20,8 @@
         body { 
             font-family: 'Montserrat', sans-serif; 
             background: #001219;
-            color: #fff; 
-            margin: 0; padding: 15px; 
-            min-height: 100vh;
-            overflow-x: hidden;
+            color: #fff; margin: 0; padding: 15px; 
+            min-height: 100vh; overflow-x: hidden;
             display: flex; flex-direction: column;
         }
 
@@ -47,15 +44,21 @@
             100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
         }
 
+        /* Музыкальная кнопка */
+        #music-control {
+            position: fixed; top: 15px; right: 15px; width: 44px; height: 44px;
+            background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 2000; cursor: pointer; transition: 0.3s;
+        }
+        #music-control.playing { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(148, 210, 189, 0.4); }
+
         .container { 
-            background: var(--glass-bg);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--glass-border);
-            border-radius: 30px; 
-            padding: 20px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            position: relative; z-index: 1;
+            background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border); border-radius: 30px; 
+            padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            margin-top: 50px;
         }
 
         .top-info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -67,75 +70,72 @@
         
         .input-wrapper { position: relative; }
         input { 
-            width: 100%; padding: 16px; 
-            border: 1px solid var(--glass-border); 
-            border-radius: 18px; 
-            background: rgba(0, 18, 25, 0.4); 
-            color: #fff; outline: none; font-size: 15px; 
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%; padding: 16px; border: 1px solid var(--glass-border); 
+            border-radius: 18px; background: rgba(0, 18, 25, 0.4); 
+            color: #fff; outline: none; font-size: 15px; transition: 0.4s;
         }
-        input:focus { border-color: #94d2bd; background: rgba(0, 18, 25, 0.6); box-shadow: 0 0 20px rgba(148, 210, 189, 0.2); }
-        input.error { border-color: #ae2012; box-shadow: 0 0 10px rgba(174, 32, 18, 0.3); }
+        input:focus { border-color: #94d2bd; background: rgba(0, 18, 25, 0.6); }
+        input.error { border-color: #ae2012; }
         
-        .clear-btn { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #fff; opacity: 0.5; font-size: 18px; cursor: pointer; display: none; }
+        .clear-btn { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); opacity: 0.5; cursor: pointer; display: none; }
 
-        .btn-add-point { color: #94d2bd; font-size: 12px; font-weight: 800; border: none; background: none; cursor: pointer; padding: 10px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-add-point { color: #94d2bd; font-size: 11px; font-weight: 800; border: none; background: none; cursor: pointer; padding: 10px 0; text-transform: uppercase; }
         .remove-point { color: #ee9b00; font-size: 10px; float: right; cursor: pointer; }
 
         .suggestions { 
             position: absolute; top: 100%; left: 0; right: 0; 
             background: rgba(0, 18, 25, 0.95); backdrop-filter: blur(15px);
             border: 1px solid var(--glass-border); border-radius: 18px; 
-            z-index: 1000; display: none; max-height: 220px; overflow-y: auto; margin-top: 8px;
+            z-index: 1000; display: none; max-height: 200px; overflow-y: auto; margin-top: 5px;
         }
-        .suggestion-item { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #fff; font-size: 14px; }
+        .suggestion-item { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
         
         .class-selector { display: flex; gap: 8px; margin-bottom: 20px; }
         .class-btn { 
             flex: 1; padding: 12px 5px; border-radius: 15px; border: 1px solid var(--glass-border);
             background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); 
-            font-size: 10px; font-weight: 800; text-transform: uppercase; transition: 0.3s;
+            font-size: 10px; font-weight: 800; text-transform: uppercase; transition: 0.3s; text-align: center;
         }
-        .class-btn.active { 
-            background: linear-gradient(135deg, #0a9396, #94d2bd);
-            color: #001219; border: none; box-shadow: 0 10px 20px rgba(10, 147, 150, 0.4);
-        }
+        .class-btn.active { background: linear-gradient(135deg, #0a9396, #94d2bd); color: #001219; border: none; }
 
         .price-section { 
             background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
             border-radius: 25px; padding: 20px; margin: 25px 0; border: 1px solid var(--glass-border);
-            text-align: center;
         }
         .price-row { display: flex; align-items: center; justify-content: space-between; }
-        .price-display { font-size: 34px; font-weight: 800; color: #ee9b00; text-shadow: 0 0 20px rgba(238, 155, 0, 0.3); }
+        .price-display { font-size: 34px; font-weight: 800; color: #ee9b00; }
         .btn-round { 
-            width: 55px; height: 55px; border-radius: 18px; border: 1px solid var(--glass-border);
-            background: var(--glass-bg); color: #fff; font-size: 26px; display: flex; align-items: center; justify-content: center;
+            width: 50px; height: 50px; border-radius: 15px; border: 1px solid var(--glass-border);
+            background: var(--glass-bg); color: #fff; font-size: 24px; cursor: pointer;
         }
 
         .pay-btn { 
             flex: 1; padding: 16px; border-radius: 18px; border: 1px solid var(--glass-border);
             background: rgba(255,255,255,0.05); color: #fff; font-weight: 700; font-size: 11px;
-            display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         .pay-btn.active { background: rgba(148, 210, 189, 0.2); border-color: #94d2bd; }
-        
-        .pay-icon { width: 22px; height: 22px; object-fit: contain; border-radius: 5px; }
+        .pay-icon { width: 20px; height: 20px; object-fit: contain; border-radius: 4px; }
 
         .order-button { 
-            width: 100%; padding: 22px; 
-            background: linear-gradient(90deg, #ee9b00, #ca6702);
-            color: #fff; border: none; border-radius: 22px; 
-            font-size: 18px; font-weight: 800; text-transform: uppercase; 
-            box-shadow: 0 15px 35px rgba(202, 103, 2, 0.4); margin-top: 10px;
+            width: 100%; padding: 22px; background: linear-gradient(90deg, #ee9b00, #ca6702);
+            color: #fff; border: none; border-radius: 22px; font-size: 18px; font-weight: 800; 
+            text-transform: uppercase; box-shadow: 0 15px 35px rgba(202, 103, 2, 0.4);
         }
-        
-        #city-selector-box { display: none; margin-bottom: 15px; }
+        #city-selector-box { display: none; }
     </style>
 </head>
-<body ontouchmove="handleScrollHide()" onclick="closeAllUI(event)">
+<body onclick="closeAllUI(event)">
 
 <div class="aqua-bg" id="aqua-bg"></div>
+
+<div id="music-control" onclick="toggleMusic()">
+    <span id="music-icon">🔇</span>
+</div>
+
+<audio id="bg-audio" loop>
+    <source src="Ringtone.mp3" type="audio/mpeg">
+</audio>
 
 <div class="container">
     <div class="top-info-row">
@@ -146,7 +146,7 @@
     <div id="city-selector-box" class="field-group">
         <label>Выбор города:</label>
         <div class="input-wrapper">
-            <input type="text" id="city-input" placeholder="Начните вводить..." autocomplete="off" oninput="getCitySuggestions(this)">
+            <input type="text" id="city-input" placeholder="Поиск города..." oninput="getCitySuggestions(this)">
             <span class="clear-btn" onclick="clearField('city-input')">✕</span>
         </div>
         <div class="suggestions"></div>
@@ -155,26 +155,26 @@
     <div class="field-group">
         <label>Откуда:</label>
         <div class="input-wrapper">
-            <input type="text" id="from" placeholder="Улица и дом" autocomplete="off" oninput="getSuggestions(this)">
+            <input type="text" id="from" placeholder="Улица и дом" oninput="getSuggestions(this)">
             <span class="clear-btn" onclick="clearField('from')">✕</span>
         </div>
         <div class="suggestions"></div>
     </div>
 
     <div id="extra-stops"></div>
-    <button class="btn-add-point" onclick="addStopField()">+ Добавить адрес</button>
+    <button class="btn-add-point" onclick="addStopField()">+ Добавить остановку</button>
     
     <div class="field-group">
         <label>Куда:</label>
         <div class="input-wrapper">
-            <input type="text" id="to" placeholder="Место назначения" autocomplete="off" oninput="getSuggestions(this)">
+            <input type="text" id="to" placeholder="Место назначения" oninput="getSuggestions(this)">
             <span class="clear-btn" onclick="clearField('to')">✕</span>
         </div>
         <div class="suggestions"></div>
     </div>
 
     <div class="field-group">
-        <label>Класс авто:</label>
+        <label>Класс:</label>
         <div class="class-selector">
             <div class="class-btn active" onclick="selectClass('econom', 500)">Эконом</div>
             <div class="class-btn" onclick="selectClass('comfort', 700)">Комфорт</div>
@@ -185,7 +185,7 @@
     <div class="field-group">
         <label>Комментарий:</label>
         <div class="input-wrapper">
-            <input type="text" id="comment" placeholder="Особые пожелания" oninput="toggleX(this)">
+            <input type="text" id="comment" placeholder="Детское кресло и т.д." oninput="toggleX(this)">
             <span class="clear-btn" onclick="clearField('comment')">✕</span>
         </div>
     </div>
@@ -198,54 +198,68 @@
         </div>
     </div>
 
-    <div class="payment-container" style="display:flex; gap:10px; margin-bottom: 20px;">
+    <div style="display:flex; gap:10px; margin-bottom: 20px;">
         <div id="pay-cash" class="pay-btn active" onclick="setPayment('Наличные')">НАЛИЧНЫЕ</div>
         <div id="pay-online" class="pay-btn" onclick="setPayment('ПЕРЕВОД СБП')">
             <img src="IMG_4580.jpeg" alt="SBP" class="pay-icon"> ПЕРЕВОД СБП
         </div>
     </div>
 
-    <button class="order-button" onclick="confirmOrder()">ПОЕХАЛИ</button>
+    <button class="order-button" onclick="confirmOrder()">ЗАКАЗАТЬ</button>
 </div>
 
 <script>
     let tg = window.Telegram.WebApp;
     tg.expand();
 
-    // Создание плавающих капель воды
+    // Музыкальная логика
+    const audio = document.getElementById('bg-audio');
+    const musicBtn = document.getElementById('music-control');
+    const musicIcon = document.getElementById('music-icon');
+    let isPlaying = false;
+
+    function toggleMusic() {
+        if (isPlaying) {
+            audio.pause(); musicIcon.innerText = "🔇"; musicBtn.classList.remove('playing');
+        } else {
+            audio.play().then(() => {
+                musicIcon.innerText = "🔊"; musicBtn.classList.add('playing');
+            }).catch(() => alert("Нажмите кнопку звука еще раз"));
+        }
+        isPlaying = !isPlaying;
+    }
+
+    // Капли воды
     function createDrops() {
         const bg = document.getElementById('aqua-bg');
         for(let i=0; i<15; i++) {
-            let drop = document.createElement('div');
-            drop.className = 'drop';
-            let size = Math.random() * 80 + 20;
-            drop.style.width = size + 'px';
-            drop.style.height = size + 'px';
-            drop.style.left = Math.random() * 100 + 'vw';
-            drop.style.animationDuration = (Math.random() * 10 + 10) + 's';
-            drop.style.animationDelay = (Math.random() * 5) + 's';
-            bg.appendChild(drop);
+            let d = document.createElement('div'); d.className = 'drop';
+            let s = Math.random() * 80 + 20;
+            d.style.width = d.style.height = s + 'px';
+            d.style.left = Math.random() * 100 + 'vw';
+            d.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            d.style.animationDelay = (Math.random() * 5) + 's';
+            bg.appendChild(d);
         }
     }
     createDrops();
 
+    // DaData & Функции
     const DADATA_API_KEY = "6f49e7177e36608d4139b823d71466c86bd7ca4f"; 
     let basePrice = 500, manualAdjustment = 0, paymentMethod = 'Наличные', selectedClass = 'Эконом', searchTimeout, detectedCity = null;
 
-    window.onload = function() { autoLocate(true); };
+    window.onload = () => { autoLocate(true); };
 
-    function handleScrollHide() { if (document.activeElement) document.activeElement.blur(); }
-    function closeAllUI(e) { if (!e.target.closest('.field-group') && !e.target.closest('.top-info-row')) document.querySelectorAll('.suggestions').forEach(s => s.style.display = 'none'); }
-    function toggleX(input) { const x = input.nextElementSibling; if (x) x.style.display = input.value.length > 0 ? 'block' : 'none'; }
-    function clearField(target) { const input = (typeof target === 'string') ? document.getElementById(target) : target; input.value = ''; toggleX(input); input.focus(); }
-    function toggleCitySelector() { const box = document.getElementById('city-selector-box'); box.style.display = box.style.display === 'block' ? 'none' : 'block'; }
+    function closeAllUI(e) { if (!e.target.closest('.field-group')) document.querySelectorAll('.suggestions').forEach(s => s.style.display = 'none'); }
+    function toggleX(input) { input.nextElementSibling.style.display = input.value.length > 0 ? 'block' : 'none'; }
+    function clearField(id) { const i = document.getElementById(id); i.value = ''; toggleX(i); i.focus(); }
+    function toggleCitySelector() { const b = document.getElementById('city-selector-box'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; }
 
-    function selectClass(className, price) {
-        selectedClass = className === 'econom' ? 'Эконом' : (className === 'comfort' ? 'Комфорт' : 'Бизнес');
-        basePrice = price; manualAdjustment = 0;
-        document.querySelectorAll('.class-btn').forEach(btn => btn.classList.remove('active'));
-        event.currentTarget.classList.add('active');
-        updatePriceDisplay();
+    function selectClass(c, p) {
+        selectedClass = c === 'econom' ? 'Эконом' : (c === 'comfort' ? 'Комфорт' : 'Бизнес');
+        basePrice = p; manualAdjustment = 0;
+        document.querySelectorAll('.class-btn').forEach(b => b.classList.remove('active'));
+        event.currentTarget.classList.add('active'); updatePriceDisplay();
     }
 
     function adjustPrice(v) { if ((basePrice + manualAdjustment + v) >= 100) { manualAdjustment += v; updatePriceDisplay(); } }
@@ -256,113 +270,71 @@
         document.getElementById('pay-online').classList.toggle('active', m === 'ПЕРЕВОД СБП'); 
     }
 
-    // Сохранение DaData логики
-    function cleanAddressString(fullAddr, city) {
-        if (!fullAddr) return "";
-        let clean = fullAddr.replace("Россия, ", "");
-        if (city) {
-            const parts = clean.split(', ');
-            return parts.filter(p => !p.includes(city) && !p.includes("обл") && !p.includes("край")).join(', ');
-        }
-        return clean;
-    }
-
-    function autoLocate(fillFrom) {
+    function autoLocate(fill) {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(async (pos) => {
-                try {
-                    const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": "Token " + DADATA_API_KEY },
-                        body: JSON.stringify({ lat: pos.coords.latitude, lon: pos.coords.longitude })
-                    });
-                    const result = await res.json();
-                    if (result.suggestions?.length > 0) {
-                        const s = result.suggestions[0];
-                        detectedCity = s.data.city || s.data.settlement;
-                        document.getElementById('city-status').innerText = "ГОРОД: " + detectedCity.toUpperCase();
-                        if (fillFrom) { const cleaned = cleanAddressString(s.value, detectedCity); document.getElementById('from').value = cleaned; toggleX(document.getElementById('from')); }
-                    }
-                } catch (e) {}
+                const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address", {
+                    method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Token " + DADATA_API_KEY },
+                    body: JSON.stringify({ lat: pos.coords.latitude, lon: pos.coords.longitude })
+                });
+                const r = await res.json();
+                if (r.suggestions?.length > 0) {
+                    detectedCity = r.suggestions[0].data.city;
+                    document.getElementById('city-status').innerText = "ГОРОД: " + detectedCity.toUpperCase();
+                    if (fill) document.getElementById('from').value = r.suggestions[0].value.replace("Россия, ", "");
+                }
             });
         }
-    }
-
-    async function getCitySuggestions(input) {
-        toggleX(input); const query = input.value; const container = input.parentElement.nextElementSibling;
-        if (query.length < 2) { container.style.display = 'none'; return; }
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(async () => {
-            const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": "Token " + DADATA_API_KEY },
-                body: JSON.stringify({ query: query, count: 5, from_bound: {value: "city"}, to_bound: {value: "city"} })
-            });
-            const data = await res.json();
-            container.innerHTML = '';
-            if (data.suggestions) {
-                container.style.display = 'block';
-                data.suggestions.forEach(s => {
-                    const div = document.createElement('div'); div.className = 'suggestion-item'; div.innerText = s.value;
-                    div.onclick = () => { detectedCity = s.data.city || s.data.settlement; document.getElementById('city-status').innerText = "ГОРОД: " + detectedCity.toUpperCase(); input.value = s.value; toggleCitySelector(); container.style.display = 'none'; };
-                    container.appendChild(div);
-                });
-            }
-        }, 300);
     }
 
     async function getSuggestions(input) {
-        toggleX(input); const query = input.value; const container = input.parentElement.nextElementSibling;
-        if (query.length < 3) { container.style.display = 'none'; return; }
+        toggleX(input); let q = input.value; let container = input.parentElement.nextElementSibling;
+        if (q.length < 3) return;
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(async () => {
-            const body = { query: query, count: 6, from_bound: {value: "city"}, to_bound: {value: "house"} };
-            if (detectedCity) body.locations = [{ city: detectedCity }];
             const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": "Token " + DADATA_API_KEY },
-                body: JSON.stringify(body)
+                method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Token " + DADATA_API_KEY },
+                body: JSON.stringify({ query: q, count: 5, locations: detectedCity ? [{city: detectedCity}] : [] })
             });
-            const data = await res.json();
-            container.innerHTML = '';
-            if (data.suggestions) {
-                container.style.display = 'block';
-                data.suggestions.forEach(s => {
-                    const div = document.createElement('div'); div.className = 'suggestion-item';
-                    const clean = cleanAddressString(s.value, detectedCity); div.innerText = clean;
-                    div.onclick = () => { input.value = clean; container.style.display = 'none'; input.blur(); toggleX(input); };
-                    container.appendChild(div);
-                });
-            }
+            const d = await res.json();
+            container.innerHTML = ''; container.style.display = 'block';
+            d.suggestions.forEach(s => {
+                const div = document.createElement('div'); div.className = 'suggestion-item';
+                div.innerText = s.value.replace("Россия, ", "");
+                div.onclick = () => { input.value = div.innerText; container.style.display = 'none'; toggleX(input); };
+                container.appendChild(div);
+            });
         }, 300);
     }
 
-    function addStopField() {
-        const container = document.getElementById('extra-stops');
-        const div = document.createElement('div'); div.className = 'field-group';
-        div.innerHTML = `
-            <label>Остановка: <span class="remove-point" onclick="this.parentElement.parentElement.remove()">✕</span></label>
-            <div class="input-wrapper"><input type="text" class="stop-input" placeholder="Введите адрес" oninput="getSuggestions(this)"><span class="clear-btn" onclick="clearField(this.previousElementSibling)">✕</span></div>
-            <div class="suggestions"></div>`;
-        container.appendChild(div);
+    async function getCitySuggestions(input) {
+        let q = input.value; let container = input.parentElement.nextElementSibling;
+        const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
+            method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Token " + DADATA_API_KEY },
+            body: JSON.stringify({ query: q, from_bound: {value: "city"}, to_bound: {value: "city"} })
+        });
+        const d = await res.json();
+        container.innerHTML = ''; container.style.display = 'block';
+        d.suggestions.forEach(s => {
+            const div = document.createElement('div'); div.className = 'suggestion-item'; div.innerText = s.value;
+            div.onclick = () => { detectedCity = s.data.city; document.getElementById('city-status').innerText = "ГОРОД: " + detectedCity.toUpperCase(); toggleCitySelector(); container.style.display = 'none'; };
+            container.appendChild(div);
+        });
     }
 
-    function hasHouse(str) { return /\d/.test(str); }
+    function addStopField() {
+        const div = document.createElement('div'); div.className = 'field-group';
+        div.innerHTML = `<label>Остановка <span class="remove-point" onclick="this.parentElement.parentElement.remove()">✕</span></label>
+            <div class="input-wrapper"><input type="text" class="stop-input" placeholder="Адрес" oninput="getSuggestions(this)"><span class="clear-btn" onclick="clearField(this.previousElementSibling)">✕</span></div>
+            <div class="suggestions"></div>`;
+        document.getElementById('extra-stops').appendChild(div);
+    }
 
     function confirmOrder() {
-        const fromInp = document.getElementById('from'), toInp = document.getElementById('to');
-        let valid = true;
-        [fromInp, toInp, ...document.querySelectorAll('.stop-input')].forEach(inp => {
-            if (!hasHouse(inp.value)) { inp.classList.add('error'); valid = false; } else { inp.classList.remove('error'); }
-        });
-        if (!valid) { alert("Пожалуйста, укажите НОМЕР ДОМА в адресах."); return; }
-        
-        const stopsArr = Array.from(document.querySelectorAll('.stop-input')).map(i => i.value).filter(v => v);
+        const f = document.getElementById('from').value, t = document.getElementById('to').value;
+        if (!/\d/.test(f) || !/\d/.test(t)) { alert("Укажите номер дома!"); return; }
         tg.sendData(JSON.stringify({
-            city: detectedCity || "Не определен", from: fromInp.value, to: toInp.value,
-            inter: stopsArr.length > 0 ? stopsArr.join(', ') : 'Нет',
-            car_class: selectedClass, price: basePrice + manualAdjustment,
-            pay: paymentMethod, comment: document.getElementById('comment').value
+            city: detectedCity, from: f, to: t, car: selectedClass, price: basePrice + manualAdjustment, pay: paymentMethod
         }));
         tg.close();
     }
