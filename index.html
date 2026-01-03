@@ -12,36 +12,36 @@
             --neon-blue: #94d2bd;
             --glass-bg: rgba(255, 255, 255, 0.08);
             --glass-border: rgba(255, 255, 255, 0.15);
+            --dark-bg: #001219;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body { 
             font-family: 'Montserrat', sans-serif; 
-            background: #001219;
+            background: var(--dark-bg);
             color: #fff; margin: 0; padding: 15px; 
             min-height: 100vh; overflow-x: hidden;
             display: flex; flex-direction: column;
         }
 
+        /* Анимация фона */
         .aqua-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1; background: linear-gradient(180deg, #001219 0%, #005f73 100%);
             overflow: hidden;
         }
-
         .drop {
             position: absolute; background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(5px); border-radius: 50%;
             animation: flow 15s infinite linear;
         }
-
         @keyframes flow {
             0% { transform: translateY(110vh) scale(0.5); opacity: 0; }
             100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
         }
 
-        /* Стиль бегунка музыки */
+        /* Музыкальный свитч */
         .music-switch-container {
             position: fixed; top: 15px; right: 15px;
             z-index: 2000; display: flex; align-items: center; gap: 8px;
@@ -49,41 +49,26 @@
             border-radius: 20px; border: 1px solid var(--glass-border);
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
         }
-
-        .switch {
-            position: relative; display: inline-block;
-            width: 40px; height: 20px;
-        }
-
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-
         .slider {
-            position: absolute; cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(255,255,255,0.1);
-            transition: .4s; border-radius: 20px;
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255,255,255,0.1); transition: .4s; border-radius: 20px;
             border: 1px solid var(--glass-border);
         }
-
         .slider:before {
-            position: absolute; content: "";
-            height: 14px; width: 14px;
-            left: 3px; bottom: 2px;
-            background-color: white; transition: .4s;
-            border-radius: 50%;
+            position: absolute; content: ""; height: 14px; width: 14px;
+            left: 3px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%;
         }
-
-        input:checked + .slider { background-color: var(--aqua-bright); border-color: var(--neon-blue); }
+        input:checked + .slider { background-color: var(--aqua-bright); border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(148, 210, 189, 0.4); }
         input:checked + .slider:before { transform: translateX(18px); }
-        input:checked + .slider { box-shadow: 0 0 10px rgba(148, 210, 189, 0.4); }
-
         .music-label { font-size: 9px; font-weight: 800; color: var(--neon-blue); text-transform: uppercase; }
 
+        /* Основной контейнер */
         .container { 
             background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--glass-border); border-radius: 30px; 
-            padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            margin-top: 50px;
+            padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); margin-top: 50px;
         }
 
         .top-info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -99,7 +84,8 @@
             color: #fff; outline: none; font-size: 15px; transition: 0.4s;
         }
         input[type="text"]:focus { border-color: #94d2bd; background: rgba(0, 18, 25, 0.6); }
-        
+
+        /* Кнопки и элементы управления */
         .btn-add-point { 
             display: block; width: fit-content; margin: -5px auto 15px 5px;
             color: #94d2bd; font-size: 11px; font-weight: 800; 
@@ -130,6 +116,7 @@
         .price-display { font-size: 34px; font-weight: 800; color: #ee9b00; margin: 0 15px; }
         .btn-round { width: 50px; height: 50px; border-radius: 15px; background: var(--glass-bg); color: #fff; font-size: 24px; border: 1px solid var(--glass-border); }
 
+        .pay-row { display:flex; gap:10px; margin-bottom: 20px; }
         .pay-btn { flex: 1; padding: 16px; border-radius: 18px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.05); color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .pay-btn.active { background: rgba(148, 210, 189, 0.2); border-color: #94d2bd; }
         .pay-icon { width: 20px; height: 20px; border-radius: 4px; }
@@ -162,17 +149,13 @@
     
     <div id="city-selector-box" class="field-group">
         <label>Выбор города:</label>
-        <div class="input-wrapper">
-            <input type="text" id="city-input" placeholder="Введите город" oninput="getCitySuggestions(this)">
-        </div>
+        <input type="text" id="city-input" placeholder="Введите город" oninput="getCitySuggestions(this)">
         <div class="suggestions"></div>
     </div>
 
     <div class="field-group">
         <label>Откуда:</label>
-        <div class="input-wrapper">
-            <input type="text" id="from" placeholder="Улица и дом" oninput="getSuggestions(this)" onfocus="autoPlayMusic()">
-        </div>
+        <input type="text" id="from" placeholder="Улица и дом" oninput="getSuggestions(this)" onfocus="autoPlayMusic()">
         <div class="suggestions"></div>
     </div>
 
@@ -181,9 +164,7 @@
     
     <div class="field-group">
         <label>Куда:</label>
-        <div class="input-wrapper">
-            <input type="text" id="to" placeholder="Место назначения" oninput="getSuggestions(this)" onfocus="autoPlayMusic()">
-        </div>
+        <input type="text" id="to" placeholder="Место назначения" oninput="getSuggestions(this)" onfocus="autoPlayMusic()">
         <div class="suggestions"></div>
     </div>
 
@@ -198,9 +179,7 @@
 
     <div class="field-group">
         <label>Комментарий:</label>
-        <div class="input-wrapper">
-            <input type="text" id="comment" placeholder="Информация для водителя…" onfocus="autoPlayMusic()">
-        </div>
+        <input type="text" id="comment" placeholder="Информация для водителя…" onfocus="autoPlayMusic()">
     </div>
 
     <div class="price-section">
@@ -211,7 +190,7 @@
         </div>
     </div>
 
-    <div style="display:flex; gap:10px; margin-bottom: 20px;">
+    <div class="pay-row">
         <div id="pay-cash" class="pay-btn active" onclick="setPayment('Наличные')">НАЛИЧНЫЕ</div>
         <div id="pay-online" class="pay-btn" onclick="setPayment('ПЕРЕВОД СБП')">
             <img src="IMG_4580.jpeg" alt="SBP" class="pay-icon"> ПЕРЕВОД СБП
@@ -222,46 +201,42 @@
 </div>
 
 <script>
-    let tg = window.Telegram.WebApp;
+    const tg = window.Telegram.WebApp;
     tg.expand();
 
     const audio = document.getElementById('bg-audio');
     const musicToggle = document.getElementById('music-toggle');
-    let isPlaying = false;
+    const DADATA_API_KEY = "6f49e7177e36608d4139b823d71466c86bd7ca4f"; 
 
-    // Инициализация при загрузке: проверяем память
+    let isPlaying = false;
+    let basePrice = 500, manualAdjustment = 0;
+    let paymentMethod = 'Наличные', selectedClass = 'Эконом';
+    let searchTimeout, detectedCity = null;
+
+    // --- Init ---
     window.addEventListener('DOMContentLoaded', () => {
         const savedMusicState = localStorage.getItem('musicEnabled');
-        // Если в памяти нет записи, по умолчанию ВКЛ (true), если есть — берем из памяти
         musicToggle.checked = (savedMusicState === null) ? true : (savedMusicState === 'true');
-        autoLocate(true);
+        autoLocate();
         createDrops();
     });
 
+    // --- Music Logic ---
     function autoPlayMusic() {
-        if (!isPlaying && musicToggle.checked) {
-            startMusic();
-        }
+        if (!isPlaying && musicToggle.checked) audio.play().then(() => isPlaying = true).catch(() => {});
     }
 
     function manualMusicControl() {
         localStorage.setItem('musicEnabled', musicToggle.checked);
         if (musicToggle.checked) {
-            startMusic();
+            audio.play().then(() => isPlaying = true).catch(() => {});
         } else {
-            stopMusic();
+            audio.pause();
+            isPlaying = false;
         }
     }
 
-    function startMusic() {
-        audio.play().then(() => { isPlaying = true; }).catch(() => {});
-    }
-
-    function stopMusic() {
-        audio.pause();
-        isPlaying = false;
-    }
-
+    // --- Visuals ---
     function createDrops() {
         const bg = document.getElementById('aqua-bg');
         for(let i=0; i<15; i++) {
@@ -274,12 +249,13 @@
         }
     }
 
-    const DADATA_API_KEY = "6f49e7177e36608d4139b823d71466c86bd7ca4f"; 
-    let basePrice = 500, manualAdjustment = 0, paymentMethod = 'Наличные', selectedClass = 'Эконом', searchTimeout, detectedCity = null;
-
     function closeAllUI(e) { if (!e.target.closest('.field-group')) document.querySelectorAll('.suggestions').forEach(s => s.style.display = 'none'); }
-    function toggleCitySelector() { const b = document.getElementById('city-selector-box'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; }
+    function toggleCitySelector() { 
+        const b = document.getElementById('city-selector-box'); 
+        b.style.display = b.style.display === 'block' ? 'none' : 'block'; 
+    }
 
+    // --- DaData & Logic ---
     function cleanAddress(full, city) {
         if (!full) return "";
         let clean = full.replace("Россия, ", "");
@@ -290,26 +266,30 @@
         return clean.replace(/^г\.?\s?/, "").trim();
     }
 
-    function autoLocate(fill) {
+    function autoLocate() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(async (pos) => {
-                const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address", {
-                    method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Token " + DADATA_API_KEY },
-                    body: JSON.stringify({ lat: pos.coords.latitude, lon: pos.coords.longitude })
-                });
-                const r = await res.json();
-                if (r.suggestions?.length > 0) {
-                    detectedCity = r.suggestions[0].data.city;
-                    document.getElementById('city-status').innerText = "ГОРОД: " + detectedCity.toUpperCase();
-                    if (fill) document.getElementById('from').value = cleanAddress(r.suggestions[0].value, detectedCity);
-                }
+                try {
+                    const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address", {
+                        method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Token " + DADATA_API_KEY },
+                        body: JSON.stringify({ lat: pos.coords.latitude, lon: pos.coords.longitude })
+                    });
+                    const r = await res.json();
+                    if (r.suggestions?.length > 0) {
+                        detectedCity = r.suggestions[0].data.city;
+                        document.getElementById('city-status').innerText = "ГОРОД: " + detectedCity.toUpperCase();
+                        document.getElementById('from').value = cleanAddress(r.suggestions[0].value, detectedCity);
+                    }
+                } catch(e) { console.error(e); }
             });
         }
     }
 
     async function getSuggestions(input) {
-        let q = input.value; let container = input.parentElement.nextElementSibling;
+        let q = input.value; 
+        let container = input.nextElementSibling; // Simplified selector
         if (q.length < 3) return;
+        
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(async () => {
             const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
@@ -328,7 +308,8 @@
     }
 
     async function getCitySuggestions(input) {
-        let q = input.value; let container = input.parentElement.nextElementSibling;
+        let q = input.value; 
+        let container = input.nextElementSibling;
         const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
             method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Token " + DADATA_API_KEY },
             body: JSON.stringify({ query: q, from_bound: {value: "city"}, to_bound: {value: "city"} })
@@ -337,7 +318,11 @@
         container.innerHTML = ''; container.style.display = 'block';
         d.suggestions.forEach(s => {
             const div = document.createElement('div'); div.className = 'suggestion-item'; div.innerText = s.value;
-            div.onclick = () => { detectedCity = s.data.city; document.getElementById('city-status').innerText = "ГОРОД: " + detectedCity.toUpperCase(); toggleCitySelector(); container.style.display = 'none'; };
+            div.onclick = () => { 
+                detectedCity = s.data.city; 
+                document.getElementById('city-status').innerText = "ГОРОД: " + detectedCity.toUpperCase(); 
+                toggleCitySelector(); container.style.display = 'none'; 
+            };
             container.appendChild(div);
         });
     }
@@ -345,7 +330,7 @@
     function addStopField() {
         const div = document.createElement('div'); div.className = 'field-group';
         div.innerHTML = `<label>Остановка <span style="color:#ee9b00; float:right; cursor:pointer;" onclick="this.parentElement.parentElement.remove()">✕</span></label>
-            <div class="input-wrapper"><input type="text" class="stop-input" placeholder="Адрес" oninput="getSuggestions(this)" onfocus="autoPlayMusic()"></div>
+            <input type="text" class="stop-input" placeholder="Адрес" oninput="getSuggestions(this)" onfocus="autoPlayMusic()">
             <div class="suggestions"></div>`;
         document.getElementById('extra-stops').appendChild(div);
     }
@@ -359,6 +344,7 @@
 
     function adjustPrice(v) { if ((basePrice + manualAdjustment + v) >= 100) { manualAdjustment += v; updatePriceDisplay(); } }
     function updatePriceDisplay() { document.getElementById('display_price').innerText = (basePrice + manualAdjustment) + " ₽"; }
+    
     function setPayment(m) { 
         paymentMethod = m; 
         document.getElementById('pay-cash').classList.toggle('active', m === 'Наличные'); 
@@ -367,10 +353,18 @@
 
     function confirmOrder() {
         const f = document.getElementById('from').value, t = document.getElementById('to').value;
-        if (!/\d/.test(f) || !/\d/.test(t)) { alert("Укажите номер дома!"); return; }
+        if (!/\d/.test(f) || !/\d/.test(t)) { alert("Укажите номер дома (цифры) в адресах!"); return; }
         const stops = Array.from(document.querySelectorAll('.stop-input')).map(i => i.value).filter(v => v).join(', ');
+        
         tg.sendData(JSON.stringify({
-            city: detectedCity, from: f, to: t, inter: stops || "Нет", car: selectedClass, price: basePrice + manualAdjustment, pay: paymentMethod, comment: document.getElementById('comment').value
+            city: detectedCity, 
+            from: f, 
+            to: t, 
+            inter: stops || "Нет", 
+            car: selectedClass, 
+            price: basePrice + manualAdjustment, 
+            pay: paymentMethod, 
+            comment: document.getElementById('comment').value
         }));
     }
 </script>
