@@ -12,6 +12,7 @@
             --neon-blue: #94d2bd;
             --glass-bg: rgba(255, 255, 255, 0.08);
             --glass-border: rgba(255, 255, 255, 0.15);
+            --pulse-intensity: 0; /* Динамически изменяется JS */
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -34,6 +35,9 @@
             position: absolute; background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(5px); border-radius: 50%;
             animation: flow 15s infinite linear;
+            /* Добавляем пульсацию */
+            box-shadow: 0 0 calc(var(--pulse-intensity) * 10px) rgba(148, 210, 189, var(--pulse-intensity));
+            transition: box-shadow 0.1s linear; /* Плавное изменение свечения */
         }
 
         @keyframes flow {
@@ -84,6 +88,14 @@
             border: 1px solid var(--glass-border); border-radius: 30px; 
             padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
             margin-top: 50px;
+        }
+
+        /* Добавляем пульсацию к активным элементам */
+        .class-btn.active, .pay-btn.active, .order-button {
+            transition: box-shadow 0.1s linear, transform 0.1s linear;
+            box-shadow: 0 0 calc(var(--pulse-intensity) * 15px) rgba(148, 210, 189, var(--pulse-intensity));
+            /* Легкое увеличение/уменьшение */
+            transform: scale(calc(1 + var(--pulse-intensity) * 0.02)); 
         }
 
         .top-info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -150,13 +162,13 @@
     </label>
 </div>
 
-<audio id="bg-audio" loop preload="auto">
+<audio id="bg-audio" loop preload="auto" crossorigin="anonymous">
     <source src="Ringtone.mp3" type="audio/mpeg">
 </audio>
 
 <div class="container">
     <div class="top-info-row">
-        <div class="version-label">v 2.2 | AQUA GLASS</div>
+        <div class="version-label">v 2.3 | AQUA GLASS</div>
         <div id="city-status" onclick="toggleCitySelector()">ГОРОД: ОПРЕДЕЛЕНИЕ...</div>
     </div>
     
@@ -229,11 +241,20 @@
     const musicToggle = document.getElementById('music-toggle');
     let isPlaying = false;
 
-    // Инициализация при загрузке: проверяем память
+    // Web Audio API для анализа
+    let audioContext, analyser, frequencyData, source;
+    let pulseUpdateInterval;
+
     window.addEventListener('DOMContentLoaded', () => {
         const savedMusicState = localStorage.getItem('musicEnabled');
-        // Если в памяти нет записи, по умолчанию ВКЛ (true), если есть — берем из памяти
         musicToggle.checked = (savedMusicState === null) ? true : (savedMusicState === 'true');
+        
+        // Если музыка должна быть включена по умолчанию, пытаемся ее запустить
+        if (musicToggle.checked) {
+            // Аудио не может проиграться до взаимодействия с пользователем.
+            // При первом фокусе на input или переключении тумблера она запустится
+        }
+
         autoLocate(true);
         createDrops();
     });
@@ -254,12 +275,53 @@
     }
 
     function startMusic() {
-        audio.play().then(() => { isPlaying = true; }).catch(() => {});
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            frequencyData = new Uint8Array(analyser.frequencyBinCount);
+
+            source = audioContext.createMediaElementSource(audio);
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+        }
+
+        audio.play().then(() => {
+            isPlaying = true;
+            if (!pulseUpdateInterval) {
+                pulseUpdateInterval = setInterval(updatePulse, 100); // Обновляем пульсацию каждые 100 мс
+            }
+        }).catch((e) => {
+            console.error("Ошибка при воспроизведении аудио:", e);
+            // Если воспроизведение было заблокировано (например, из-за отсутствия пользовательского взаимодействия),
+            // то isPlaying останется false, и при следующем взаимодействии снова попытаемся запустить.
+        });
     }
 
     function stopMusic() {
         audio.pause();
         isPlaying = false;
+        clearInterval(pulseUpdateInterval);
+        pulseUpdateInterval = null;
+        document.documentElement.style.setProperty('--pulse-intensity', 0); // Сбрасываем пульсацию
+    }
+
+    function updatePulse() {
+        if (!isPlaying || !analyser) return;
+
+        analyser.getByteFrequencyData(frequencyData);
+        let sum = 0;
+        for (let i = 0; i < frequencyData.length; i++) {
+            sum += frequencyData[i];
+        }
+        let average = sum / frequencyData.length;
+
+        // Нормализуем значение от 0 до 1 (или чуть больше для усиления эффекта)
+        // average max is 255. Divide by a smaller number to make pulse more visible
+        let normalized = Math.min(1, average / 150); 
+        
+        // Устанавливаем CSS переменную, которая будет влиять на box-shadow и transform
+        document.documentElement.style.setProperty('--pulse-intensity', normalized);
     }
 
     function createDrops() {
