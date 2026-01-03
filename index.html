@@ -41,14 +41,43 @@
             100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
         }
 
-        #music-control {
-            position: fixed; top: 15px; right: 15px; width: 44px; height: 44px;
-            background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            z-index: 2000; cursor: pointer; transition: 0.3s;
+        /* Стиль бегунка музыки */
+        .music-switch-container {
+            position: fixed; top: 15px; right: 15px;
+            z-index: 2000; display: flex; align-items: center; gap: 8px;
+            background: var(--glass-bg); padding: 8px 12px;
+            border-radius: 20px; border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
         }
-        #music-control.playing { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(148, 210, 189, 0.4); }
+
+        .switch {
+            position: relative; display: inline-block;
+            width: 40px; height: 20px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute; cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255,255,255,0.1);
+            transition: .4s; border-radius: 20px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .slider:before {
+            position: absolute; content: "";
+            height: 14px; width: 14px;
+            left: 3px; bottom: 2px;
+            background-color: white; transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: var(--aqua-bright); border-color: var(--neon-blue); }
+        input:checked + .slider:before { transform: translateX(18px); }
+        input:checked + .slider { box-shadow: 0 0 10px rgba(148, 210, 189, 0.4); }
+
+        .music-label { font-size: 9px; font-weight: 800; color: var(--neon-blue); text-transform: uppercase; }
 
         .container { 
             background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
@@ -64,13 +93,12 @@
         .field-group { margin-bottom: 18px; position: relative; }
         label { font-size: 11px; font-weight: 800; color: var(--neon-blue); text-transform: uppercase; display: block; margin-bottom: 8px; margin-left: 5px; }
         
-        .input-wrapper { position: relative; }
-        input { 
+        input[type="text"] { 
             width: 100%; padding: 16px; border: 1px solid var(--glass-border); 
             border-radius: 18px; background: rgba(0, 18, 25, 0.4); 
             color: #fff; outline: none; font-size: 15px; transition: 0.4s;
         }
-        input:focus { border-color: #94d2bd; background: rgba(0, 18, 25, 0.6); }
+        input[type="text"]:focus { border-color: #94d2bd; background: rgba(0, 18, 25, 0.6); }
         
         .btn-add-point { 
             display: block; width: fit-content; margin: -5px auto 15px 5px;
@@ -114,8 +142,12 @@
 
 <div class="aqua-bg" id="aqua-bg"></div>
 
-<div id="music-control" onclick="toggleMusic()">
-    <span id="music-icon">🔇</span>
+<div class="music-switch-container">
+    <span class="music-label">MUSIC</span>
+    <label class="switch">
+        <input type="checkbox" id="music-toggle" onchange="manualMusicControl()">
+        <span class="slider"></span>
+    </label>
 </div>
 
 <audio id="bg-audio" loop preload="auto">
@@ -124,7 +156,7 @@
 
 <div class="container">
     <div class="top-info-row">
-        <div class="version-label">v 2.0 | AQUA GLASS</div>
+        <div class="version-label">v 2.2 | AQUA GLASS</div>
         <div id="city-status" onclick="toggleCitySelector()">ГОРОД: ОПРЕДЕЛЕНИЕ...</div>
     </div>
     
@@ -194,22 +226,40 @@
     tg.expand();
 
     const audio = document.getElementById('bg-audio');
-    const musicBtn = document.getElementById('music-control');
-    const musicIcon = document.getElementById('music-icon');
+    const musicToggle = document.getElementById('music-toggle');
     let isPlaying = false;
 
-    function autoPlayMusic() { if (!isPlaying) toggleMusic(); }
+    // Инициализация при загрузке: проверяем память
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedMusicState = localStorage.getItem('musicEnabled');
+        // Если в памяти нет записи, по умолчанию ВКЛ (true), если есть — берем из памяти
+        musicToggle.checked = (savedMusicState === null) ? true : (savedMusicState === 'true');
+        autoLocate(true);
+        createDrops();
+    });
 
-    function toggleMusic() {
-        if (isPlaying) {
-            audio.pause(); musicIcon.innerText = "🔇"; musicBtn.classList.remove('playing');
-            isPlaying = false;
-        } else {
-            audio.play().then(() => {
-                musicIcon.innerText = "🔊"; musicBtn.classList.add('playing');
-                isPlaying = true;
-            }).catch(() => { console.log("User interaction required"); });
+    function autoPlayMusic() {
+        if (!isPlaying && musicToggle.checked) {
+            startMusic();
         }
+    }
+
+    function manualMusicControl() {
+        localStorage.setItem('musicEnabled', musicToggle.checked);
+        if (musicToggle.checked) {
+            startMusic();
+        } else {
+            stopMusic();
+        }
+    }
+
+    function startMusic() {
+        audio.play().then(() => { isPlaying = true; }).catch(() => {});
+    }
+
+    function stopMusic() {
+        audio.pause();
+        isPlaying = false;
     }
 
     function createDrops() {
@@ -223,12 +273,9 @@
             bg.appendChild(d);
         }
     }
-    createDrops();
 
     const DADATA_API_KEY = "6f49e7177e36608d4139b823d71466c86bd7ca4f"; 
     let basePrice = 500, manualAdjustment = 0, paymentMethod = 'Наличные', selectedClass = 'Эконом', searchTimeout, detectedCity = null;
-
-    window.onload = () => { autoLocate(true); };
 
     function closeAllUI(e) { if (!e.target.closest('.field-group')) document.querySelectorAll('.suggestions').forEach(s => s.style.display = 'none'); }
     function toggleCitySelector() { const b = document.getElementById('city-selector-box'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; }
