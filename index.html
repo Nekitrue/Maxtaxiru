@@ -8,7 +8,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { 
-            --aqua-deep: #005f73;
             --aqua-bright: #0a9396;
             --neon-blue: #94d2bd;
             --glass-bg: rgba(255, 255, 255, 0.08);
@@ -25,7 +24,6 @@
             display: flex; flex-direction: column;
         }
 
-        /* Анимированный водный фон */
         .aqua-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1; background: linear-gradient(180deg, #001219 0%, #005f73 100%);
@@ -40,11 +38,9 @@
 
         @keyframes flow {
             0% { transform: translateY(110vh) scale(0.5); opacity: 0; }
-            50% { opacity: 0.3; }
             100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
         }
 
-        /* Музыкальная кнопка */
         #music-control {
             position: fixed; top: 15px; right: 15px; width: 44px; height: 44px;
             background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
@@ -75,12 +71,14 @@
             color: #fff; outline: none; font-size: 15px; transition: 0.4s;
         }
         input:focus { border-color: #94d2bd; background: rgba(0, 18, 25, 0.6); }
-        input.error { border-color: #ae2012; }
         
-        .clear-btn { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); opacity: 0.5; cursor: pointer; display: none; }
-
-        .btn-add-point { color: #94d2bd; font-size: 11px; font-weight: 800; border: none; background: none; cursor: pointer; padding: 10px 0; text-transform: uppercase; }
-        .remove-point { color: #ee9b00; font-size: 10px; float: right; cursor: pointer; }
+        /* Исправление кнопки "Добавить остановку" */
+        .btn-add-point { 
+            display: block; width: fit-content; margin: -5px auto 15px 5px;
+            color: #94d2bd; font-size: 11px; font-weight: 800; 
+            border: none; background: none; cursor: pointer; 
+            text-transform: uppercase; padding: 5px 0;
+        }
 
         .suggestions { 
             position: absolute; top: 100%; left: 0; right: 0; 
@@ -93,36 +91,25 @@
         .class-selector { display: flex; gap: 8px; margin-bottom: 20px; }
         .class-btn { 
             flex: 1; padding: 12px 5px; border-radius: 15px; border: 1px solid var(--glass-border);
-            background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); 
-            font-size: 10px; font-weight: 800; text-transform: uppercase; transition: 0.3s; text-align: center;
+            background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.7); 
+            font-size: 10px; font-weight: 800; text-transform: uppercase; text-align: center;
         }
         .class-btn.active { background: linear-gradient(135deg, #0a9396, #94d2bd); color: #001219; border: none; }
 
         .price-section { 
             background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
-            border-radius: 25px; padding: 20px; margin: 25px 0; border: 1px solid var(--glass-border);
+            border-radius: 25px; padding: 20px; margin: 25px 0; border: 1px solid var(--glass-border); text-align: center;
         }
-        .price-row { display: flex; align-items: center; justify-content: space-between; }
-        .price-display { font-size: 34px; font-weight: 800; color: #ee9b00; }
-        .btn-round { 
-            width: 50px; height: 50px; border-radius: 15px; border: 1px solid var(--glass-border);
-            background: var(--glass-bg); color: #fff; font-size: 24px; cursor: pointer;
-        }
+        .price-display { font-size: 34px; font-weight: 800; color: #ee9b00; margin: 0 15px; }
+        .btn-round { width: 50px; height: 50px; border-radius: 15px; background: var(--glass-bg); color: #fff; font-size: 24px; border: 1px solid var(--glass-border); }
 
-        .pay-btn { 
-            flex: 1; padding: 16px; border-radius: 18px; border: 1px solid var(--glass-border);
-            background: rgba(255,255,255,0.05); color: #fff; font-weight: 700; font-size: 11px;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
+        .pay-btn { flex: 1; padding: 16px; border-radius: 18px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.05); color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .pay-btn.active { background: rgba(148, 210, 189, 0.2); border-color: #94d2bd; }
-        .pay-icon { width: 20px; height: 20px; object-fit: contain; border-radius: 4px; }
+        .pay-icon { width: 20px; height: 20px; border-radius: 4px; }
 
-        .order-button { 
-            width: 100%; padding: 22px; background: linear-gradient(90deg, #ee9b00, #ca6702);
-            color: #fff; border: none; border-radius: 22px; font-size: 18px; font-weight: 800; 
-            text-transform: uppercase; box-shadow: 0 15px 35px rgba(202, 103, 2, 0.4);
-        }
+        .order-button { width: 100%; padding: 22px; background: linear-gradient(90deg, #ee9b00, #ca6702); color: #fff; border: none; border-radius: 22px; font-size: 18px; font-weight: 800; text-transform: uppercase; }
         #city-selector-box { display: none; }
+        .clear-btn { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); display: none; cursor: pointer; }
     </style>
 </head>
 <body onclick="closeAllUI(event)">
@@ -133,7 +120,7 @@
     <span id="music-icon">🔇</span>
 </div>
 
-<audio id="bg-audio" loop>
+<audio id="bg-audio" loop preload="auto">
     <source src="Ringtone.mp3" type="audio/mpeg">
 </audio>
 
@@ -146,8 +133,7 @@
     <div id="city-selector-box" class="field-group">
         <label>Выбор города:</label>
         <div class="input-wrapper">
-            <input type="text" id="city-input" placeholder="Поиск города..." oninput="getCitySuggestions(this)">
-            <span class="clear-btn" onclick="clearField('city-input')">✕</span>
+            <input type="text" id="city-input" placeholder="Введите город" oninput="getCitySuggestions(this)">
         </div>
         <div class="suggestions"></div>
     </div>
@@ -155,8 +141,7 @@
     <div class="field-group">
         <label>Откуда:</label>
         <div class="input-wrapper">
-            <input type="text" id="from" placeholder="Улица и дом" oninput="getSuggestions(this)">
-            <span class="clear-btn" onclick="clearField('from')">✕</span>
+            <input type="text" id="from" placeholder="Улица и дом" oninput="getSuggestions(this)" onfocus="autoPlayMusic()">
         </div>
         <div class="suggestions"></div>
     </div>
@@ -167,8 +152,7 @@
     <div class="field-group">
         <label>Куда:</label>
         <div class="input-wrapper">
-            <input type="text" id="to" placeholder="Место назначения" oninput="getSuggestions(this)">
-            <span class="clear-btn" onclick="clearField('to')">✕</span>
+            <input type="text" id="to" placeholder="Место назначения" oninput="getSuggestions(this)" onfocus="autoPlayMusic()">
         </div>
         <div class="suggestions"></div>
     </div>
@@ -185,13 +169,12 @@
     <div class="field-group">
         <label>Комментарий:</label>
         <div class="input-wrapper">
-            <input type="text" id="comment" placeholder="Детское кресло и т.д." oninput="toggleX(this)">
-            <span class="clear-btn" onclick="clearField('comment')">✕</span>
+            <input type="text" id="comment" placeholder="Детское кресло..." onfocus="autoPlayMusic()">
         </div>
     </div>
 
     <div class="price-section">
-        <div class="price-row">
+        <div class="price-row" style="display:flex; align-items:center; justify-content:center;">
             <button class="btn-round" onclick="adjustPrice(-100)">−</button>
             <div class="price-display" id="display_price">500 ₽</div>
             <button class="btn-round" onclick="adjustPrice(100)">+</button>
@@ -212,11 +195,15 @@
     let tg = window.Telegram.WebApp;
     tg.expand();
 
-    // Музыкальная логика
     const audio = document.getElementById('bg-audio');
     const musicBtn = document.getElementById('music-control');
     const musicIcon = document.getElementById('music-icon');
     let isPlaying = false;
+
+    // Исправление музыки: принудительный старт при фокусе на любое поле
+    function autoPlayMusic() {
+        if (!isPlaying) toggleMusic();
+    }
 
     function toggleMusic() {
         if (isPlaying) {
@@ -224,12 +211,14 @@
         } else {
             audio.play().then(() => {
                 musicIcon.innerText = "🔊"; musicBtn.classList.add('playing');
-            }).catch(() => alert("Нажмите кнопку звука еще раз"));
+                isPlaying = true;
+            }).catch(() => {
+                console.log("Ждем клика");
+            });
         }
-        isPlaying = !isPlaying;
+        if (isPlaying && !audio.paused) isPlaying = true; else if (audio.paused) isPlaying = false;
     }
 
-    // Капли воды
     function createDrops() {
         const bg = document.getElementById('aqua-bg');
         for(let i=0; i<15; i++) {
@@ -238,36 +227,23 @@
             d.style.width = d.style.height = s + 'px';
             d.style.left = Math.random() * 100 + 'vw';
             d.style.animationDuration = (Math.random() * 10 + 10) + 's';
-            d.style.animationDelay = (Math.random() * 5) + 's';
             bg.appendChild(d);
         }
     }
     createDrops();
 
-    // DaData & Функции
     const DADATA_API_KEY = "6f49e7177e36608d4139b823d71466c86bd7ca4f"; 
     let basePrice = 500, manualAdjustment = 0, paymentMethod = 'Наличные', selectedClass = 'Эконом', searchTimeout, detectedCity = null;
 
     window.onload = () => { autoLocate(true); };
 
     function closeAllUI(e) { if (!e.target.closest('.field-group')) document.querySelectorAll('.suggestions').forEach(s => s.style.display = 'none'); }
-    function toggleX(input) { input.nextElementSibling.style.display = input.value.length > 0 ? 'block' : 'none'; }
-    function clearField(id) { const i = document.getElementById(id); i.value = ''; toggleX(i); i.focus(); }
     function toggleCitySelector() { const b = document.getElementById('city-selector-box'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; }
 
-    function selectClass(c, p) {
-        selectedClass = c === 'econom' ? 'Эконом' : (c === 'comfort' ? 'Комфорт' : 'Бизнес');
-        basePrice = p; manualAdjustment = 0;
-        document.querySelectorAll('.class-btn').forEach(b => b.classList.remove('active'));
-        event.currentTarget.classList.add('active'); updatePriceDisplay();
-    }
-
-    function adjustPrice(v) { if ((basePrice + manualAdjustment + v) >= 100) { manualAdjustment += v; updatePriceDisplay(); } }
-    function updatePriceDisplay() { document.getElementById('display_price').innerText = (basePrice + manualAdjustment) + " ₽"; }
-    function setPayment(m) { 
-        paymentMethod = m; 
-        document.getElementById('pay-cash').classList.toggle('active', m === 'Наличные'); 
-        document.getElementById('pay-online').classList.toggle('active', m === 'ПЕРЕВОД СБП'); 
+    // Исправление: функция очистки адреса от города
+    function cleanAddress(full, city) {
+        if (!full || !city) return full;
+        return full.replace("Россия, ", "").replace(city + ", ", "").replace(city, "").trim();
     }
 
     function autoLocate(fill) {
@@ -281,14 +257,15 @@
                 if (r.suggestions?.length > 0) {
                     detectedCity = r.suggestions[0].data.city;
                     document.getElementById('city-status').innerText = "ГОРОД: " + detectedCity.toUpperCase();
-                    if (fill) document.getElementById('from').value = r.suggestions[0].value.replace("Россия, ", "");
+                    // Скрываем город из инпута
+                    if (fill) document.getElementById('from').value = cleanAddress(r.suggestions[0].value, detectedCity);
                 }
             });
         }
     }
 
     async function getSuggestions(input) {
-        toggleX(input); let q = input.value; let container = input.parentElement.nextElementSibling;
+        let q = input.value; let container = input.parentElement.nextElementSibling;
         if (q.length < 3) return;
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(async () => {
@@ -300,8 +277,8 @@
             container.innerHTML = ''; container.style.display = 'block';
             d.suggestions.forEach(s => {
                 const div = document.createElement('div'); div.className = 'suggestion-item';
-                div.innerText = s.value.replace("Россия, ", "");
-                div.onclick = () => { input.value = div.innerText; container.style.display = 'none'; toggleX(input); };
+                div.innerText = cleanAddress(s.value, detectedCity);
+                div.onclick = () => { input.value = div.innerText; container.style.display = 'none'; };
                 container.appendChild(div);
             });
         }, 300);
@@ -324,17 +301,33 @@
 
     function addStopField() {
         const div = document.createElement('div'); div.className = 'field-group';
-        div.innerHTML = `<label>Остановка <span class="remove-point" onclick="this.parentElement.parentElement.remove()">✕</span></label>
-            <div class="input-wrapper"><input type="text" class="stop-input" placeholder="Адрес" oninput="getSuggestions(this)"><span class="clear-btn" onclick="clearField(this.previousElementSibling)">✕</span></div>
+        div.innerHTML = `<label>Остановка <span style="color:#ee9b00; float:right; cursor:pointer;" onclick="this.parentElement.parentElement.remove()">✕</span></label>
+            <div class="input-wrapper"><input type="text" class="stop-input" placeholder="Адрес" oninput="getSuggestions(this)" onfocus="autoPlayMusic()"></div>
             <div class="suggestions"></div>`;
         document.getElementById('extra-stops').appendChild(div);
+    }
+
+    function selectClass(c, p) {
+        selectedClass = c === 'econom' ? 'Эконом' : (c === 'comfort' ? 'Комфорт' : 'Бизнес');
+        basePrice = p; manualAdjustment = 0;
+        document.querySelectorAll('.class-btn').forEach(b => b.classList.remove('active'));
+        event.currentTarget.classList.add('active'); updatePriceDisplay();
+    }
+
+    function adjustPrice(v) { if ((basePrice + manualAdjustment + v) >= 100) { manualAdjustment += v; updatePriceDisplay(); } }
+    function updatePriceDisplay() { document.getElementById('display_price').innerText = (basePrice + manualAdjustment) + " ₽"; }
+    function setPayment(m) { 
+        paymentMethod = m; 
+        document.getElementById('pay-cash').classList.toggle('active', m === 'Наличные'); 
+        document.getElementById('pay-online').classList.toggle('active', m === 'ПЕРЕВОД СБП'); 
     }
 
     function confirmOrder() {
         const f = document.getElementById('from').value, t = document.getElementById('to').value;
         if (!/\d/.test(f) || !/\d/.test(t)) { alert("Укажите номер дома!"); return; }
+        const stops = Array.from(document.querySelectorAll('.stop-input')).map(i => i.value).filter(v => v).join(', ');
         tg.sendData(JSON.stringify({
-            city: detectedCity, from: f, to: t, car: selectedClass, price: basePrice + manualAdjustment, pay: paymentMethod
+            city: detectedCity, from: f, to: t, inter: stops || "Нет", car: selectedClass, price: basePrice + manualAdjustment, pay: paymentMethod, comment: document.getElementById('comment').value
         }));
         tg.close();
     }
