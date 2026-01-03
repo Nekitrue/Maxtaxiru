@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Такси MAX - Eternal Liquid</title>
+    <title>Такси MAX - Ultra Pulse Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -12,7 +12,7 @@
             --neon-blue: #94d2bd;
             --glass-bg: rgba(255, 255, 255, 0.08);
             --glass-border: rgba(255, 255, 255, 0.15);
-            --pulse-intensity: 0.2; /* Начальное значение больше нуля */
+            --pulse-intensity: 0; /* От 0 до 1 */
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -21,17 +21,16 @@
             font-family: 'Montserrat', sans-serif; 
             background: #001219;
             color: #fff; margin: 0; padding: 15px; 
-            min-height: 100vh; overflow: hidden;
+            min-height: 100vh; overflow-x: hidden;
             display: flex; flex-direction: column;
-            filter: hue-rotate(calc(var(--pulse-intensity) * 15deg));
-            transition: filter 0.2s linear;
+            transition: background 0.3s ease;
         }
 
         .aqua-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1; 
             background: radial-gradient(circle at center, 
-                calc(#005f73 + (var(--pulse-intensity) * 35px)) 0%, 
+                calc(#005f73 + (var(--pulse-intensity) * 20px)) 0%, 
                 #001219 100%);
         }
 
@@ -39,14 +38,14 @@
             position: absolute; background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(5px); border-radius: 50%;
             animation: flow 15s infinite linear;
-            box-shadow: 0 0 calc(var(--pulse-intensity) * 35px) var(--neon-blue);
-            transform: scale(calc(0.6 + var(--pulse-intensity) * 1.2));
-            opacity: calc(0.2 + var(--pulse-intensity) * 0.8);
+            /* Капли реагируют на бас */
+            box-shadow: 0 0 calc(var(--pulse-intensity) * 25px) rgba(148, 210, 189, var(--pulse-intensity));
+            transform: scale(calc(1 + var(--pulse-intensity) * 0.5));
         }
 
         @keyframes flow {
-            0% { transform: translateY(110vh); }
-            100% { transform: translateY(-20vh); }
+            0% { transform: translateY(110vh) scale(0.5); opacity: 0; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
         }
 
         .music-switch-container {
@@ -55,7 +54,7 @@
             background: var(--glass-bg); padding: 8px 12px;
             border-radius: 20px; border: 1px solid var(--glass-border);
             backdrop-filter: blur(10px);
-            box-shadow: 0 0 calc(var(--pulse-intensity) * 20px) var(--aqua-bright);
+            box-shadow: 0 0 calc(var(--pulse-intensity) * 15px) var(--aqua-bright);
         }
 
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
@@ -72,52 +71,55 @@
         input:checked + .slider:before { transform: translateX(18px); }
 
         .container { 
-            background: rgba(255, 255, 255, calc(0.04 + var(--pulse-intensity) * 0.08));
-            backdrop-filter: blur(25px); 
-            border: 1px solid rgba(255,255,255, calc(0.1 + var(--pulse-intensity) * 0.2)); 
+            background: rgba(255, 255, 255, calc(0.05 + var(--pulse-intensity) * 0.05));
+            backdrop-filter: blur(25px); border: 1px solid var(--glass-border); 
             border-radius: 30px; padding: 20px; margin-top: 50px;
             position: relative; z-index: 10;
-            transform: scale(calc(1 + var(--pulse-intensity) * 0.03));
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 
-                        inset 0 0 calc(var(--pulse-intensity) * 30px) rgba(10, 147, 150, 0.2);
-            transition: transform 0.1s ease-out, background 0.1s ease-out;
+            /* Контейнер "дышит" */
+            transform: scale(calc(1 + var(--pulse-intensity) * 0.015));
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3), 
+                        inset 0 0 calc(var(--pulse-intensity) * 20px) rgba(10, 147, 150, 0.2);
+            transition: transform 0.05s linear, background 0.05s linear;
         }
 
         label { 
             font-size: 11px; font-weight: 800; color: var(--neon-blue); 
-            text-transform: uppercase; display: block; margin-bottom: 8px;
-            text-shadow: 0 0 calc(var(--pulse-intensity) * 12px) var(--neon-blue);
+            text-transform: uppercase; margin-bottom: 8px;
+            /* Текст светится в такт */
+            text-shadow: 0 0 calc(var(--pulse-intensity) * 8px) var(--neon-blue);
         }
         
         input[type="text"] { 
             width: 100%; padding: 16px; border: 1px solid var(--glass-border); 
-            border-radius: 18px; background: rgba(0, 18, 25, 0.5); 
+            border-radius: 18px; background: rgba(0, 18, 25, 0.4); 
             color: #fff; outline: none; font-size: 15px;
+            transition: border 0.1s linear;
         }
+        input[type="text"]:focus { border-color: var(--neon-blue); }
 
         .class-btn.active, .pay-btn.active, .order-button {
-            filter: drop-shadow(0 0 calc(var(--pulse-intensity) * 15px) var(--neon-blue));
-            transform: scale(calc(1 + var(--pulse-intensity) * 0.04));
+            box-shadow: 0 0 calc(var(--pulse-intensity) * 25px) var(--neon-blue);
+            filter: brightness(calc(1 + var(--pulse-intensity) * 0.3));
         }
 
         .price-display { 
-            font-size: 38px; font-weight: 800; color: #ee9b00; 
-            text-shadow: 0 0 calc(var(--pulse-intensity) * 20px) #ee9b00;
-            display: inline-block;
-            transform: scale(calc(1 + var(--pulse-intensity) * 0.15));
+            font-size: 34px; font-weight: 800; color: #ee9b00; 
+            text-shadow: 0 0 calc(var(--pulse-intensity) * 15px) #ee9b00;
         }
+
+        .suggestions { 
+            position: absolute; top: 100%; left: 0; right: 0; 
+            background: rgba(0, 18, 25, 0.98); border-radius: 18px; 
+            z-index: 1000; display: none;
+        }
+        .suggestion-item { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
         .order-button { 
             width: 100%; padding: 22px; 
             background: linear-gradient(90deg, #ee9b00, #ca6702); 
             color: #fff; border: none; border-radius: 22px; 
-            font-size: 20px; font-weight: 800; text-transform: uppercase;
-            margin-top: 15px;
-        }
-
-        .suggestions { 
-            position: absolute; top: 100%; left: 0; right: 0; 
-            background: rgba(0, 18, 25, 0.98); border-radius: 18px; z-index: 1000; display: none;
+            font-size: 18px; font-weight: 800; text-transform: uppercase;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -126,7 +128,7 @@
 <div class="aqua-bg" id="aqua-bg"></div>
 
 <div class="music-switch-container">
-    <span style="font-size: 9px; font-weight: 800; color: var(--neon-blue);">AQUA MODE</span>
+    <span style="font-size: 9px; font-weight: 800; color: var(--neon-blue);">PULSE</span>
     <label class="switch">
         <input type="checkbox" id="music-toggle" onchange="manualMusicControl()">
         <span class="slider"></span>
@@ -138,9 +140,9 @@
 </audio>
 
 <div class="container">
-    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-        <div style="font-size: 10px; color: var(--neon-blue); font-weight: 800;">LIVING GLASS</div>
-        <div id="city-status" onclick="toggleCitySelector()" style="font-size: 10px; color: #94d2bd; text-decoration: underline; font-weight: 800;">ОПРЕДЕЛЕНИЕ ГОРОДА...</div>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+        <div style="font-size: 10px; color: var(--neon-blue); opacity: 0.6; font-weight: 800;">AQUA v3.0</div>
+        <div id="city-status" onclick="toggleCitySelector()" style="font-size: 10px; color: #94d2bd; text-decoration: underline; font-weight: 800;">ГОРОД: ОПРЕДЕЛЕНИЕ...</div>
     </div>
     
     <div class="field-group">
@@ -149,6 +151,8 @@
         <div class="suggestions"></div>
     </div>
 
+    <div id="extra-stops"></div>
+    
     <div class="field-group">
         <label>Куда:</label>
         <input type="text" id="to" placeholder="Место назначения" oninput="getSuggestions(this)" onfocus="autoPlayMusic()">
@@ -156,20 +160,20 @@
     </div>
 
     <div class="field-group">
-        <label>Класс такси:</label>
-        <div style="display: flex; gap: 10px;">
-            <div class="class-btn active" style="flex:1; padding:15px; border-radius:18px; border:1px solid var(--glass-border); text-align:center; font-size:11px; font-weight:800;" onclick="selectClass(this, 500)">ЭКОНОМ</div>
-            <div class="class-btn" style="flex:1; padding:15px; border-radius:18px; border:1px solid var(--glass-border); text-align:center; font-size:11px; font-weight:800;" onclick="selectClass(this, 850)">БИЗНЕС</div>
+        <label>Класс:</label>
+        <div style="display: flex; gap: 8px;">
+            <div class="class-btn active" style="flex:1; padding:12px; border-radius:15px; border:1px solid var(--glass-border); text-align:center; font-size:10px; font-weight:800;" onclick="selectClass(this, 500)">ЭКОНОМ</div>
+            <div class="class-btn" style="flex:1; padding:12px; border-radius:15px; border:1px solid var(--glass-border); text-align:center; font-size:10px; font-weight:800;" onclick="selectClass(this, 700)">КОМФОРТ</div>
         </div>
     </div>
 
-    <div style="text-align: center; margin: 30px 0;">
+    <div class="price-section" style="text-align: center; margin: 20px 0;">
         <span class="price-display" id="display_price">500 ₽</span>
     </div>
 
-    <div style="display:flex; gap:10px; margin-bottom: 25px;">
-        <div id="pay-cash" class="pay-btn active" style="flex:1; padding:18px; border-radius:20px; border:1px solid var(--glass-border); text-align:center; font-size:12px; font-weight:800;" onclick="setPayment('Наличные')">CASH</div>
-        <div id="pay-online" class="pay-btn" style="flex:1; padding:18px; border-radius:20px; border:1px solid var(--glass-border); text-align:center; font-size:12px; font-weight:800;" onclick="setPayment('СБП')">СБП</div>
+    <div style="display:flex; gap:10px; margin-bottom: 20px;">
+        <div id="pay-cash" class="pay-btn active" style="flex:1; padding:16px; border-radius:18px; border:1px solid var(--glass-border); text-align:center; font-size:11px;" onclick="setPayment('Наличные')">НАЛИЧНЫЕ</div>
+        <div id="pay-online" class="pay-btn" style="flex:1; padding:16px; border-radius:18px; border:1px solid var(--glass-border); text-align:center; font-size:11px;" onclick="setPayment('ПЕРЕВОД СБП')">СБП</div>
     </div>
 
     <button class="order-button" onclick="confirmOrder()">ЗАКАЗАТЬ</button>
@@ -181,17 +185,14 @@
 
     const audio = document.getElementById('bg-audio');
     const musicToggle = document.getElementById('music-toggle');
-    let audioContext, analyser, frequencyData, isPlaying = false, pulseFrame;
-    
-    // Автономный ритм
-    let autoPulsePhase = 0;
+    let audioContext, analyser, frequencyData, isPlaying = false, pulseInterval;
 
+    // Инициализация при загрузке
     window.onload = () => {
         const saved = localStorage.getItem('musicEnabled');
         musicToggle.checked = (saved === null) ? true : (saved === 'true');
         createDrops();
-        // Запускаем цикл анимации сразу
-        updatePulseLoop();
+        autoLocate(true);
     };
 
     function closeAllUI(e) {
@@ -212,64 +213,63 @@
         if (!audioContext) {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
             analyser = audioContext.createAnalyser();
-            analyser.fftSize = 32;
+            analyser.fftSize = 64; // Меньше размер — быстрее реакция на басы
             frequencyData = new Uint8Array(analyser.frequencyBinCount);
             let source = audioContext.createMediaElementSource(audio);
             source.connect(analyser);
             analyser.connect(audioContext.destination);
         }
-        audio.play().then(() => { isPlaying = true; }).catch(() => {});
+        audio.play().then(() => {
+            isPlaying = true;
+            if (!pulseInterval) pulseInterval = requestAnimationFrame(updatePulseLoop);
+        }).catch(() => {});
     }
 
     function stopMusic() {
-        audio.pause(); 
-        isPlaying = false;
+        audio.pause(); isPlaying = false;
+        cancelAnimationFrame(pulseInterval); pulseInterval = null;
+        document.documentElement.style.setProperty('--pulse-intensity', 0);
     }
 
+    // Более плавная анимация через requestAnimationFrame
     function updatePulseLoop() {
-        let intensity = 0;
-
-        if (isPlaying && analyser) {
-            // Режим музыки: реакция на басы
-            analyser.getByteFrequencyData(frequencyData);
-            let raw = frequencyData[0] / 255;
-            intensity = Math.pow(raw, 1.5) * 1.4;
-        } else {
-            // Автономный режим: мягкая синусоида
-            autoPulsePhase += 0.03; // Скорость "дыхания"
-            intensity = (Math.sin(autoPulsePhase) + 1) / 2; // От 0 до 1
-            intensity = 0.15 + intensity * 0.25; // Ограничиваем диапазон для спокойного режима
-        }
+        if (!isPlaying) return;
+        analyser.getByteFrequencyData(frequencyData);
+        // Берем только низкие частоты (басы) для более четкого ритма
+        let bassValue = frequencyData[0] + frequencyData[1] + frequencyData[2];
+        let average = bassValue / 3;
+        let intensity = Math.pow(average / 255, 2) * 1.2; // Квадратичная зависимость для резкости
         
         document.documentElement.style.setProperty('--pulse-intensity', intensity.toFixed(3));
-        pulseFrame = requestAnimationFrame(updatePulseLoop);
+        pulseInterval = requestAnimationFrame(updatePulseLoop);
     }
 
     function createDrops() {
         const bg = document.getElementById('aqua-bg');
-        for(let i=0; i<18; i++) {
+        for(let i=0; i<15; i++) {
             let d = document.createElement('div'); d.className = 'drop';
-            let s = Math.random() * 90 + 30;
+            let s = Math.random() * 80 + 20;
             d.style.width = d.style.height = s + 'px';
             d.style.left = Math.random() * 100 + 'vw';
-            d.style.top = Math.random() * 100 + 'vh';
-            d.style.animationDuration = (Math.random() * 15 + 8) + 's';
+            d.style.animationDuration = (Math.random() * 10 + 10) + 's';
             bg.appendChild(d);
         }
     }
 
-    // Сокращенные вспомогательные функции (сохраните логику DaData из прошлых версий)
+    // Функции DaData и заказа (сокращено для примера, используйте из прошлых версий)
     function selectClass(el, p) {
         document.querySelectorAll('.class-btn').forEach(b => b.classList.remove('active'));
         el.classList.add('active');
         document.getElementById('display_price').innerText = p + " ₽";
     }
+
     function setPayment(m) {
         document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('active'));
         event.currentTarget.classList.add('active');
     }
+
     function confirmOrder() {
-        tg.sendData(JSON.stringify({ order: "ready" }));
+        tg.sendData(JSON.stringify({ action: "order" }));
     }
 </script>
 </body>
