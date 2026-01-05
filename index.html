@@ -3,601 +3,390 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aqua Taxi WebApp</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <title>Такси MAX - Liquid Aqua</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root {
-            --bg-color: #001219;
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --accent-teal: #94d2bd;
-            --accent-dark-teal: #0a9396;
-            --accent-orange: #ee9b00;
-            --text-main: #e9d8a6;
-            --text-white: #ffffff;
-            --blur-val: 25px;
-            --anim-bezier: cubic-bezier(0.2, 0, 0, 1);
+        :root { 
+            --aqua-bright: #0a9396;
+            --neon-blue: #94d2bd;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --dark-bg: #001219;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-white);
-            overflow-x: hidden;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding-bottom: 20px;
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            background: var(--dark-bg);
+            color: #fff; margin: 0; padding: 15px; 
+            min-height: 100vh; overflow-x: hidden;
+            display: flex; flex-direction: column;
         }
 
-        /* --- Background Animation --- */
-        .background-anim {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
+        .aqua-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; background: linear-gradient(180deg, #001219 0%, #005f73 100%);
             overflow: hidden;
         }
-        .bubble {
-            position: absolute;
-            bottom: -100px;
-            background: radial-gradient(circle, rgba(0,95,115,0.4) 0%, rgba(0,0,0,0) 70%);
-            border-radius: 50%;
-            animation: floatUp 15s infinite linear;
+        .drop {
+            position: absolute; background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px); border-radius: 50%;
+            animation: flow 15s infinite linear;
         }
-        @keyframes floatUp {
-            0% { transform: translateY(0) scale(1); opacity: 0; }
-            50% { opacity: 0.6; }
-            100% { transform: translateY(-120vh) scale(1.5); opacity: 0; }
+        @keyframes flow {
+            0% { transform: translateY(110vh) scale(0.5); opacity: 0; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
         }
 
-        /* --- Header --- */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            z-index: 10;
+        .music-switch-container {
+            position: fixed; top: 15px; right: 15px;
+            z-index: 2000; display: flex; align-items: center; gap: 8px;
+            background: var(--glass-bg); padding: 8px 12px;
+            border-radius: 20px; border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
         }
-        h1 { margin: 0; font-size: 24px; font-weight: 700; color: var(--accent-teal); text-shadow: 0 0 10px rgba(148, 210, 189, 0.3); }
-
-        .music-toggle {
-            width: 40px; height: 40px;
-            border-radius: 50%;
-            background: var(--glass-bg);
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255,255,255,0.1); transition: .4s; border-radius: 20px;
             border: 1px solid var(--glass-border);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-            backdrop-filter: blur(var(--blur-val));
-            transition: all 0.3s var(--anim-bezier);
         }
-        .music-toggle.active { box-shadow: 0 0 15px var(--accent-teal); border-color: var(--accent-teal); }
+        .slider:before {
+            position: absolute; content: ""; height: 14px; width: 14px;
+            left: 3px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--aqua-bright); border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(148, 210, 189, 0.4); }
+        input:checked + .slider:before { transform: translateX(18px); }
+        .music-label { font-size: 9px; font-weight: 800; color: var(--neon-blue); text-transform: uppercase; }
 
-        /* --- Container --- */
-        .container { padding: 0 16px; width: 100%; max-width: 500px; margin: 0 auto; }
-
-        /* --- Glass Cards --- */
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(var(--blur-val));
-            -webkit-backdrop-filter: blur(var(--blur-val));
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        .container { 
+            background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border); border-radius: 30px; 
+            padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); margin-top: 50px;
         }
 
-        /* --- Inputs --- */
-        .input-group { position: relative; margin-bottom: 12px; }
-        .input-group:last-child { margin-bottom: 0; }
+        .top-info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .version-label { font-size: 10px; color: var(--neon-blue); opacity: 0.6; font-weight: 800; }
+        #city-status { font-size: 10px; font-weight: 800; color: #94d2bd; cursor: pointer; text-decoration: underline; text-transform: uppercase; }
+
+        .field-group { margin-bottom: 18px; position: relative; }
+        label { font-size: 11px; font-weight: 800; color: var(--neon-blue); text-transform: uppercase; display: block; margin-bottom: 8px; margin-left: 5px; }
         
-        input[type="text"] {
-            width: 100%;
-            background: rgba(0,0,0,0.2);
-            border: 1px solid transparent;
-            padding: 14px 14px 14px 40px;
-            border-radius: 12px;
-            color: white;
-            font-family: inherit;
-            font-size: 16px;
-            transition: all 0.2s;
+        input[type="text"] { 
+            width: 100%; padding: 16px; border: 1px solid var(--glass-border); 
+            border-radius: 18px; background: rgba(0, 18, 25, 0.4); 
+            color: #fff; outline: none; font-size: 15px; transition: 0.4s;
         }
-        input[type="text"]:focus {
-            outline: none;
-            border-color: var(--accent-teal);
-            box-shadow: 0 0 10px rgba(148,210,189,0.2);
-        }
-        .input-icon {
-            position: absolute; left: 14px; top: 50%;
-            transform: translateY(-50%);
-            color: var(--accent-teal);
-        }
-        .remove-btn, .add-stop-btn {
-            color: var(--accent-orange);
-            font-size: 14px;
-            background: none; border: none;
-            cursor: pointer;
-            padding: 5px;
-            margin-top: 5px;
+        input[type="text"]:focus { border-color: #94d2bd; background: rgba(0, 18, 25, 0.6); }
+
+        .btn-add-point { 
+            display: block; width: fit-content; margin: -5px auto 15px 5px;
+            color: #94d2bd; font-size: 11px; font-weight: 800; 
+            border: none; background: none; cursor: pointer; 
+            text-transform: uppercase; padding: 5px 0;
         }
 
-        /* --- Suggestions (DaData) --- */
-        .suggestions-list {
-            background: #001e29;
-            border-radius: 12px;
-            margin-top: 5px;
-            max-height: 200px;
-            overflow-y: auto;
-            position: absolute;
-            width: 100%;
-            z-index: 100;
-            display: none;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            border: 1px solid var(--glass-border);
+        .suggestions { 
+            position: absolute; top: 100%; left: 0; right: 0; 
+            background: rgba(0, 18, 25, 0.95); backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border); border-radius: 18px; 
+            z-index: 1000; display: none; max-height: 200px; overflow-y: auto; margin-top: 5px;
         }
-        .suggestion-item {
-            padding: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-size: 14px;
-        }
-        .suggestion-item:active { background: var(--accent-dark-teal); }
-
-        /* --- Scrubbing Areas (Car Class & Payment) --- */
-        .scrub-container {
-            display: flex;
-            background: rgba(0,0,0,0.3);
-            border-radius: 16px;
-            padding: 4px;
-            position: relative;
-            touch-action: none; /* Важно для свайпов */
-            margin-bottom: 15px;
-            justify-content: space-between;
-        }
-
-        .scrub-item {
-            flex: 1;
-            text-align: center;
-            padding: 12px 0;
-            font-size: 14px;
-            font-weight: 600;
-            color: rgba(255,255,255,0.6);
-            border-radius: 12px;
-            transition: all 0.2s var(--anim-bezier);
-            position: relative;
-            z-index: 2;
-            user-select: none;
-        }
-        .scrub-item.active {
-            color: #001219;
-            transform: scale(0.95);
-        }
+        .suggestion-item { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
         
-        /* Плавающая подложка для активации */
-        .scrub-bg {
-            position: absolute;
-            top: 4px; left: 4px;
-            height: calc(100% - 8px);
-            background: var(--accent-teal);
-            border-radius: 12px;
-            z-index: 1;
-            transition: transform 0.15s var(--anim-bezier), width 0.15s var(--anim-bezier);
-            box-shadow: 0 0 15px var(--accent-teal);
+        .class-selector { display: flex; gap: 8px; margin-bottom: 20px; }
+        .class-btn { 
+            flex: 1; padding: 12px 5px; border-radius: 15px; border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.7); 
+            font-size: 10px; font-weight: 800; text-transform: uppercase; text-align: center;
         }
+        .class-btn.active { background: linear-gradient(135deg, #0a9396, #94d2bd); color: #001219; border: none; }
 
-        /* --- Price & Options --- */
-        .options-row {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 10px;
+        .price-section { 
+            background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+            border-radius: 25px; padding: 20px; margin: 25px 0; border: 1px solid var(--glass-border); text-align: center;
         }
-        .price-control {
-            display: flex; align-items: center; gap: 15px;
-            background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 12px;
-        }
-        .price-btn {
-            width: 30px; height: 30px;
-            border-radius: 8px;
-            background: var(--glass-border);
-            border: none; color: white;
-            font-size: 18px;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .current-price { font-weight: 700; color: var(--accent-orange); font-size: 18px; }
+        .price-display { font-size: 34px; font-weight: 800; color: #ee9b00; margin: 0 15px; }
+        .btn-round { width: 50px; height: 50px; border-radius: 15px; background: var(--glass-bg); color: #fff; font-size: 24px; border: 1px solid var(--glass-border); }
 
-        .file-upload-btn {
-            background: rgba(0,0,0,0.2);
-            color: var(--accent-teal);
-            border: 1px solid var(--glass-border);
-            padding: 10px;
-            border-radius: 12px;
-            cursor: pointer;
-            display: flex; align-items: center; gap: 8px;
-            font-size: 14px;
-        }
-        #photo-input { display: none; }
+        .pay-row { display:flex; gap:10px; margin-bottom: 20px; }
+        .pay-btn { flex: 1; padding: 16px; border-radius: 18px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.05); color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .pay-btn.active { background: rgba(148, 210, 189, 0.2); border-color: #94d2bd; }
+        .pay-icon { width: 20px; height: 20px; border-radius: 4px; }
 
-        /* --- Main Button --- */
-        .order-btn {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, var(--accent-orange), #ca6702);
-            border: none;
-            border-radius: 16px;
-            color: white;
-            font-size: 18px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 5px 20px rgba(238, 155, 0, 0.4);
-            margin-top: 10px;
-            transition: transform 0.1s;
-        }
-        .order-btn:active { transform: scale(0.96); }
-
-        .price-display-large {
-            text-align: center;
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--text-white);
-            margin: 10px 0;
-            text-shadow: 0 0 20px rgba(255,255,255,0.2);
-        }
-
+        .order-button { width: 100%; padding: 22px; background: linear-gradient(90deg, #ee9b00, #ca6702); color: #fff; border: none; border-radius: 22px; font-size: 18px; font-weight: 800; text-transform: uppercase; }
+        #city-selector-box { display: none; }
     </style>
 </head>
-<body>
+<body onclick="closeAllUI(event)" ontouchmove="handleScroll()">
 
-    <div class="background-anim" id="bg-anim"></div>
-    <audio id="bg-music" loop src="Ringtone.mp3"></audio>
+<div class="aqua-bg" id="aqua-bg"></div>
 
-    <header>
-        <h1>AquaTaxi</h1>
-        <div class="music-toggle" id="music-btn">
-            <i class="fas fa-music" style="color: var(--accent-teal);"></i>
-        </div>
-    </header>
+<div class="music-switch-container">
+    <span class="music-label">MUSIC</span>
+    <label class="switch">
+        <input type="checkbox" id="music-toggle" onchange="manualMusicControl()">
+        <span class="slider"></span>
+    </label>
+</div>
 
-    <div class="container">
-        
-        <div class="glass-card">
-            <div class="input-group">
-                <i class="fas fa-location-dot input-icon"></i>
-                <input type="text" id="address-from" placeholder="Откуда" autocomplete="off">
-                <div class="suggestions-list" id="suggestions-from"></div>
-            </div>
-            
-            <div id="intermediate-container"></div>
-            
-            <button class="add-stop-btn" id="add-stop-btn">+ Заезд</button>
+<audio id="bg-audio" loop preload="auto">
+    <source src="Ringtone.mp3" type="audio/mpeg">
+</audio>
 
-            <div class="input-group" style="margin-top: 12px;">
-                <i class="fas fa-flag-checkered input-icon"></i>
-                <input type="text" id="address-to" placeholder="Куда" autocomplete="off">
-                <div class="suggestions-list" id="suggestions-to"></div>
-            </div>
-        </div>
-
-        <div class="glass-card">
-            <div style="margin-bottom: 8px; font-size: 12px; color: #aaa;">Класс авто</div>
-            <div class="scrub-container" id="class-scrubber">
-                <div class="scrub-bg" id="class-bg"></div>
-                <div class="scrub-item active" data-class="econom" data-price="300">Эконом</div>
-                <div class="scrub-item" data-class="comfort" data-price="500">Комфорт</div>
-                <div class="scrub-item" data-class="business" data-price="900">Бизнес</div>
-            </div>
-            
-            <div class="price-display-large" id="main-price-display">300 ₽</div>
-        </div>
-
-        <div class="glass-card">
-            <div class="options-row">
-                <div class="price-control">
-                    <button class="price-btn" id="price-minus">−</button>
-                    <span class="current-price" id="extra-price">0</span>
-                    <button class="price-btn" id="price-plus">+</button>
-                </div>
-                
-                <label class="file-upload-btn">
-                    <i class="fas fa-camera"></i>
-                    <span id="file-label">Фото</span>
-                    <input type="file" id="photo-input" accept="image/*">
-                </label>
-            </div>
-            
-            <div class="input-group">
-                <i class="fas fa-comment input-icon"></i>
-                <input type="text" id="comment" placeholder="Комментарий к заказу">
-            </div>
-        </div>
-
-        <div class="glass-card">
-             <div style="margin-bottom: 8px; font-size: 12px; color: #aaa;">Способ оплаты</div>
-             <div class="scrub-container" id="payment-scrubber">
-                <div class="scrub-bg" id="payment-bg"></div>
-                <div class="scrub-item active" data-pay="cash">Наличные</div>
-                <div class="scrub-item" data-pay="sbp">СБП</div>
-            </div>
-        </div>
-
-        <button class="order-btn" id="order-btn">Заказать такси</button>
+<div class="container">
+    <div class="top-info-row">
+        <div class="version-label">v 2.2 | AQUA GLASS</div>
+        <div id="city-status" onclick="toggleCitySelector()">ГОРОД: ОПРЕДЕЛЕНИЕ...</div>
+    </div>
+    
+    <div id="city-selector-box" class="field-group">
+        <label>Выбор города:</label>
+        <input type="text" id="city-input" placeholder="Введите город" oninput="getCitySuggestions(this)" onkeydown="checkEnter(event, this)">
+        <div class="suggestions"></div>
     </div>
 
-    <script>
-        // --- 1. CONFIG & STATE ---
-        const DADATA_TOKEN = "YOUR_API_KEY_HERE"; // Вставьте ваш ключ!
-        const tg = window.Telegram.WebApp;
-        
-        let state = {
-            basePrice: 300,
-            extraPrice: 0,
-            carClass: 'econom',
-            paymentMethod: 'cash',
-            stops: [],
-            addresses: { from: '', to: '' },
-            musicPlaying: false
-        };
+    <div class="field-group">
+        <label>Откуда:</label>
+        <input type="text" id="from" placeholder="Улица и дом" oninput="getSuggestions(this)" onfocus="autoPlayMusic()" onkeydown="checkEnter(event, this)">
+        <div class="suggestions"></div>
+    </div>
 
-        // Инициализация Telegram
-        tg.expand();
-        tg.MainButton.hide(); // Используем свою кнопку
+    <div id="extra-stops"></div>
+    <button class="btn-add-point" onclick="addStopField()">+ Добавить остановку</button>
+    
+    <div class="field-group">
+        <label>Куда:</label>
+        <input type="text" id="to" placeholder="Место назначения" oninput="getSuggestions(this)" onfocus="autoPlayMusic()" onkeydown="checkEnter(event, this)">
+        <div class="suggestions"></div>
+    </div>
 
-        // --- 2. BACKGROUND ANIMATION ---
-        function createBubbles() {
-            const bg = document.getElementById('bg-anim');
-            for(let i=0; i<15; i++) {
-                let b = document.createElement('div');
-                b.className = 'bubble';
-                let size = Math.random() * 60 + 20;
-                b.style.width = size + 'px';
-                b.style.height = size + 'px';
-                b.style.left = Math.random() * 100 + '%';
-                b.style.animationDelay = Math.random() * 10 + 's';
-                b.style.animationDuration = (Math.random() * 10 + 10) + 's';
-                bg.appendChild(b);
-            }
+    <div class="field-group">
+        <label>Класс:</label>
+        <div class="class-selector">
+            <div class="class-btn active" onclick="selectClass('econom', 500)">Эконом</div>
+            <div class="class-btn" onclick="selectClass('comfort', 700)">Комфорт</div>
+            <div class="class-btn" onclick="selectClass('business', 900)">Бизнес</div>
+        </div>
+    </div>
+
+    <div class="field-group">
+        <label>Комментарий:</label>
+        <input type="text" id="comment" placeholder="Информация для водителя…" onfocus="autoPlayMusic()" onkeydown="checkEnter(event, this)">
+    </div>
+
+    <div class="price-section">
+        <div class="price-row" style="display:flex; align-items:center; justify-content:center;">
+            <button class="btn-round" onclick="adjustPrice(-100)">−</button>
+            <div class="price-display" id="display_price">500 ₽</div>
+            <button class="btn-round" onclick="adjustPrice(100)">+</button>
+        </div>
+    </div>
+
+    <div class="pay-row">
+        <div id="pay-cash" class="pay-btn active" onclick="setPayment('Наличные')">НАЛИЧНЫЕ</div>
+        <div id="pay-online" class="pay-btn" onclick="setPayment('ПЕРЕВОД СБП')">
+            <img src="IMG_4580.jpeg" alt="SBP" class="pay-icon"> ПЕРЕВОД СБП
+        </div>
+    </div>
+
+    <button class="order-button" onclick="confirmOrder()">ЗАКАЗАТЬ</button>
+</div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    const audio = document.getElementById('bg-audio');
+    const musicToggle = document.getElementById('music-toggle');
+    const DADATA_API_KEY = "6f49e7177e36608d4139b823d71466c86bd7ca4f"; 
+
+    let isPlaying = false;
+    let basePrice = 500, manualAdjustment = 0;
+    let paymentMethod = 'Наличные', selectedClass = 'Эконом';
+    let searchTimeout, detectedCity = null;
+
+    // --- Keyboard Control Helpers ---
+
+    // 1. Скрытие при клике вне инпутов
+    function closeAllUI(e) { 
+        if (!e.target.closest('.field-group')) {
+            document.activeElement.blur(); // Убирает клавиатуру
+            document.querySelectorAll('.suggestions').forEach(s => s.style.display = 'none'); 
         }
-        createBubbles();
+    }
 
-        // --- 3. SCRUBBING LOGIC (Tactile Selection) ---
-        function setupScrubbing(containerId, bgId, onSelect) {
-            const container = document.getElementById(containerId);
-            const bg = document.getElementById(bgId);
-            const items = container.querySelectorAll('.scrub-item');
-            
-            function updateSelection(targetItem) {
-                if (!targetItem || !targetItem.classList.contains('scrub-item')) return;
-                
-                // Визуал
-                items.forEach(i => i.classList.remove('active'));
-                targetItem.classList.add('active');
-                
-                // Двигаем фон
-                const rect = targetItem.getBoundingClientRect();
-                const parentRect = container.getBoundingClientRect();
-                bg.style.width = rect.width + 'px';
-                bg.style.transform = `translateX(${rect.left - parentRect.left - 4}px)`; // -4 padding correction
-
-                // Haptics & Callback
-                tg.HapticFeedback.impactOccurred('light');
-                onSelect(targetItem);
-            }
-
-            // Init position
-            updateSelection(container.querySelector('.active'));
-
-            // Touch Events
-            container.addEventListener('touchstart', (e) => {
-                const touch = e.touches[0];
-                const target = document.elementFromPoint(touch.clientX, touch.clientY);
-                updateSelection(target);
-            }, {passive: false});
-
-            container.addEventListener('touchmove', (e) => {
-                e.preventDefault(); // Stop scroll
-                const touch = e.touches[0];
-                const target = document.elementFromPoint(touch.clientX, touch.clientY);
-                if (target && target.classList.contains('scrub-item') && !target.classList.contains('active')) {
-                    updateSelection(target);
-                }
-            }, {passive: false});
-            
-            // Mouse Events (для десктоп тестов)
-            items.forEach(item => {
-                item.addEventListener('click', () => updateSelection(item));
-            });
+    // 2. Скрытие при нажатии клавиши Enter (Ввод)
+    function checkEnter(event, input) {
+        if (event.key === "Enter") {
+            input.blur();
         }
+    }
 
-        // Setup Car Class Scrubbing
-        setupScrubbing('class-scrubber', 'class-bg', (item) => {
-            state.carClass = item.dataset.class;
-            state.basePrice = parseInt(item.dataset.price);
-            updatePriceDisplay();
-        });
-
-        // Setup Payment Scrubbing
-        setupScrubbing('payment-scrubber', 'payment-bg', (item) => {
-            state.paymentMethod = item.dataset.pay;
-        });
-
-        // --- 4. PRICE & OPTIONS LOGIC ---
-        function updatePriceDisplay() {
-            const total = state.basePrice + state.extraPrice;
-            document.getElementById('main-price-display').innerText = `${total} ₽`;
-            document.getElementById('extra-price').innerText = state.extraPrice > 0 ? `+${state.extraPrice}` : state.extraPrice;
+    // 3. Скрытие при пролистывании (скролле)
+    function handleScroll() {
+        if (document.activeElement.tagName === 'INPUT') {
+            document.activeElement.blur();
         }
+    }
 
-        document.getElementById('price-plus').addEventListener('click', () => {
-            state.extraPrice += 100;
-            tg.HapticFeedback.selectionChanged();
-            updatePriceDisplay();
-        });
+    // --- Init ---
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedMusicState = localStorage.getItem('musicEnabled');
+        musicToggle.checked = (savedMusicState === null) ? true : (savedMusicState === 'true');
+        autoLocate();
+        createDrops();
+    });
 
-        document.getElementById('price-minus').addEventListener('click', () => {
-            state.extraPrice -= 100;
-            tg.HapticFeedback.selectionChanged();
-            updatePriceDisplay();
-        });
+    // --- Music Logic ---
+    function autoPlayMusic() {
+        if (!isPlaying && musicToggle.checked) audio.play().then(() => isPlaying = true).catch(() => {});
+    }
 
-        // Photo Upload Feedback
-        document.getElementById('photo-input').addEventListener('change', (e) => {
-            const label = document.getElementById('file-label');
-            if (e.target.files.length > 0) {
-                label.innerText = "Фото загружено";
-                label.style.color = "var(--text-white)";
-            }
-        });
-
-        // --- 5. ADDRESS & DADATA INTEGRATION ---
-        
-        async function fetchSuggestions(query) {
-            if (!query || query.length < 3) return [];
-            const url = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address";
-            
-            try {
-                const response = await fetch(url, {
-                    method: "POST",
-                    mode: "cors",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json",
-                        "Authorization": "Token " + DADATA_TOKEN
-                    },
-                    body: JSON.stringify({ 
-                        query: query, 
-                        count: 5,
-                        locations: [{ city_fias_id: null }] // Можно зафиксировать город здесь при геолокации
-                    })
-                });
-                const data = await response.json();
-                return data.suggestions;
-            } catch (error) {
-                console.error(error);
-                return [];
-            }
+    function manualMusicControl() {
+        localStorage.setItem('musicEnabled', musicToggle.checked);
+        if (musicToggle.checked) {
+            audio.play().then(() => isPlaying = true).catch(() => {});
+        } else {
+            audio.pause();
+            isPlaying = false;
         }
+    }
 
-        function setupAutocomplete(inputId, listId, onSelect) {
-            const input = document.getElementById(inputId);
-            const list = document.getElementById(listId);
-            
-            // Auto-hide keyboard on scroll
-            window.addEventListener('scroll', () => {
-                if(document.activeElement === input) input.blur();
-            });
+    // --- Visuals ---
+    function createDrops() {
+        const bg = document.getElementById('aqua-bg');
+        for(let i=0; i<15; i++) {
+            let d = document.createElement('div'); d.className = 'drop';
+            let s = Math.random() * 80 + 20;
+            d.style.width = d.style.height = s + 'px';
+            d.style.left = Math.random() * 100 + 'vw';
+            d.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            bg.appendChild(d);
+        }
+    }
 
-            // Start music on input interaction
-            input.addEventListener('focus', () => {
-                if(!state.musicPlaying && localStorage.getItem('musicEnabled') === 'true') {
-                    document.getElementById('bg-music').play().catch(e => console.log(e));
-                    state.musicPlaying = true;
-                }
-            });
+    function toggleCitySelector() { 
+        const b = document.getElementById('city-selector-box'); 
+        b.style.display = b.style.display === 'block' ? 'none' : 'block'; 
+    }
 
-            input.addEventListener('input', async () => {
-                const query = input.value;
-                if(query.length < 3) { list.style.display = 'none'; return; }
-                
-                const suggestions = await fetchSuggestions(query);
-                list.innerHTML = '';
-                
-                suggestions.forEach(sg => {
-                    const div = document.createElement('div');
-                    div.className = 'suggestion-item';
-                    // Clean prefix logic (simple version)
-                    let text = sg.value; 
-                    div.innerText = text;
-                    
-                    div.addEventListener('click', () => {
-                        input.value = text;
-                        list.style.display = 'none';
-                        onSelect(sg);
-                        tg.HapticFeedback.impactOccurred('medium');
+    // --- DaData & Logic ---
+    function cleanAddress(full, city) {
+        if (!full) return "";
+        let clean = full.replace("Россия, ", "");
+        if (city) {
+            const cityReg = new RegExp("(г\\.?\\s?)?" + city + ",?\\s?", "gi");
+            clean = clean.replace(cityReg, "");
+        }
+        return clean.replace(/^г\.?\s?/, "").trim();
+    }
+
+    function autoLocate() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                try {
+                    const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address", {
+                        method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Token " + DADATA_API_KEY },
+                        body: JSON.stringify({ lat: pos.coords.latitude, lon: pos.coords.longitude })
                     });
-                    list.appendChild(div);
-                });
-                
-                if(suggestions.length > 0) list.style.display = 'block';
-            });
-            
-            // Hide on outside click
-            document.addEventListener('click', (e) => {
-                if (e.target !== input && e.target !== list) list.style.display = 'none';
+                    const r = await res.json();
+                    if (r.suggestions?.length > 0) {
+                        detectedCity = r.suggestions[0].data.city;
+                        document.getElementById('city-status').innerText = "ГОРОД: " + detectedCity.toUpperCase();
+                        document.getElementById('from').value = cleanAddress(r.suggestions[0].value, detectedCity);
+                    }
+                } catch(e) { console.error(e); }
             });
         }
+    }
 
-        setupAutocomplete('address-from', 'suggestions-from', (data) => state.addresses.from = data.value);
-        setupAutocomplete('address-to', 'suggestions-to', (data) => state.addresses.to = data.value);
-
-        // Промежуточные адреса
-        document.getElementById('add-stop-btn').addEventListener('click', () => {
-            const container = document.getElementById('intermediate-container');
-            const id = 'stop-' + Date.now();
-            
-            const div = document.createElement('div');
-            div.className = 'input-group';
-            div.innerHTML = `
-                <i class="fas fa-map-pin input-icon"></i>
-                <input type="text" id="${id}" placeholder="Заезд">
-                <div class="suggestions-list" id="sugg-${id}"></div>
-            `;
-            container.appendChild(div);
-            
-            setupAutocomplete(id, `sugg-${id}`, (data) => {
-                state.stops.push(data.value);
-            });
-        });
-
-        // --- 6. MUSIC & UTILS ---
-        const musicBtn = document.getElementById('music-btn');
-        const audio = document.getElementById('bg-music');
+    async function getSuggestions(input) {
+        let q = input.value; 
+        let container = input.nextElementSibling;
+        if (q.length < 3) return;
         
-        // Restore state
-        if (localStorage.getItem('musicEnabled') === 'true') {
-            musicBtn.classList.add('active');
-        }
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(async () => {
+            const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
+                method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Token " + DADATA_API_KEY },
+                body: JSON.stringify({ query: q, count: 5, locations: detectedCity ? [{city: detectedCity}] : [] })
+            });
+            const d = await res.json();
+            container.innerHTML = ''; container.style.display = 'block';
+            d.suggestions.forEach(s => {
+                const div = document.createElement('div'); div.className = 'suggestion-item';
+                div.innerText = cleanAddress(s.value, detectedCity);
+                div.onclick = () => { input.value = div.innerText; container.style.display = 'none'; input.blur(); };
+                container.appendChild(div);
+            });
+        }, 300);
+    }
 
-        musicBtn.addEventListener('click', () => {
-            const isEnabled = !musicBtn.classList.contains('active');
-            musicBtn.classList.toggle('active');
-            localStorage.setItem('musicEnabled', isEnabled);
-            
-            if (isEnabled) {
-                audio.play();
-                state.musicPlaying = true;
-            } else {
-                audio.pause();
-                state.musicPlaying = false;
-            }
-            tg.HapticFeedback.selectionChanged();
+    async function getCitySuggestions(input) {
+        let q = input.value; 
+        let container = input.nextElementSibling;
+        const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
+            method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Token " + DADATA_API_KEY },
+            body: JSON.stringify({ query: q, from_bound: {value: "city"}, to_bound: {value: "city"} })
         });
-
-        // --- 7. FINAL ORDER ---
-        document.getElementById('order-btn').addEventListener('click', () => {
-            // Validate House Number (Basic regex check for digit)
-            const hasDigit = /\d/.test(document.getElementById('address-from').value);
-            
-            if (!document.getElementById('address-from').value || !hasDigit) {
-                tg.showAlert("Пожалуйста, укажите точный адрес подачи (с номером дома)");
-                tg.HapticFeedback.notificationOccurred('error');
-                return;
-            }
-
-            const orderData = {
-                ...state,
-                comment: document.getElementById('comment').value,
-                totalPrice: state.basePrice + state.extraPrice
+        const d = await res.json();
+        container.innerHTML = ''; container.style.display = 'block';
+        d.suggestions.forEach(s => {
+            const div = document.createElement('div'); div.className = 'suggestion-item'; div.innerText = s.value;
+            div.onclick = () => { 
+                detectedCity = s.data.city; 
+                document.getElementById('city-status').innerText = "ГОРОД: " + detectedCity.toUpperCase(); 
+                toggleCitySelector(); container.style.display = 'none'; 
+                input.blur();
             };
-
-            tg.sendData(JSON.stringify(orderData));
-            tg.HapticFeedback.notificationOccurred('success');
-            // tg.close(); // Опционально закрыть окно
+            container.appendChild(div);
         });
+    }
 
-    </script>
+    function addStopField() {
+        const div = document.createElement('div'); div.className = 'field-group';
+        div.innerHTML = `<label>Остановка <span style="color:#ee9b00; float:right; cursor:pointer;" onclick="this.parentElement.parentElement.remove()">✕</span></label>
+            <input type="text" class="stop-input" placeholder="Адрес" oninput="getSuggestions(this)" onfocus="autoPlayMusic()" onkeydown="checkEnter(event, this)">
+            <div class="suggestions"></div>`;
+        document.getElementById('extra-stops').appendChild(div);
+    }
+
+    function selectClass(c, p) {
+        selectedClass = c === 'econom' ? 'Эконом' : (c === 'comfort' ? 'Комфорт' : 'Бизнес');
+        basePrice = p; manualAdjustment = 0;
+        document.querySelectorAll('.class-btn').forEach(b => b.classList.remove('active'));
+        event.currentTarget.classList.add('active'); updatePriceDisplay();
+    }
+
+    function adjustPrice(v) { if ((basePrice + manualAdjustment + v) >= 100) { manualAdjustment += v; updatePriceDisplay(); } }
+    function updatePriceDisplay() { document.getElementById('display_price').innerText = (basePrice + manualAdjustment) + " ₽"; }
+    
+    function setPayment(m) { 
+        paymentMethod = m; 
+        document.getElementById('pay-cash').classList.toggle('active', m === 'Наличные'); 
+        document.getElementById('pay-online').classList.toggle('active', m === 'ПЕРЕВОД СБП'); 
+    }
+
+    function confirmOrder() {
+        const f = document.getElementById('from').value, t = document.getElementById('to').value;
+        if (!/\d/.test(f) || !/\d/.test(t)) { alert("Укажите номер дома (цифры) в адресах!"); return; }
+        const stops = Array.from(document.querySelectorAll('.stop-input')).map(i => i.value).filter(v => v).join(', ');
+        
+        tg.sendData(JSON.stringify({
+            city: detectedCity, 
+            from: f, 
+            to: t, 
+            inter: stops || "Нет", 
+            car: selectedClass, 
+            price: basePrice + manualAdjustment, 
+            pay: paymentMethod, 
+            comment: document.getElementById('comment').value
+        }));
+    }
+</script>
 </body>
 </html>
