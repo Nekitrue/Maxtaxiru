@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Такси MAX - Liquid Aqua Final</title>
+    <title>Такси MAX - Final Fix</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -23,7 +23,7 @@
             background: var(--dark-bg);
             color: #fff; margin: 0; padding: 15px; 
             min-height: 100vh; display: flex; flex-direction: column;
-            user-select: none; /* Глобальный запрет выделения для UX */
+            user-select: none; 
         }
 
         /* --- Фон --- */
@@ -31,18 +31,45 @@
         .drop { position: absolute; background: rgba(255, 255, 255, 0.1); border-radius: 50%; animation: flow 15s infinite linear; }
         @keyframes flow { 0% { transform: translateY(110vh) scale(0.5); opacity: 0; } 100% { transform: translateY(-10vh) scale(1.2); opacity: 0; } }
 
-        /* --- Исправленные Инпуты (Курсор) --- */
-        input[type="text"] { 
-            width: 100%; padding: 16px; border: 1px solid var(--glass-border); border-radius: 18px; 
-            background: rgba(0, 18, 25, 0.4); color: #fff; font-size: 15px; transition: 0.3s;
-            /* Исправление плавающего курсора */
-            line-height: 1.2; 
-            vertical-align: middle;
-            user-select: text !important; /* Разрешаем ввод текста */
-            -webkit-user-select: text !important;
+        /* --- Верхняя панель (Музыка и Город) --- */
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; height: 40px;
         }
 
-        /* --- Кнопки (Защита от бегунка и меню) --- */
+        .music-switch-container {
+            display: flex; align-items: center; gap: 8px;
+            background: var(--glass-bg); padding: 6px 10px; 
+            border-radius: 20px; border: 1px solid var(--glass-border);
+        }
+        
+        .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--aqua-bright); }
+        input:checked + .slider:before { transform: translateX(16px); }
+
+        /* --- Инпуты (Исправлено дрожание курсора) --- */
+        input[type="text"] { 
+            width: 100%; 
+            padding: 14px 16px; /* Оптимальные отступы */
+            border: 1px solid var(--glass-border); border-radius: 18px; 
+            background: rgba(0, 18, 25, 0.4); color: #fff; 
+            transition: 0.3s;
+            
+            /* КРИТИЧЕСКИ ВАЖНО ДЛЯ iOS */
+            font-size: 16px; /* Убирает авто-зум */
+            line-height: normal; /* Убирает вертикальное смещение курсора */
+            -webkit-appearance: none;
+            appearance: none;
+            
+            user-select: text !important;
+            -webkit-user-select: text !important;
+        }
+        input[type="text"]::placeholder { color: rgba(255,255,255,0.4); }
+
+        /* --- Кнопки (Защита от выделения) --- */
         .class-btn, .pay-btn, .btn-round, .order-button, .btn-add-point, .switch { 
             user-select: none !important; 
             -webkit-user-select: none !important; 
@@ -57,8 +84,7 @@
             100% { background-position: 0% 50%; box-shadow: 0 0 10px var(--aqua-bright); }
         }
 
-        /* --- Контейнер --- */
-        .container { background: var(--glass-bg); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: 30px; padding: 20px; margin-top: 50px; position: relative; z-index: 10; }
+        .container { background: var(--glass-bg); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: 30px; padding: 20px; position: relative; z-index: 10; margin-top: 10px; }
 
         .field-group { margin-bottom: 18px; position: relative; }
         label { font-size: 10px; font-weight: 800; color: var(--neon-blue); text-transform: uppercase; display: block; margin-bottom: 8px; margin-left: 5px; }
@@ -79,16 +105,11 @@
         .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: rgba(0, 18, 25, 0.95); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 18px; z-index: 1000; display: none; max-height: 200px; overflow-y: auto; margin-top: 5px; }
         .suggestion-item { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
         .pay-icon { width: 18px; height: 18px; border-radius: 4px; }
-        .music-switch-container { position: fixed; top: 15px; right: 15px; z-index: 2000; display: flex; align-items: center; gap: 8px; background: var(--glass-bg); padding: 8px 12px; border-radius: 20px; border: 1px solid var(--glass-border); }
-        .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); transition: .4s; border-radius: 20px; }
-        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--aqua-bright); }
-        input:checked + .slider:before { transform: translateX(16px); }
+        
         .price-section { background: rgba(255,255,255,0.03); border-radius: 25px; padding: 15px; margin: 20px 0; border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: space-around; }
         .price-display { font-size: 28px; font-weight: 800; color: #ee9b00; }
-        .btn-round { width: 45px; height: 45px; border-radius: 12px; background: var(--glass-bg); color: #fff; font-size: 20px; border: 1px solid var(--glass-border); }
+        .btn-round { width: 45px; height: 45px; border-radius: 12px; background: var(--glass-bg); color: #fff; font-size: 20px; border: 1px solid var(--glass-border); display:flex; align-items:center; justify-content:center; }
+        
         .order-button { width: 100%; padding: 22px; background: var(--accent-gold); color: #fff; border: none; border-radius: 22px; font-size: 18px; font-weight: 800; text-transform: uppercase; }
         .btn-add-point { background: none; border: none; color: var(--neon-blue); font-size: 10px; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; cursor: pointer; }
     </style>
@@ -96,23 +117,23 @@
 <body onclick="closeAllUI(event)" ontouchmove="blurInputs()">
 
 <div class="aqua-bg" id="aqua-bg"></div>
-
-<div class="music-switch-container">
-    <span style="font-size: 8px; font-weight: 800; color: var(--neon-blue);">MUSIC</span>
-    <label class="switch">
-        <input type="checkbox" id="music-toggle" onchange="manualMusicControl()" checked>
-        <span class="slider"></span>
-    </label>
-</div>
-
 <audio id="bg-audio" loop><source src="Ringtone.mp3" type="audio/mpeg"></audio>
 
-<div class="container">
-    <div style="display:flex; justify-content:space-between; margin-bottom: 15px; align-items: center;">
-        <div style="font-size: 9px; color: var(--neon-blue); opacity: 0.6; font-weight: 800;">v 3.2 | FIX EDITION</div>
-        <div id="city-status" onclick="toggleCitySelector()" style="font-size: 10px; font-weight: 800; color: #94d2bd; cursor: pointer; text-decoration: underline;">ГОРОД: ОПРЕДЕЛЕНИЕ...</div>
+<div class="top-bar">
+    <div class="music-switch-container">
+        <span style="font-size: 8px; font-weight: 800; color: var(--neon-blue);">MUSIC</span>
+        <label class="switch">
+            <input type="checkbox" id="music-toggle" onchange="manualMusicControl()" checked>
+            <span class="slider"></span>
+        </label>
     </div>
     
+    <div id="city-status" onclick="toggleCitySelector()" style="font-size: 10px; font-weight: 800; color: #94d2bd; cursor: pointer; text-decoration: underline;">
+        ГОРОД: ОПРЕДЕЛЕНИЕ...
+    </div>
+</div>
+
+<div class="container">
     <div id="city-selector-box" class="field-group" style="display: none;">
         <label>Выбор города</label>
         <input type="text" id="city-input" placeholder="Введите город" oninput="getCitySuggestions(this)">
@@ -137,18 +158,18 @@
     <div class="class-selector">
         <div class="class-btn active" onclick="selectClass(this, 500, 'Эконом')">Эконом</div>
         <div class="class-btn" onclick="selectClass(this, 700, 'Комфорт')">Комфорт</div>
-        <div class="class-btn" onclick="selectClass(this, 950, 'Бизнес')">Бизнес</div>
+        <div class="class-btn" onclick="selectClass(this, 900, 'Бизнес')">Бизнес</div>
     </div>
 
     <div class="field-group">
         <label>Комментарий</label>
-        <input type="text" id="comment" placeholder="Подъезд, код домофона..." onfocus="autoPlayMusic()">
+        <input type="text" id="comment" placeholder="Информация для водителя..." onfocus="autoPlayMusic()">
     </div>
 
     <div class="price-section">
-        <button class="btn-round" onclick="adjustPrice(-50)">−</button>
+        <button class="btn-round" onclick="adjustPrice(-100)">−</button>
         <div class="price-display" id="display_price">500 ₽</div>
-        <button class="btn-round" onclick="adjustPrice(50)">+</button>
+        <button class="btn-round" onclick="adjustPrice(100)">+</button>
     </div>
 
     <div class="pay-row">
@@ -166,7 +187,7 @@
     tg.expand();
     const DADATA_API_KEY = "6f49e7177e36608d4139b823d71466c86bd7ca4f"; 
 
-    // Глобальный запрет контекстного меню для кнопок (убирает бегунок)
+    // Защита от контекстного меню (бегунка)
     document.addEventListener('contextmenu', function(e) {
         if (e.target.closest('.class-btn, .pay-btn, .order-button, .btn-round')) {
             e.preventDefault();
@@ -177,7 +198,6 @@
     let basePrice = 500, manualAdjustment = 0;
     let paymentMethod = 'Наличные', selectedClassName = 'Эконом', detectedCity = null;
 
-    // Детальная очистка адреса
     function cleanAddress(full, city) {
         if (!full) return "";
         let clean = full.replace("Россия, ", "");
@@ -203,6 +223,30 @@
             div.onclick = () => { input.value = div.innerText; container.style.display = 'none'; input.blur(); };
             container.appendChild(div);
         });
+    }
+    
+    async function getCitySuggestions(input) {
+        const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
+            method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Token " + DADATA_API_KEY },
+            body: JSON.stringify({ query: input.value, from_bound: {value: "city"}, to_bound: {value: "city"} })
+        });
+        const d = await res.json();
+        const container = input.nextElementSibling;
+        container.innerHTML = ''; container.style.display = 'block';
+        d.suggestions.forEach(s => {
+            const div = document.createElement('div'); div.className = 'suggestion-item'; div.innerText = s.value;
+            div.onclick = () => { 
+                detectedCity = s.data.city; 
+                document.getElementById('city-status').innerText = "ГОРОД: " + detectedCity.toUpperCase(); 
+                toggleCitySelector(); container.style.display = 'none'; input.blur();
+            };
+            container.appendChild(div);
+        });
+    }
+
+    function toggleCitySelector() {
+        const box = document.getElementById('city-selector-box');
+        box.style.display = box.style.display === 'none' ? 'block' : 'none';
     }
 
     function addStopField() {
@@ -242,16 +286,12 @@
     function autoPlayMusic() { if (!isPlaying && document.getElementById('music-toggle').checked) { audio.play().then(() => isPlaying = true).catch(() => {}); } }
     function manualMusicControl() { const isChecked = document.getElementById('music-toggle').checked; if (isChecked) { audio.play(); isPlaying = true; } else { audio.pause(); isPlaying = false; } }
 
-    // UX
     function closeAllUI(e) { if (!e.target.closest('.field-group')) blurInputs(); }
     function blurInputs() { 
-        if (document.activeElement.tagName === 'INPUT') {
-            // Не блюрим, если пользователь просто скроллит, но оставляем для клика по фону
-        }
+        if (document.activeElement.tagName === 'INPUT') { /* оставляем фокус если это скролл внутри инпута */ }
         document.querySelectorAll('.suggestions').forEach(s => s.style.display = 'none'); 
     }
 
-    // Заказ
     function confirmOrder() {
         const from = document.getElementById('from').value, to = document.getElementById('to').value;
         if (!/\d/.test(from) || !/\d/.test(to)) { tg.showAlert("Укажите номер дома!"); return; }
@@ -263,7 +303,6 @@
         }));
     }
 
-    // Автоматический город
     window.onload = () => { 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(async (pos) => {
