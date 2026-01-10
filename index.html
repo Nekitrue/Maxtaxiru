@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Такси MAX - Liquid Aqua</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { 
@@ -22,12 +20,11 @@
         body { 
             font-family: 'Montserrat', sans-serif; 
             background: var(--dark-bg);
-            color: #fff; margin: 0; padding: 0; /* Убрал padding для карты */
+            color: #fff; margin: 0; padding: 15px; 
             min-height: 100vh; overflow-x: hidden;
             display: flex; flex-direction: column;
         }
 
-        /* Фоновая анимация */
         .aqua-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1; background: linear-gradient(180deg, #001219 0%, #005f73 100%);
@@ -43,7 +40,6 @@
             100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
         }
 
-        /* Музыка и свитч */
         .music-switch-container {
             position: fixed; top: 15px; right: 15px;
             z-index: 2000; display: flex; align-items: center; gap: 8px;
@@ -66,13 +62,10 @@
         input:checked + .slider:before { transform: translateX(18px); }
         .music-label { font-size: 9px; font-weight: 800; color: var(--neon-blue); text-transform: uppercase; }
 
-        /* Основной контейнер формы */
         .container { 
             background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--glass-border); border-radius: 30px; 
-            padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); 
-            margin: 60px 15px 15px 15px; /* Отступы для контейнера */
-            transition: opacity 0.5s ease;
+            padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); margin-top: 50px;
         }
 
         .top-info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -126,84 +119,11 @@
 
         .order-button { width: 100%; padding: 22px; background: linear-gradient(90deg, #ee9b00, #ca6702); color: #fff; border: none; border-radius: 22px; font-size: 18px; font-weight: 800; text-transform: uppercase; }
         #city-selector-box { display: none; }
-
-        /* --- SEARCH OVERLAY STYLES --- */
-        #search-overlay {
-            position: fixed; inset: 0; background: linear-gradient(180deg, #001219, #005f73);
-            z-index: 5000; display: none; align-items: center; justify-content: center;
-        }
-        .search-card {
-            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(25px); border-radius: 30px; padding: 40px 30px;
-            text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,0.4); animation: fadeUp 0.6s ease;
-        }
-        .search-title { font-size: 18px; font-weight: 800; margin-top: 20px; }
-        .search-subtitle { font-size: 12px; color: #94d2bd; margin-top: 6px; }
-        .loader {
-            width: 80px; height: 80px; border-radius: 50%;
-            border: 4px solid rgba(255,255,255,0.2); border-top-color: #94d2bd;
-            animation: spin 1.2s linear infinite; margin: 0 auto;
-        }
-
-        /* --- MAP OVERLAY STYLES --- */
-        #map-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 4000; background: #001219; display: none;
-            flex-direction: column;
-        }
-        #map { width: 100%; height: 100%; z-index: 1; }
-        .driver-panel {
-            position: absolute; bottom: 0; left: 0; width: 100%;
-            background: rgba(0, 18, 25, 0.9); backdrop-filter: blur(20px);
-            padding: 20px; border-top-left-radius: 30px; border-top-right-radius: 30px;
-            border-top: 1px solid var(--aqua-bright); z-index: 5000;
-            animation: slideUp 0.5s ease-out;
-        }
-        .driver-info { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
-        .driver-avatar { width: 50px; height: 50px; background: #ccc; border-radius: 50%; border: 2px solid #ee9b00; }
-        .driver-text h3 { margin: 0; font-size: 16px; color: #fff; }
-        .driver-text p { margin: 3px 0 0; font-size: 12px; color: #94d2bd; }
-        .car-number { background: #fff; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 800; font-size: 12px; margin-left: auto; border: 2px solid #000; }
-        .status-badge { 
-            display: inline-block; padding: 5px 10px; background: #0a9396; 
-            color: white; border-radius: 10px; font-size: 10px; font-weight: 800; margin-bottom: 10px; 
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-        /* Leaflet custom marker */
-        .car-icon { font-size: 30px; line-height: 30px; text-align: center; }
     </style>
 </head>
 <body onclick="closeAllUI(event)" ontouchmove="handleScroll()">
 
 <div class="aqua-bg" id="aqua-bg"></div>
-
-<div id="search-overlay">
-    <div class="search-card">
-        <div class="loader"></div>
-        <div class="search-title">Поиск автомобиля...</div>
-        <div class="search-subtitle">Ищем ближайшего водителя</div>
-    </div>
-</div>
-
-<div id="map-overlay">
-    <div id="map"></div>
-    <div class="driver-panel">
-        <div class="status-badge">ВОДИТЕЛЬ В ПУТИ</div>
-        <div class="driver-info">
-            <div class="driver-avatar" style="background: url('https://cdn-icons-png.flaticon.com/512/3135/3135715.png') center/cover;"></div>
-            <div class="driver-text">
-                <h3>Александр</h3>
-                <p>Toyota Camry • Комфорт</p>
-            </div>
-            <div class="car-number">X 777 XX</div>
-        </div>
-        <div style="font-size:11px; color:rgba(255,255,255,0.5); text-align:center;">Прибытие через <span id="time-to-arrive" style="color:#ee9b00">2 мин</span></div>
-    </div>
-</div>
 
 <div class="music-switch-container">
     <span class="music-label">MUSIC</span>
@@ -217,9 +137,9 @@
     <source src="Ringtone.mp3" type="audio/mpeg">
 </audio>
 
-<div class="container" id="main-form">
+<div class="container">
     <div class="top-info-row">
-        <div class="version-label">v 3.0 | MAP INTEGRATION</div>
+        <div class="version-label">v 2.2 | AQUA GLASS</div>
         <div id="city-status" onclick="toggleCitySelector()">ГОРОД: ОПРЕДЕЛЕНИЕ...</div>
     </div>
     
@@ -273,14 +193,12 @@
         </div>
     </div>
 
-    <button class="order-button" onclick="startOrderProcess()">ЗАКАЗАТЬ</button>
+    <button class="order-button" onclick="confirmOrder()">ЗАКАЗАТЬ</button>
 </div>
 
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
-    // Пытаемся скрыть системную кнопку, если она есть
-    tg.MainButton.hide();
 
     const audio = document.getElementById('bg-audio');
     const musicToggle = document.getElementById('music-toggle');
@@ -290,17 +208,30 @@
     let basePrice = 500, manualAdjustment = 0;
     let paymentMethod = 'Наличные', selectedClass = 'Эконом';
     let searchTimeout, detectedCity = null;
-    let map, carMarker;
 
     // --- Keyboard Control Helpers ---
+
+    // 1. Скрытие при клике вне инпутов
     function closeAllUI(e) { 
         if (!e.target.closest('.field-group')) {
-            document.activeElement.blur(); 
+            document.activeElement.blur(); // Убирает клавиатуру
             document.querySelectorAll('.suggestions').forEach(s => s.style.display = 'none'); 
         }
     }
-    function checkEnter(event, input) { if (event.key === "Enter") input.blur(); }
-    function handleScroll() { if (document.activeElement.tagName === 'INPUT') document.activeElement.blur(); }
+
+    // 2. Скрытие при нажатии клавиши Enter (Ввод)
+    function checkEnter(event, input) {
+        if (event.key === "Enter") {
+            input.blur();
+        }
+    }
+
+    // 3. Скрытие при пролистывании (скролле)
+    function handleScroll() {
+        if (document.activeElement.tagName === 'INPUT') {
+            document.activeElement.blur();
+        }
+    }
 
     // --- Init ---
     window.addEventListener('DOMContentLoaded', () => {
@@ -311,11 +242,18 @@
     });
 
     // --- Music Logic ---
-    function autoPlayMusic() { if (!isPlaying && musicToggle.checked) audio.play().then(() => isPlaying = true).catch(() => {}); }
+    function autoPlayMusic() {
+        if (!isPlaying && musicToggle.checked) audio.play().then(() => isPlaying = true).catch(() => {});
+    }
+
     function manualMusicControl() {
         localStorage.setItem('musicEnabled', musicToggle.checked);
-        if (musicToggle.checked) { audio.play().then(() => isPlaying = true).catch(() => {}); } 
-        else { audio.pause(); isPlaying = false; }
+        if (musicToggle.checked) {
+            audio.play().then(() => isPlaying = true).catch(() => {});
+        } else {
+            audio.pause();
+            isPlaying = false;
+        }
     }
 
     // --- Visuals ---
@@ -330,6 +268,7 @@
             bg.appendChild(d);
         }
     }
+
     function toggleCitySelector() { 
         const b = document.getElementById('city-selector-box'); 
         b.style.display = b.style.display === 'block' ? 'none' : 'block'; 
@@ -366,8 +305,10 @@
     }
 
     async function getSuggestions(input) {
-        let q = input.value; let container = input.nextElementSibling;
+        let q = input.value; 
+        let container = input.nextElementSibling;
         if (q.length < 3) return;
+        
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(async () => {
             const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
@@ -386,7 +327,8 @@
     }
 
     async function getCitySuggestions(input) {
-        let q = input.value; let container = input.nextElementSibling;
+        let q = input.value; 
+        let container = input.nextElementSibling;
         const res = await fetch("https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address", {
             method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Token " + DADATA_API_KEY },
             body: JSON.stringify({ query: q, from_bound: {value: "city"}, to_bound: {value: "city"} })
@@ -396,8 +338,10 @@
         d.suggestions.forEach(s => {
             const div = document.createElement('div'); div.className = 'suggestion-item'; div.innerText = s.value;
             div.onclick = () => { 
-                detectedCity = s.data.city; document.getElementById('city-status').innerText = "ГОРОД: " + detectedCity.toUpperCase(); 
-                toggleCitySelector(); container.style.display = 'none'; input.blur();
+                detectedCity = s.data.city; 
+                document.getElementById('city-status').innerText = "ГОРОД: " + detectedCity.toUpperCase(); 
+                toggleCitySelector(); container.style.display = 'none'; 
+                input.blur();
             };
             container.appendChild(div);
         });
@@ -417,104 +361,30 @@
         document.querySelectorAll('.class-btn').forEach(b => b.classList.remove('active'));
         event.currentTarget.classList.add('active'); updatePriceDisplay();
     }
+
     function adjustPrice(v) { if ((basePrice + manualAdjustment + v) >= 100) { manualAdjustment += v; updatePriceDisplay(); } }
     function updatePriceDisplay() { document.getElementById('display_price').innerText = (basePrice + manualAdjustment) + " ₽"; }
+    
     function setPayment(m) { 
         paymentMethod = m; 
         document.getElementById('pay-cash').classList.toggle('active', m === 'Наличные'); 
         document.getElementById('pay-online').classList.toggle('active', m === 'ПЕРЕВОД СБП'); 
     }
 
-    // --- ORDER & MAP LOGIC ---
-    function startOrderProcess() {
-        const f = document.getElementById('from').value;
-        const t = document.getElementById('to').value;
+    function confirmOrder() {
+        const f = document.getElementById('from').value, t = document.getElementById('to').value;
         if (!/\d/.test(f) || !/\d/.test(t)) { alert("Укажите номер дома (цифры) в адресах!"); return; }
-
-        // 1. Показываем "Поиск"
-        const searchOverlay = document.getElementById('search-overlay');
-        const mainForm = document.getElementById('main-form');
-        searchOverlay.style.display = 'flex';
-        
-        // 2. Имитация поиска (3 секунды)
-        setTimeout(() => {
-            searchOverlay.style.display = 'none';
-            mainForm.style.display = 'none'; // Скрываем форму
-            initMapAndSimulate(); // Запускаем карту
-        }, 3000);
-    }
-
-    function initMapAndSimulate() {
-        const mapOverlay = document.getElementById('map-overlay');
-        mapOverlay.style.display = 'flex';
-
-        // Инициализация Leaflet (Москва по дефолту, либо по геолокации если бы была)
-        // Для примера центрируем на "красивом" месте
-        map = L.map('map', {zoomControl: false}).setView([55.7558, 37.6173], 15);
-
-        // Темная тема карты (CartoDB DarkMatter)
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap &copy; CARTO',
-            subdomains: 'abcd',
-            maxZoom: 19
-        }).addTo(map);
-
-        // Иконка машинки (emoji)
-        const carIcon = L.divIcon({
-            className: 'car-icon',
-            html: '🚖',
-            iconSize: [30, 30],
-            iconAnchor: [15, 15]
-        });
-
-        // Маршрут (простая линия для демо)
-        // Старт (Кремль) -> Финиш (где-то рядом)
-        const startPos = [55.7558, 37.6173];
-        const endPos = [55.7520, 37.6200];
-
-        carMarker = L.marker(startPos, {icon: carIcon}).addTo(map);
-        
-        // Анимация движения
-        let steps = 100;
-        let currentStep = 0;
-        const deltaLat = (endPos[0] - startPos[0]) / steps;
-        const deltaLng = (endPos[1] - startPos[1]) / steps;
-
-        const moveInterval = setInterval(() => {
-            currentStep++;
-            const newLat = startPos[0] + (deltaLat * currentStep);
-            const newLng = startPos[1] + (deltaLng * currentStep);
-            carMarker.setLatLng([newLat, newLng]);
-
-            // Обновляем время
-            if (currentStep % 20 === 0) {
-                let timeLeft = Math.ceil((steps - currentStep) / 20); // примерно
-                document.getElementById('time-to-arrive').innerText = timeLeft > 0 ? timeLeft + " мин" : "прибыл";
-            }
-
-            if (currentStep >= steps) {
-                clearInterval(moveInterval);
-                document.querySelector('.status-badge').innerText = "ВОДИТЕЛЬ ПРИБЫЛ";
-                document.querySelector('.status-badge').style.background = "#ee9b00";
-                
-                // Финальная отправка данных в бот
-                setTimeout(sendFinalData, 1500); 
-            }
-        }, 100); // Скорость обновления
-    }
-
-    function sendFinalData() {
         const stops = Array.from(document.querySelectorAll('.stop-input')).map(i => i.value).filter(v => v).join(', ');
+        
         tg.sendData(JSON.stringify({
-            city: detectedCity || "Не определен", 
-            from: document.getElementById('from').value, 
-            to: document.getElementById('to').value, 
+            city: detectedCity, 
+            from: f, 
+            to: t, 
             inter: stops || "Нет", 
             car: selectedClass, 
             price: basePrice + manualAdjustment, 
             pay: paymentMethod, 
-            comment: document.getElementById('comment').value,
-            status: "driver_arrived" // Метка для бота
+            comment: document.getElementById('comment').value
         }));
     }
 </script>
