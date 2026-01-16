@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Такси MAX - Liquid Aqua</title>
+    <title>Такси MAX - Test Mode</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -25,6 +25,7 @@
             display: flex; flex-direction: column;
         }
 
+        /* Фон с каплями */
         .aqua-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1; background: linear-gradient(180deg, #001219 0%, #005f73 100%);
@@ -40,14 +41,22 @@
             100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
         }
 
-        .music-switch-container {
-            position: fixed; top: 15px; right: 15px;
-            z-index: 2000; display: flex; align-items: center; gap: 8px;
-            background: var(--glass-bg); padding: 8px 12px;
-            border-radius: 20px; border: 1px solid var(--glass-border);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        .container { 
+            background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border); border-radius: 30px; 
+            padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); margin-top: 20px;
         }
-        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+
+        /* ВЕРХНЯЯ ПАНЕЛЬ: МУЗЫКА СЛЕВА, ГОРОД СПРАВА */
+        .top-info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        
+        .music-control-box {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.05); padding: 5px 10px;
+            border-radius: 15px; border: 1px solid var(--glass-border);
+        }
+        
+        .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
             position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
@@ -55,23 +64,16 @@
             border: 1px solid var(--glass-border);
         }
         .slider:before {
-            position: absolute; content: ""; height: 14px; width: 14px;
-            left: 3px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%;
+            position: absolute; content: ""; height: 12px; width: 12px;
+            left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%;
         }
-        input:checked + .slider { background-color: var(--aqua-bright); border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(148, 210, 189, 0.4); }
-        input:checked + .slider:before { transform: translateX(18px); }
+        input:checked + .slider { background-color: var(--aqua-bright); border-color: var(--neon-blue); }
+        input:checked + .slider:before { transform: translateX(16px); }
         .music-label { font-size: 9px; font-weight: 800; color: var(--neon-blue); text-transform: uppercase; }
 
-        .container { 
-            background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--glass-border); border-radius: 30px; 
-            padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); margin-top: 50px;
-        }
+        #city-status { font-size: 10px; font-weight: 800; color: #94d2bd; cursor: pointer; text-decoration: underline; text-transform: uppercase; text-align: right; }
 
-        .top-info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .version-label { font-size: 10px; color: var(--neon-blue); opacity: 0.6; font-weight: 800; }
-        #city-status { font-size: 10px; font-weight: 800; color: #94d2bd; cursor: pointer; text-decoration: underline; text-transform: uppercase; }
-
+        /* Поля ввода */
         .field-group { margin-bottom: 18px; position: relative; }
         label { font-size: 11px; font-weight: 800; color: var(--neon-blue); text-transform: uppercase; display: block; margin-bottom: 8px; margin-left: 5px; }
         
@@ -97,6 +99,7 @@
         }
         .suggestion-item { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
         
+        /* Классы авто */
         .class-selector { display: flex; gap: 8px; margin-bottom: 20px; }
         .class-btn { 
             flex: 1; padding: 12px 5px; border-radius: 15px; border: 1px solid var(--glass-border);
@@ -105,6 +108,7 @@
         }
         .class-btn.active { background: linear-gradient(135deg, #0a9396, #94d2bd); color: #001219; border: none; }
 
+        /* Цена */
         .price-section { 
             background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
             border-radius: 25px; padding: 20px; margin: 25px 0; border: 1px solid var(--glass-border); text-align: center;
@@ -112,6 +116,7 @@
         .price-display { font-size: 34px; font-weight: 800; color: #ee9b00; margin: 0 15px; }
         .btn-round { width: 50px; height: 50px; border-radius: 15px; background: var(--glass-bg); color: #fff; font-size: 24px; border: 1px solid var(--glass-border); }
 
+        /* Оплата */
         .pay-row { display:flex; gap:10px; margin-bottom: 20px; }
         .pay-btn { flex: 1; padding: 16px; border-radius: 18px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.05); color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .pay-btn.active { background: rgba(148, 210, 189, 0.2); border-color: #94d2bd; }
@@ -125,21 +130,20 @@
 
 <div class="aqua-bg" id="aqua-bg"></div>
 
-<div class="music-switch-container">
-    <span class="music-label">MUSIC</span>
-    <label class="switch">
-        <input type="checkbox" id="music-toggle" onchange="manualMusicControl()">
-        <span class="slider"></span>
-    </label>
-</div>
-
 <audio id="bg-audio" loop preload="auto">
     <source src="Ringtone.mp3" type="audio/mpeg">
 </audio>
 
 <div class="container">
     <div class="top-info-row">
-        <div class="version-label">v 2.2 | AQUA GLASS</div>
+        <div class="music-control-box">
+            <span class="music-label">MUSIC</span>
+            <label class="switch">
+                <input type="checkbox" id="music-toggle" onchange="manualMusicControl()">
+                <span class="slider"></span>
+            </label>
+        </div>
+
         <div id="city-status" onclick="toggleCitySelector()">ГОРОД: ОПРЕДЕЛЕНИЕ...</div>
     </div>
     
@@ -209,29 +213,15 @@
     let paymentMethod = 'Наличные', selectedClass = 'Эконом';
     let searchTimeout, detectedCity = null;
 
-    // --- Keyboard Control Helpers ---
-
-    // 1. Скрытие при клике вне инпутов
+    // --- Keyboard & UI Helpers ---
     function closeAllUI(e) { 
-        if (!e.target.closest('.field-group')) {
-            document.activeElement.blur(); // Убирает клавиатуру
+        if (!e.target.closest('.field-group') && !e.target.closest('.music-control-box')) {
+            document.activeElement.blur(); 
             document.querySelectorAll('.suggestions').forEach(s => s.style.display = 'none'); 
         }
     }
-
-    // 2. Скрытие при нажатии клавиши Enter (Ввод)
-    function checkEnter(event, input) {
-        if (event.key === "Enter") {
-            input.blur();
-        }
-    }
-
-    // 3. Скрытие при пролистывании (скролле)
-    function handleScroll() {
-        if (document.activeElement.tagName === 'INPUT') {
-            document.activeElement.blur();
-        }
-    }
+    function checkEnter(event, input) { if (event.key === "Enter") input.blur(); }
+    function handleScroll() { if (document.activeElement.tagName === 'INPUT') document.activeElement.blur(); }
 
     // --- Init ---
     window.addEventListener('DOMContentLoaded', () => {
@@ -241,7 +231,7 @@
         createDrops();
     });
 
-    // --- Music Logic ---
+    // --- Music ---
     function autoPlayMusic() {
         if (!isPlaying && musicToggle.checked) audio.play().then(() => isPlaying = true).catch(() => {});
     }
@@ -274,7 +264,7 @@
         b.style.display = b.style.display === 'block' ? 'none' : 'block'; 
     }
 
-    // --- DaData & Logic ---
+    // --- DaData Logic ---
     function cleanAddress(full, city) {
         if (!full) return "";
         let clean = full.replace("Россия, ", "");
@@ -376,7 +366,10 @@
         if (!/\d/.test(f) || !/\d/.test(t)) { alert("Укажите номер дома (цифры) в адресах!"); return; }
         const stops = Array.from(document.querySelectorAll('.stop-input')).map(i => i.value).filter(v => v).join(', ');
         
+        // Отправляем данные. Обратите внимание, я добавил поле 'type': 'test_order'
+        // чтобы бот мог понять, что это тестовый заказ.
         tg.sendData(JSON.stringify({
+            type: 'test_order',
             city: detectedCity, 
             from: f, 
             to: t, 
